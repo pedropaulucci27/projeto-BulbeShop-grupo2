@@ -240,25 +240,27 @@ function removerItemDoCarrinho(chave, card) {
   updateTriggerA11y(card, false);
 
   // 3) Persistência: remover do bulbe:cart (se existir)
-  let title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
-  let priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
-  let unit    = 0;
-
-  if (priceEl?.dataset?.preco) {
-    unit = Number(priceEl.dataset.preco);
-  } else {
-    unit = Number(
-      (priceEl?.textContent || "0")
-        .replace(/[^\d,.-]/g, "")
-        .replace(/\./g, "")
-        .replace(",", ".")
-    );
+  // Usa data-cart-id (cards extras) ou reconstrói idGuess (cards hardcoded)
+  let cartItemId = card?.dataset?.cartId || null;
+  if (!cartItemId) {
+    let title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
+    let priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
+    let unit    = 0;
+    if (priceEl?.dataset?.preco) {
+      unit = Number(priceEl.dataset.preco);
+    } else {
+      unit = Number(
+        (priceEl?.textContent || "0")
+          .replace(/[^\d,.-]/g, "")
+          .replace(/\./g, "")
+          .replace(",", ".")
+      );
+    }
+    cartItemId = `${String(title).toLowerCase().replace(/\s+/g, " ").slice(0, 200)}|${Number(unit || 0).toFixed(2)}`;
   }
 
-  const idGuess = `${String(title).toLowerCase().replace(/\s+/g, " ").slice(0, 200)}|${Number(unit || 0).toFixed(2)}`;
-
   const cartArr = loadCart();
-  const idx     = cartArr.findIndex((it) => it.id === idGuess);
+  const idx     = cartArr.findIndex((it) => it.id === cartItemId);
 
   if (idx >= 0) {
     cartArr.splice(idx, 1);
@@ -266,7 +268,7 @@ function removerItemDoCarrinho(chave, card) {
   }
 
   const last = getLastId();
-  if (last && last === idGuess) {
+  if (last && last === cartItemId) {
     setLastId("");
   }
 
@@ -356,6 +358,30 @@ function atualizarResumoSelecionados() {
 
 
 /* ======================================================
+   SALVAR ITENS SELECIONADOS PARA O CHECKOUT
+   ====================================================== */
+function saveSelectedForCheckout() {
+  const items = [];
+  getVisibleCards().forEach(card => {
+    const chave = card.dataset.produto;
+    if (!chave || !selecionados[chave]) return;
+    const titleEl = card.querySelector('.titulo-produto, .title, h3, h2');
+    const priceEl = card.querySelector('.valor-produto, .price, [data-preco]');
+    const qtyEl   = card.querySelector('[data-quantidade], .qtd, .quantidade');
+    const imgEl   = card.querySelector('.imagem-produto img, .img img, img');
+    const title = (titleEl?.textContent || '').trim().replace(/\s+/g, ' ');
+    const price = priceEl?.dataset?.preco
+      ? Number(priceEl.dataset.preco)
+      : Number((priceEl?.textContent || '0').replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.'));
+    const qty = Math.max(1, parseInt(qtyEl?.textContent || '1', 10) || 1);
+    const img = imgEl?.getAttribute('src') || '';
+    const alt = imgEl?.getAttribute('alt') || title;
+    items.push({ title, price, qty, img, alt });
+  });
+  try { localStorage.setItem('bulbe:checkoutItems', JSON.stringify(items)); } catch {}
+}
+
+/* ======================================================
    CARROSSEL E CONTINUAR (fade+redirect)
    ====================================================== */
 const trilha = document.getElementById("trilhaCarrossel");
@@ -371,6 +397,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const resumoCarrinho = document.getElementById("resumoCarrinho");
   if (botaoContinuar && resumoCarrinho) {
     botaoContinuar.addEventListener("click", function () {
+      const algumSelecionado = Object.values(selecionados).some(Boolean);
+      if (!algumSelecionado) {
+        alert("Selecione pelo menos um produto para continuar.");
+        return;
+      }
+      saveSelectedForCheckout();
       resumoCarrinho.classList.add("fade-out");
       setTimeout(() => (window.location.href = "../pagamento1/pagamento.html"), 400);
     });
@@ -566,8 +598,75 @@ function importarDoLocalStorage() {
     } catch { }
   }
 
+  renderExtraCartItems();
   atualizarResumo();
   atualizarResumoSelecionados();
+}
+
+/* ======================================================
+   RENDERIZA ITENS EXTRAS DO CARRINHO (além do "lampada")
+   ====================================================== */
+function renderExtraCartItems() {
+  const cart   = loadCart();
+  const lastId = getLastId();
+  // ID do item já exibido no slot "lampada"
+  const mainId = (lastId && cart.find(it => it.id === lastId)?.id) || cart[0]?.id;
+
+  // Remove cards extras gerados anteriormente para evitar duplicatas
+  document.querySelectorAll('article.cartao-produto[data-produto^="extra-"]').forEach(c => c.remove());
+
+  const extras = cart.filter(it => it.id !== mainId);
+  if (!extras.length) return;
+
+  const lampadaCard = document.querySelector('article.cartao-produto[data-produto="lampada"]');
+  if (!lampadaCard) return;
+
+  extras.forEach(item => {
+    const key = 'extra-' + item.id.replace(/[^a-z0-9]/gi, '-').slice(0, 30);
+
+    // Registra no estado interno
+    if (!produtos[key]) {
+      produtos[key]    = { titulo: item.title, preco: Number(item.price || 0), quantidade: Number(item.qty || 1) };
+      selecionados[key] = false;
+    } else {
+      produtos[key].titulo     = item.title;
+      produtos[key].preco      = Number(item.price || 0);
+      produtos[key].quantidade = Number(item.qty || 1);
+    }
+
+    const qty = Number(item.qty || 1);
+    const img = resolverImgParaCarrinho(item.img || '');
+
+    const card = document.createElement('article');
+    card.className         = 'cartao-produto';
+    card.dataset.produto   = key;
+    card.dataset.cartId    = item.id; // ID real no bulbe:cart para remoção correta
+    card.innerHTML = `
+      <label class="checkbox-produto">
+        <input type="checkbox" class="selecao-individual">
+        <span class="texto-checkbox">Selecionar</span>
+      </label>
+      <div class="imagem-produto">
+        <img src="${img}" alt="${item.alt || item.title || 'Produto'}">
+      </div>
+      <div class="informacoes-produto">
+        <h3 class="titulo-produto">${item.title || 'Produto'}</h3>
+        <div class="preco-produto">
+          <span class="simbolo-reais">R$</span>
+          <span class="valor-produto" data-preco="${Number(item.price || 0).toFixed(2)}">${Number(item.price || 0).toFixed(2).replace('.', ',')}</span>
+        </div>
+        <div class="controle-quantidade">
+          <div class="contador" data-produto="${key}">
+            <button class="botao-quantidade" data-acao="diminuir">–</button>
+            <span class="quantidade-atual" data-quantidade>${qty}</span>
+            <button class="botao-quantidade" data-acao="aumentar">+</button>
+          </div>
+          <div class="texto-unidades">(${qty} unidade${qty > 1 ? 's' : ''})</div>
+        </div>
+      </div>`;
+
+    lampadaCard.insertAdjacentElement('afterend', card);
+  });
 }
 
 /* ======================================================
@@ -671,22 +770,6 @@ function syncSelectionFromCheckboxes() {
   atualizarResumoSelecionados();
 }
 /* ======================================================
-   REMOVE PARA FUSADIERA DO RESUMO INFERIOR — DEFINITIVO
-   ====================================================== */
-
-function removerParafusadeiraResumo() {
-  const itensResumo = document.querySelectorAll(".item-resumo");
-
-  itensResumo.forEach(item => {
-    const titulo = item.querySelector("strong")?.textContent?.toLowerCase() || "";
-
-    if (titulo.includes("parafusadeira") || titulo.includes("ppf120")) {
-      item.remove();
-    }
-  });
-}
-
-/* ======================================================
    INICIALIZAÇÃO (com proteção contra listeners duplicados)
    ====================================================== */
 function init() {
@@ -703,20 +786,12 @@ function init() {
   const selecionarTudo = document.getElementById("selecionarTudo");
   if (selecionarTudo) { selecionarTudo.checked = false; selecionarTudo.indeterminate = false; }
 
-  // Carrinho vazio por padrão (se não houver storage/payload)
-
-
-  // Garante que parafusadeira não apareça indevidamente
-
-  // Carrinho vazio por padrão (se não houver storage/payload)
-  importarDoLocalStorage();
   inicializarCarrinhoVazioSeNecessario();
-  importarDoLocalStorage();
-  // Garante que parafusadeira não apareça indevidamente       
   ensureParafusadeiraNaoAutoCarrega();
+  importarDoLocalStorage();
+  removerParafusadeiraResumo();
   bindCheckboxesSelecao();
   ativarContadores();
-
 
   // Delegação única
   document.addEventListener("click", onClickSelecionar);

@@ -6,244 +6,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Favoritos | Bulbe</title>
     <link rel="stylesheet" href="styleFavoritos.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Libertinus+Mono&family=Libertinus+Sans:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-
 
 <body id="topo">
     <!-- HEADER -->
     <header class="header">
-        <button onclick="window.history.back()" class="back-btn" aria-label="Voltar"><span
-                class="arrow">←</span></button>
-        <a href="#topo" class="logo-link">
+        <button onclick="window.history.back()" class="back-btn" aria-label="Voltar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+        </button>
+        <a href="/altafidelidade/home/paginicial.html" class="logo-link">
             <img src="./imgs/bulbelogo.jpg" alt="Bulbe" class="logo">
         </a>
     </header>
 
-    <!--FAVORITOS-->
+    <!-- TÍTULO FAVORITOS -->
     <div class="fav-header">
         <div class="fav-title">
-            <img src="./imgs/favoritoicon.jpg" alt="Favoritos" class="fav-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#F04438" aria-hidden="true">
+                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" />
+            </svg>
             <h1>Favoritos</h1>
         </div>
-        <img src="./imgs/shareicon.jpg" alt="Compartilhar" class="fav-icon">
+        <button class="share-btn" aria-label="Compartilhar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+        </button>
     </div>
-    <!--PRODUTO1-->
-    <div class="produto-conteudo">
-        <div class="containerimg">
-            <img src="./imgs/ventiladorft.jpg" alt="ventilador" class="produto-img">
-        </div>
 
-        <div class="produto-info">
-            <p class="produto-nome">
-                Ventilador de Mesa 40cm Mondial Turbo VT40NB com 8 Pás, 3 Velocidades - Preto e Prata - 110V
-            </p>
-            <p class="produto-antigo">
-                De <span class="risco">R$ 189,90</span> por
-            </p>
+    <!-- Lista dinâmica de favoritos (preenchida pelo scriptFavoritos.js) -->
+    <div id="lista-favoritos" class="lista-favoritos"></div>
 
-            <div class="produto-preco">
-                <div class="valor">
-                    <span class="simbolo">R$</span>
-                    <span class="preco">179,59</span>
-                </div>
+    <!-- ADICIONAR MAIS ITENS -->
+    <section class="mais-itens">
+        <h2 class="mais-itens__titulo">Adicionar mais itens</h2>
+
+        <div class="oferta-bloco">
+            <div class="oferta-topo">
+                <span class="badge-oferta">Oferta relâmpago</span>
             </div>
-
-            <p class="produto-unidades">(90 unidades)</p>
-        </div>
-    </div>
-    <div class="produto-desconto">
-        <span>Na Bulbe Sai:</span>
-        <span>R$ 200,00</span>
-        <img src="./imgs/bulbee.jpg" alt="Ícone compartilhar" class="icone-desconto">
-    </div>
-    <!--PRODUTO 2-->
-    <div class="produto-conteudo">
-        <div class="containerimg">
-            <img src="./imgs/parafusa.jpg" alt="Parafusadeira" class="produto-img">
-        </div>
-        <div class="produto-info">
-            <p class="produto-nome">
-                Parafusadeira Philco Force PPF120 3 em 1 1500RPM
-            </p>
-            <div class="produto-preco">
-                <div class="valor">
-                    <span class="simbolo">R$</span>
-                    <span class="preco">199,90</span>
-                </div>
-            </div>
-            <p class="produto-unidades">(30 unidade)</p>
-        </div>
-    </div>
-
-
-    <!--ADD MAIS ITENS-->
-    <div class="additem">
-        <h2>Adicionar mais itens</h2>
-    <div class="oferta-relampago">
-        <div class="oferta-topo">
-            <span class="badge">Oferta relâmpago</span>
-        </div>
-
-        <div class="oferta-container">
-            <div class="produtos">
+            <div class="oferta-cards">
                 <!-- Produto 1 -->
-                <div class="card">
-                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="produto-img">
-                    <p class="produto-nome">Caixa de Ferramentas Philco...</p>
-                    <div class="precos">
-                        <span class="preco-atual">R$59,90</span>
-                        <span class="preco-antigo">R$119,90</span>
+                <div class="mini-card">
+                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="mini-card__img">
+                    <p class="mini-card__nome">Caixa de Ferramentas Philco...</p>
+                    <div class="mini-card__precos">
+                        <span class="mini-card__atual">R$59,90</span>
+                        <span class="mini-card__antigo">R$119,90</span>
                     </div>
-                    <div class="icones">
-                        <div class="actions">
-                            <button class="icon-btn heart" aria-label="Favoritar">
-                                <!-- coração (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path
-                                        d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
-                                        fill="none" stroke="currentColor" stroke-width="1.7" />
-                                </svg>
-                            </button>
-
-                            <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                                <!-- carrinho (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
-                                        stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="9" cy="20" r="1.6" fill="currentColor" />
-                                    <circle cx="17" cy="20" r="1.6" fill="currentColor" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="mini-card__acoes">
+                        <button class="icon-btn heart" aria-label="Favoritar">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
+                                    fill="none" stroke="currentColor" stroke-width="1.7" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
+                                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="20" r="1.6" fill="currentColor" />
+                                <circle cx="17" cy="20" r="1.6" fill="currentColor" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Produto 2 -->
-                <div class="card">
-                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="produto-img">
-                    <p class="produto-nome">Caixa de Ferramentas Philco...</p>
-                    <div class="precos">
-                        <span class="preco-atual">R$179,30</span>
+                <div class="mini-card">
+                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="mini-card__img">
+                    <p class="mini-card__nome">Caixa de Ferramentas Philco...</p>
+                    <div class="mini-card__precos">
+                        <span class="mini-card__atual">R$179,30</span>
                     </div>
-                    <div class="icones">
-                        <div class="actions">
-                            <button class="icon-btn heart" aria-label="Favoritar">
-                                <!-- coração (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path
-                                        d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
-                                        fill="none" stroke="currentColor" stroke-width="1.7" />
-                                </svg>
-                            </button>
-
-                            <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                                <!-- carrinho (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
-                                        stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="9" cy="20" r="1.6" fill="currentColor" />
-                                    <circle cx="17" cy="20" r="1.6" fill="currentColor" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="mini-card__acoes">
+                        <button class="icon-btn heart" aria-label="Favoritar">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
+                                    fill="none" stroke="currentColor" stroke-width="1.7" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
+                                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="20" r="1.6" fill="currentColor" />
+                                <circle cx="17" cy="20" r="1.6" fill="currentColor" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div
-    <div class="additem">
-    <div class="oferta-relampago">
-        <div class="oferta-topo">
-            <span class="badge">Oferta relâmpago</span>
-        </div>
 
-        <div class="oferta-container">
-            <div class="produtos">
-                <!-- Produto 1 -->
-                <div class="card">
-                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="produto-img">
-                    <p class="produto-nome">Caixa de Ferramentas Philco...</p>
-                    <div class="precos">
-                        <span class="preco-atual">R$59,90</span>
-                        <span class="preco-antigo">R$119,90</span>
+        <div class="oferta-bloco">
+            <div class="oferta-topo">
+                <span class="badge-oferta">Oferta relâmpago</span>
+            </div>
+            <div class="oferta-cards">
+                <!-- Produto 3 -->
+                <div class="mini-card">
+                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="mini-card__img">
+                    <p class="mini-card__nome">Caixa de Ferramentas Philco...</p>
+                    <div class="mini-card__precos">
+                        <span class="mini-card__atual">R$59,90</span>
+                        <span class="mini-card__antigo">R$119,90</span>
                     </div>
-                    <div class="icones">
-                        <div class="actions">
-                            <button class="icon-btn heart" aria-label="Favoritar">
-                                <!-- coração (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path
-                                        d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
-                                        fill="none" stroke="currentColor" stroke-width="1.7" />
-                                </svg>
-                            </button>
-
-                            <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                                <!-- carrinho (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
-                                        stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="9" cy="20" r="1.6" fill="currentColor" />
-                                    <circle cx="17" cy="20" r="1.6" fill="currentColor" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="mini-card__acoes">
+                        <button class="icon-btn heart" aria-label="Favoritar">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
+                                    fill="none" stroke="currentColor" stroke-width="1.7" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
+                                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="20" r="1.6" fill="currentColor" />
+                                <circle cx="17" cy="20" r="1.6" fill="currentColor" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Produto 2 -->
-                <div class="card">
-                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="produto-img">
-                    <p class="produto-nome">Caixa de Ferramentas Philco...</p>
-                    <div class="precos">
-                        <span class="preco-atual">R$179,30</span>
+                <!-- Produto 4 -->
+                <div class="mini-card">
+                    <img src="/altafidelidade/produto/img/image 3.png" alt="Caixa de Ferramentas" class="mini-card__img">
+                    <p class="mini-card__nome">Caixa de Ferramentas Philco...</p>
+                    <div class="mini-card__precos">
+                        <span class="mini-card__atual">R$179,30</span>
                     </div>
-                    <div class="icones">
-                        <div class="actions">
-                            <button class="icon-btn heart" aria-label="Favoritar">
-                                <!-- coração (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path
-                                        d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
-                                        fill="none" stroke="currentColor" stroke-width="1.7" />
-                                </svg>
-                            </button>
-
-                            <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                                <!-- carrinho (stroke) -->
-                                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                                    <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
-                                        stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="9" cy="20" r="1.6" fill="currentColor" />
-                                    <circle cx="17" cy="20" r="1.6" fill="currentColor" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="mini-card__acoes">
+                        <button class="icon-btn heart" aria-label="Favoritar">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
+                                    fill="none" stroke="currentColor" stroke-width="1.7" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
+                                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="20" r="1.6" fill="currentColor" />
+                                <circle cx="17" cy="20" r="1.6" fill="currentColor" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <a href="/altafidelidade/home/paginicial.html"><img src="./imgs/bulbelogo.jpg" alt="Bulbe" class="footer-logo"></a>
+            <p class="footer-text">sua próxima energia</p>
+        </div>
+    </footer>
 
-            <!-- FOOTER -->
-            <footer class="footer">
-                <div class="footer-content">
-                    <img src="./imgs/bulbelogo.jpg" alt="Bulbe" class="footer-logo">
-                    <p class="footer-text">sua próxima energia</p>
-                </div>
-            </footer>
-
+    <script src="./scriptFavoritos.js"></script>
 </body>
 
 </html>

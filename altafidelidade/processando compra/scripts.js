@@ -3,7 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.querySelector(".appbar__back");
   backBtn?.addEventListener("click", (ev) => {
     ev.preventDefault();
-    window.location.href = "/altafidelidade/pagamento3/pagamento3.html";
+    const method = (localStorage.getItem('payMethod') || '').toLowerCase();
+    if (method.includes('débito') || method.includes('debito')) {
+      window.location.href = '/altafidelidade/cartao de debito/index.html';
+    } else if (method.includes('pix')) {
+      window.location.href = '/altafidelidade/pix/pix.html';
+    } else if (method.includes('boleto')) {
+      window.location.href = '/altafidelidade/boleto/boleto.html';
+    } else {
+      window.location.href = '/altafidelidade/pagamento3/pagamento3.html';
+    }
   });
 
   // (opcional) Fechar o toast se existir um botão de fechar com data-close

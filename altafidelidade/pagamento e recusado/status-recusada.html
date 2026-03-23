@@ -15,7 +15,7 @@
     <button class="appbar__back" aria-label="Voltar" id="btnBack">
       <img src="../pagamento e recusado/.assets/img/corner-up-left.svg" alt="">
     </button>
-    <img class="appbar__logo" id="btnLogo" src="../pagamento e recusado/.assets/img/logo-base (1).svg" alt="Bulbe">
+    <a href="/altafidelidade/home/paginicial.html"><img class="appbar__logo" id="btnLogo" src="../pagamento e recusado/.assets/img/logo-base (1).svg" alt="Bulbe"></a>
   </header>
 
   <main class="wrap">
@@ -26,19 +26,18 @@
     </figure>
 
     <!-- Banner de status -->
-    <button class="status-banner status-banner--ok" type="button" disabled>
+    <button class="status-banner status-banner--err" type="button" disabled>
       Compra Recusada!
     </button>
 
     <!-- Caixa Dados do pedido -->
-    <section class="info-card info-card--ok">
+    <section class="info-card info-card--err">
       <header class="info-card__head">
         <img src="../pagamento e recusado/.assets/img/alert-circle.svg" alt="" class="info-card__ico">
-        <span class="info-card__title">Nao foi possivel finalizar</span>
+        <span class="info-card__title">Não foi possível finalizar</span>
       </header>
       <p class="info-card__text" id="orderInfo">
-        Número do pedido: —<br>
-        Código de rastreio: (será atualizado em breve)
+        Verifique os dados do seu cartão ou escolha outro método de pagamento.
       </p>
     </section>
 

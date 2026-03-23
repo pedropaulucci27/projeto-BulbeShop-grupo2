@@ -108,34 +108,72 @@ function showToast(msg) {
    Likes (favoritos)
    ========================================================= */
 const LS_KEY_LIKES = "bulbe_likes_v1";
+const LS_KEY_FAVS  = "bulbe:favorites";
 
 function getLikes() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(LS_KEY_LIKES)) || []);
-  } catch {
-    return new Set();
-  }
+  try { return new Set(JSON.parse(localStorage.getItem(LS_KEY_LIKES)) || []); }
+  catch { return new Set(); }
 }
 function setLikes(set) {
   localStorage.setItem(LS_KEY_LIKES, JSON.stringify(Array.from(set)));
 }
-function isLiked(id) {
-  return getLikes().has(id);
+function getFavs() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_FAVS)) || []; }
+  catch { return []; }
 }
+function saveFavs(arr) {
+  localStorage.setItem(LS_KEY_FAVS, JSON.stringify(arr));
+}
+
+function getProductDataForBtn(btn) {
+  // Tenta ler dados do tile pai (prateleira)
+  const tile = btn.closest('.tile');
+  if (tile) {
+    return {
+      id:       btn.dataset.likeId || btn.id,
+      title:    tile.querySelector('.title')?.textContent?.trim() || 'Produto',
+      price:    tile.querySelector('.price')?.textContent?.trim() || '',
+      priceOld: tile.querySelector('.price-old')?.textContent?.trim() || '',
+      img:      tile.querySelector('img')?.getAttribute('src') || '',
+    };
+  }
+  // Produto principal da página
+  return {
+    id:       btn.dataset.likeId || btn.id,
+    title:    document.querySelector('.product-title')?.textContent?.trim() || 'Produto',
+    price:    document.querySelector('.price-current')?.textContent?.trim() || '',
+    priceOld: document.querySelector('.price-old')?.textContent?.trim() || '',
+    img:      document.querySelector('#gallery-img')?.getAttribute('src') || '',
+  };
+}
+
+function isLiked(id) { return getLikes().has(id); }
+
 function paintHeart(btn, liked) {
   btn.src = liked ? IMG_HEART_FILLED : IMG_HEART_OUTLINE;
 }
+
 function toggleLike(btn) {
-  const id = btn.dataset.likeId || btn.id;
+  const id  = btn.dataset.likeId || btn.id;
   const set = getLikes();
   const liked = !set.has(id);
   if (liked) set.add(id);
   else set.delete(id);
-
   setLikes(set);
+
+  // Atualiza lista de favoritos completos
+  const favs = getFavs();
+  if (liked) {
+    if (!favs.find(f => f.id === id)) favs.push(getProductDataForBtn(btn));
+    saveFavs(favs);
+  } else {
+    saveFavs(favs.filter(f => f.id !== id));
+  }
+
   paintHeart(btn, liked);
-  showToast(liked ? "Adicionado aos Curtidos" : "Removido dos Curtidos");
+  showToast(liked ? "Adicionado aos Favoritos ❤️" : "Removido dos Favoritos");
 }
+
 function initLikes() {
   const all = document.querySelectorAll(".btn-fav");
   all.forEach((btn) => {

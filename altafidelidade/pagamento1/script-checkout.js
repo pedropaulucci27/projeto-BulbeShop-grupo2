@@ -1,4 +1,48 @@
+/* ======================================================
+   Renderiza itens selecionados do carrinho na tela de checkout
+   ====================================================== */
+function renderCheckoutItems() {
+  const cartSection = document.querySelector('.cart');
+  if (!cartSection) return;
+
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('bulbe:checkoutItems')) || []; } catch {}
+
+  if (!items.length) return; // mantém os itens hardcoded se não houver seleção
+
+  cartSection.innerHTML = '';
+
+  let total = 0;
+  items.forEach(item => {
+    total += (item.price || 0) * (item.qty || 1);
+    const art = document.createElement('article');
+    art.className = 'cart-card';
+    art.innerHTML = `
+      <img class="cart-card__thumb" src="${item.img || ''}" alt="${item.title || 'Produto'}"
+           onerror="this.style.display='none'">
+      <div class="cart-card__body">
+        <h4 class="cart-card__title">${item.title || 'Produto'}</h4>
+        <div class="cart-card__price-row">
+          <div class="price">
+            <span class="price__curr">R$</span>
+            <span class="price__big">${(item.price || 0).toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="units">(${item.qty || 1} unidade${(item.qty || 1) > 1 ? 's' : ''})</div>
+        </div>
+      </div>`;
+    cartSection.appendChild(art);
+  });
+
+  // Atualiza totais na revisão do pedido
+  const totalFormatado = `R$ ${total.toFixed(2).replace('.', ',')}`;
+  const elTotal = document.querySelector('.review-row .value');
+  const elPedido = document.querySelector('.review-total strong');
+  if (elTotal) elTotal.textContent = totalFormatado;
+  if (elPedido) elPedido.textContent = totalFormatado;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  renderCheckoutItems();
   const box    = document.getElementById('paySelect');
   if (!box) return;
 

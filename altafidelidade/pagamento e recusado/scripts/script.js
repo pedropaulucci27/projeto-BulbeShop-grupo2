@@ -1,12 +1,11 @@
 // ——— navegação do header
 document.getElementById('btnBack')?.addEventListener('click', () => {
-  // volta para a tela de pagamento 3 mantendo os dados
-  window.location.href = '/altafidelidade/pagamento3/pagamento3.html';
+  window.history.back();
 });
 
 document.getElementById('btnLogo')?.addEventListener('click', () => {
   // leve o usuário para sua “home”
-  window.location.href = '/altafidelidade/home/index.html';
+  window.location.href = '/altafidelidade/home/paginicial.html';
 });
 
 // ——— carrega dados do pedido / cartão (salvos na etapa de pagamento)
@@ -30,8 +29,7 @@ document.getElementById('btnLogo')?.addEventListener('click', () => {
 
 // ——— botões da página
 document.getElementById('btnResumo')?.addEventListener('click', () => {
-  // ajuste a rota do seu resumo se já existir
-  alert('Abrir resumo de compra (defina a rota do seu resumo aqui).');
+  window.location.href = '/altafidelidade/pagamento1/pagamento.html';
 });
 
 document.getElementById('btnInicio')?.addEventListener('click', () => {

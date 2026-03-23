@@ -88,13 +88,60 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-//icones que preenchem
-// Toggle dos ícones (preencher com a cor ao clicar)
-
+// === ÍCONES (coração / carrinho) ===
 document.querySelectorAll('.icon-btn').forEach(btn => {
     btn.addEventListener('click', (event) => {
-        event.stopPropagation(); // impede que o clique afete o card
+        event.stopPropagation();
         btn.classList.toggle('active');
+
+        const card = btn.closest('.card, [data-produto], .produto') || null;
+        if (!card) return;
+
+        const imgEl   = card.querySelector('img');
+        const titleEl = card.querySelector('.title, h3, h2');
+        const priceEl = card.querySelector('.price-now, .price, [data-preco]');
+
+        const parsePrecoBR = (txt) => {
+            if (!txt) return 0;
+            return parseFloat(String(txt).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+        };
+
+        const title = (titleEl?.textContent || '').trim() || 'Produto';
+        const price = priceEl?.dataset?.preco
+            ? parseFloat(priceEl.dataset.preco)
+            : parsePrecoBR(priceEl?.textContent || '0');
+        const img = imgEl?.src || '';
+        const alt = imgEl?.alt || title;
+
+        // === FAVORITAR ===
+        if (btn.classList.contains('heart')) {
+            const id = `loja-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
+            let favs = [];
+            try { favs = JSON.parse(localStorage.getItem('bulbe:favorites')) || []; } catch {}
+            const jaFav = favs.find(f => f.id === id);
+            if (jaFav) {
+                favs = favs.filter(f => f.id !== id);
+                btn.classList.remove('active');
+            } else {
+                favs.push({ id, title, price: `R$ ${price.toFixed(2).replace('.', ',')}`, priceOld: '', img });
+                btn.classList.add('active');
+            }
+            try { localStorage.setItem('bulbe:favorites', JSON.stringify(favs)); } catch {}
+            return;
+        }
+
+        // === ADICIONAR AO CARRINHO ===
+        if (btn.classList.contains('cart')) {
+            const id = `${title.toLowerCase()}|${price.toFixed(2)}`;
+            let carrinho = [];
+            try { carrinho = JSON.parse(localStorage.getItem('bulbe:cart')) || []; } catch {}
+            const existente = carrinho.find(p => p.id === id);
+            if (existente) existente.qty++;
+            else carrinho.push({ id, title, price, img, alt, qty: 1 });
+            localStorage.setItem('bulbe:cart', JSON.stringify(carrinho));
+            localStorage.setItem('bulbe:lastAddedId', id);
+            window.location.href = '/altafidelidade/carrinhos/carrinho.html';
+        }
     });
 });
 

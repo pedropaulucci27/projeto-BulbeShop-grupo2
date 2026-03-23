@@ -43,11 +43,7 @@ function validate(){
 function markInvalid(el){ el.classList.add('is-invalid'); }
 function clearInvalid(el){ el.classList.remove('is-invalid'); }
 
-// Ação do botão
-btn.addEventListener('click', () => {
-  if(btn.disabled) return;
-  alert('Pagamento por débito confirmado ✅');
-});
+// Ação do botão — redirect tratado pelo IIFE debito.js abaixo
 
 // valida no load
 validate();

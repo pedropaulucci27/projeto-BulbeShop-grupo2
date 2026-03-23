@@ -128,6 +128,42 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
   btn.addEventListener("click", (event) => {
     btn.classList.toggle("active");
 
+    // === FAVORITAR ===
+    if (btn.classList.contains("heart")) {
+      const card = btn.closest(".card, [data-produto], .produto") || null;
+      if (!card) return;
+
+      const imgEl   = card.querySelector("img");
+      const titleEl = card.querySelector(".title, h3, h2");
+      const priceEl = card.querySelector(".price-now, .price, [data-preco]");
+
+      const parsePrecoBR = (txt) => {
+        if (!txt) return 0;
+        return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
+      };
+
+      const title = titleEl?.textContent.trim() || "Produto";
+      const price = priceEl?.dataset?.preco
+        ? `R$ ${parseFloat(priceEl.dataset.preco).toFixed(2).replace('.', ',')}`
+        : (priceEl?.textContent.trim() || '');
+      const img = imgEl?.src || "";
+      const id  = `home-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
+
+      let favs = [];
+      try { favs = JSON.parse(localStorage.getItem("bulbe:favorites")) || []; } catch {}
+
+      const jaFavoritado = favs.find(f => f.id === id);
+      if (jaFavoritado) {
+        favs = favs.filter(f => f.id !== id);
+        btn.classList.remove("active");
+      } else {
+        favs.push({ id, title, price, priceOld: '', img });
+        btn.classList.add("active");
+      }
+      try { localStorage.setItem("bulbe:favorites", JSON.stringify(favs)); } catch {}
+      return;
+    }
+
     // === ADICIONAR AO CARRINHO ===
     if (btn.classList.contains("cart")) {
       const card =

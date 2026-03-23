@@ -93,7 +93,6 @@
   fretes.forEach(chk => {
     chk.addEventListener('change', () => {
       if (chk.checked) fretes.forEach(o => { if (o !== chk) o.checked = false; });
-      refreshCTA();
     });
   });
 
@@ -147,34 +146,14 @@
     return data;
   }
 
-  // ⚠️ Nesta etapa, só exigimos País + Frete
-  function isValid(data) {
-    return Boolean(data.pais && data.frete);
-  }
-
-  function refreshCTA() {
-    if (!btn) return;
-    btn.disabled = !isValid(collect());
-  }
-
-  // Inputs de texto
-  Array.from(document.querySelectorAll('input')).forEach(el => {
-    el.addEventListener('input', refreshCTA, {passive:true});
-    el.addEventListener('change', refreshCTA, {passive:true});
-  });
-
   wirePais();
   wireInline(selEstado);
   wireInline(selCidade);
-  refreshCTA();
 
   // ---------- Salvar + redirecionar ----------
   btn?.addEventListener('click', () => {
+    if (btn.disabled) return;
     const data = collect();
-    if (!isValid(data)) {
-      alert('Selecione o País e um método de Frete para continuar.');
-      return;
-    }
     localStorage.setItem('checkoutCustomer', JSON.stringify(data));
 
     const method = (localStorage.getItem('payMethod') || '').toLowerCase();
