@@ -1,0 +1,66 @@
+[
+  {
+    "id": "ventilador-britania",
+    "type": "product",
+    "badge": "flash",
+    "img": "./img/ventiladorbritania.webp",
+    "alt": "Ventilador de mesa Britânia",
+    "title": "Ventilador de mesa Britânia",
+    "price": 279.00,
+    "priceOld": 349.00,
+    "promo": { "type": "pill-green", "text": "20% off" },
+    "footnote": "Oferta válida até 20 de outubro.",
+    "link": "/altafidelidade/produto/produto.html"
+  },
+  {
+    "id": "liquidificador-mondial",
+    "type": "product",
+    "badge": "cash",
+    "img": "./img/blender.jpg",
+    "alt": "Liquidificador Mondial 1000W",
+    "title": "Liquidificador Mondial 1000W",
+    "price": 183.00,
+    "priceOld": null,
+    "promo": { "type": "ship", "text": "frete grátis" },
+    "footnote": null,
+    "link": "/altafidelidade/produto/produto.html"
+  },
+  {
+    "id": "garrafa-tupperware",
+    "type": "product",
+    "badge": "cash",
+    "img": "./img/tupperware.jpg",
+    "alt": "Garrafa de água Tupperware",
+    "title": "Garrafa de água Tuppaware",
+    "price": 53.00,
+    "priceOld": null,
+    "promo": { "type": "ship", "text": "frete grátis" },
+    "footnote": null,
+    "link": "/altafidelidade/produto/produto.html"
+  },
+  {
+    "id": "livro-energia",
+    "type": "product",
+    "badge": null,
+    "img": "./img/livro.jpg",
+    "alt": "Energia: Fique por dentro",
+    "title": "Energia: Fique por dentro",
+    "price": 49.00,
+    "priceOld": null,
+    "promo": null,
+    "footnote": null,
+    "link": "/altafidelidade/produto/produto.html"
+  },
+  {
+    "id": "banner-indique",
+    "type": "banner",
+    "img": "./img/indiquecard.png",
+    "alt": "Indique um amigo"
+  },
+  {
+    "id": "banner-pontos",
+    "type": "banner",
+    "img": "./img/acumulepontos.png",
+    "alt": "Acumule pontos"
+  }
+]

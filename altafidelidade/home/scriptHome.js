@@ -121,11 +121,85 @@ openBtn?.addEventListener("click", openModal);
 toClose.forEach((el) => el.addEventListener("click", closeModal));
 
 /* =========================================================
+   CATÁLOGO — renderiza cards a partir de produtos.json
+   ========================================================= */
+const SVG_HEART = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
+const SVG_CART  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
+
+function formatPriceBR(n) {
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function buildCard(p) {
+  if (p.type === "banner") {
+    return `<article class="card card-banner"><img src="${p.img}" alt="${p.alt}"></article>`;
+  }
+
+  const badge = p.badge
+    ? `<span class="badge badge-${p.badge === "flash" ? "flash" : "cash"}">${p.badge === "flash" ? "oferta relâmpago" : "com cashback"}</span>`
+    : "";
+
+  const priceWas = p.priceOld
+    ? `<div class="price-was">R$${formatPriceBR(p.priceOld)}</div>`
+    : "";
+
+  let promoHTML = "";
+  if (p.promo) {
+    if (p.promo.type === "pill-green") {
+      promoHTML = `<span class="pill pill-green">${p.promo.text}</span>`;
+    } else if (p.promo.type === "ship") {
+      promoHTML = `<span class="ship-pill"><span>${p.promo.text}</span></span>`;
+    }
+    if (p.footnote) promoHTML += `<small class="footnote">${p.footnote}</small>`;
+    promoHTML = `<div class="promo-row">${promoHTML}</div>`;
+  }
+
+  return `
+    <article class="card">
+      <div class="card-body">
+        ${badge}
+        <div class="media">
+          <a href="${p.link}"><img src="${p.img}" alt="${p.alt}"></a>
+        </div>
+        <div class="info">
+          <a href="${p.link}"><h3 class="title">${p.title}</h3></a>
+          <div class="pricebox">
+            <div class="price-now" data-preco="${p.price}">R$${formatPriceBR(p.price)}</div>
+            ${priceWas}
+          </div>
+          ${promoHTML}
+        </div>
+        <div class="actions">
+          <button class="icon-btn heart" aria-label="Favoritar">${SVG_HEART}</button>
+          <button class="icon-btn cart" aria-label="Adicionar ao carrinho">${SVG_CART}</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+async function renderProdutos() {
+  const grid = document.querySelector(".grid");
+  if (!grid) return;
+
+  try {
+    const res  = await fetch("./produtos.json");
+    const data = await res.json();
+    grid.innerHTML = data.map(buildCard).join("");
+  } catch (err) {
+    console.error("Erro ao carregar produtos.json:", err);
+  }
+}
+
+renderProdutos();
+
+/* =========================================================
    ÍCONES (favoritos + adicionar ao carrinho)
+   — usa event delegation para funcionar com cards dinâmicos
    ========================================================= */
 
-document.querySelectorAll(".icon-btn").forEach((btn) => {
-  btn.addEventListener("click", (event) => {
+document.addEventListener("click", (event) => {
+  const btn = event.target.closest(".icon-btn");
+  if (!btn) return;
 
     // === FAVORITAR ===
     if (btn.classList.contains("heart")) {
@@ -203,8 +277,7 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
       setTimeout(() => btn.classList.remove("active"), 1000);
     }
 
-    event.stopPropagation();
-  });
+  event.stopPropagation();
 });
 
 /* =========================================================
