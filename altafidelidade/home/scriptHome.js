@@ -126,10 +126,10 @@ toClose.forEach((el) => el.addEventListener("click", closeModal));
 
 document.querySelectorAll(".icon-btn").forEach((btn) => {
   btn.addEventListener("click", (event) => {
-    btn.classList.toggle("active");
 
     // === FAVORITAR ===
     if (btn.classList.contains("heart")) {
+      btn.classList.toggle("active");
       const card = btn.closest(".card, [data-produto], .produto") || null;
       if (!card) return;
 
@@ -198,7 +198,9 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
       localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
       localStorage.setItem("bulbe:lastAddedId", id);
 
-      window.location.href = "/altafidelidade/carrinhos/carrinho.html";
+      // Feedback visual breve — sem redirecionar
+      btn.classList.add("active");
+      setTimeout(() => btn.classList.remove("active"), 1000);
     }
 
     event.stopPropagation();

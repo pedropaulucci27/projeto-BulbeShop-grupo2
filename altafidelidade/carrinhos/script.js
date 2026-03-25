@@ -326,33 +326,55 @@ function atualizarResumo() {
    ====================================================== */
 function atualizarResumoSelecionados() {
   const resumo = document.getElementById("resumoCarrinho");
+  if (!resumo) return;
+
   const tituloResumo = document.getElementById("tituloResumo");
   const imagemResumo = resumo.querySelector(".item-resumo img");
-  const precoResumo = document.getElementById("totalResumo");
+  const totalEl = document.getElementById("totalResumo");
 
-  // Sempre pega o item do localStorage
-  const cart = loadCart();
-  const lastId = getLastId();
-  const item = (lastId && cart.find(it => it.id === lastId)) || cart[0];
-
-  if (!item) {
-    // Se não tiver nada no storage → esconde
-    tituloResumo.textContent = "";
-    imagemResumo.src = "";
-    precoResumo.textContent = "R$0,00";
-    mostrarItensResumo(false);
+  // Só exibe o resumo se houver pelo menos 1 produto selecionado
+  const algumSelecionado = Object.values(selecionados).some(Boolean);
+  if (!algumSelecionado) {
+    resumo.style.display = "none";
     return;
   }
 
-  // MOSTRA O ITEM NO MINI-RESUMO MESMO SEM SELECIONAR
-  tituloResumo.textContent = item.title;
-  imagemResumo.src = resolverImgParaCarrinho(item.img);
-  imagemResumo.alt = item.title;
+  resumo.style.display = "block";
 
-  const subtotal = Number(item.price) * Number(item.qty);
-  precoResumo.textContent = moedaBR(subtotal);
+  // Calcula total e captura primeiro item selecionado para exibição
+  let total = 0;
+  let firstItem = null;
 
-  // Exibe os itens do resumo
+  getVisibleCards().forEach(card => {
+    const chave = card.dataset.produto;
+    if (!chave || !selecionados[chave]) return;
+
+    const priceEl = card.querySelector('.valor-produto, [data-preco]');
+    const qtyEl   = card.querySelector('[data-quantidade], .quantidade-atual');
+
+    const price = priceEl?.dataset?.preco
+      ? Number(priceEl.dataset.preco)
+      : (produtos[chave]?.preco || 0);
+    const qty = parseInt(qtyEl?.textContent || '1', 10) || 1;
+
+    total += price * qty;
+
+    if (!firstItem) {
+      const titleEl = card.querySelector('.titulo-produto, h3');
+      const imgEl   = card.querySelector('.imagem-produto img, img');
+      firstItem = {
+        title: (titleEl?.textContent || '').trim().replace(/\s+/g, ' '),
+        img:   imgEl?.src || ''
+      };
+    }
+  });
+
+  if (firstItem) {
+    if (tituloResumo) tituloResumo.textContent = firstItem.title;
+    if (imagemResumo) { imagemResumo.src = firstItem.img; imagemResumo.alt = firstItem.title; }
+  }
+
+  if (totalEl) totalEl.textContent = moedaBR(total);
   mostrarItensResumo(true);
 }
 
@@ -777,7 +799,6 @@ function init() {
   window.__bulbeCartInit = true;
 
   injectSelecionarStyles();
-  enhanceSelecionarUI();
 
   // Estado inicial: SEM selecionados
   document.querySelectorAll(".selecao-individual").forEach((cb) => (cb.checked = false));
@@ -788,7 +809,8 @@ function init() {
 
   inicializarCarrinhoVazioSeNecessario();
   ensureParafusadeiraNaoAutoCarrega();
-  importarDoLocalStorage();
+  importarDoLocalStorage(); // renderExtraCartItems() é chamado aqui dentro
+  enhanceSelecionarUI();    // roda DEPOIS de criar os cards extras, garantindo uniformidade
   removerParafusadeiraResumo();
   bindCheckboxesSelecao();
   ativarContadores();
