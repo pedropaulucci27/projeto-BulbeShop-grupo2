@@ -238,28 +238,28 @@ async function carregarProduto() {
     _produtoAtual = p;
 
     const titleEl = document.querySelector(".product-title");
-    if (titleEl) titleEl.textContent = p.nome;
+    if (titleEl) titleEl.textContent = p.title;
 
     const priceEl = document.querySelector(".price-current");
-    if (priceEl) priceEl.textContent = `R$ ${formatPriceBR(p.preco)}`;
+    if (priceEl) priceEl.textContent = `R$ ${formatPriceBR(p.price)}`;
 
     const priceOldEl = document.querySelector(".price-old");
-    if (priceOldEl && p.preco_original) priceOldEl.textContent = `R$ ${formatPriceBR(p.preco_original)}`;
+    if (priceOldEl) priceOldEl.style.display = "none";
 
     const imgEl = document.getElementById("gallery-img");
-    if (imgEl && p.imagem_url) {
-      imgEl.src = p.imagem_url;
-      imgEl.alt = p.nome;
+    if (imgEl && p.image) {
+      imgEl.src = p.image;
+      imgEl.alt = p.title;
     }
 
     const breadcrumb = document.querySelector(".breadcrumbs");
-    if (breadcrumb) breadcrumb.innerHTML = `Você está em: <a href="/altafidelidade/home/paginicial.html">produtos</a> › ${p.nome}`;
+    if (breadcrumb) breadcrumb.innerHTML = `Você está em: <a href="/altafidelidade/home/paginicial.html">produtos</a> › ${p.title}`;
 
     const stockEl = document.querySelector(".stock");
-    if (stockEl) stockEl.textContent = p.estoque > 0 ? "Em estoque" : "Produto indisponível";
+    if (stockEl) stockEl.textContent = p.stock > 0 ? "Em estoque" : "Produto indisponível";
 
     const btnAdd = document.getElementById("btn-add");
-    if (btnAdd && p.estoque <= 0) {
+    if (btnAdd && p.stock <= 0) {
       btnAdd.disabled = true;
       btnAdd.textContent = "Indisponível";
     }
@@ -280,10 +280,10 @@ document.getElementById("btn-add")?.addEventListener("click", () => {
 
   if (_produtoAtual) {
     id    = String(_produtoAtual.id);
-    title = _produtoAtual.nome;
-    price = parseFloat(_produtoAtual.preco);
-    img   = _produtoAtual.imagem_url || "./img/image 1.png";
-    alt   = _produtoAtual.nome;
+    title = _produtoAtual.title;
+    price = parseFloat(_produtoAtual.price);
+    img   = _produtoAtual.image || "./img/image 1.png";
+    alt   = _produtoAtual.title;
   } else {
     id    = "ventilador-bvt301";
     title = "Ventilador Britânia BVT301";

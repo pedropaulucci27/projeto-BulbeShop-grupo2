@@ -117,11 +117,11 @@ async function carregarFavoritosDoServidor() {
     const resposta = await window.api.favoritos.listar();
     const lista = Array.isArray(resposta) ? resposta : (resposta.favoritos || []);
     const favs = lista.map(p => ({
-      id:       String(p.id),
-      title:    p.nome,
-      price:    `R$ ${parseFloat(p.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-      priceOld: p.preco_original ? `R$ ${parseFloat(p.preco_original).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "",
-      img:      p.imagem_url || "",
+      id:       String(p.produtoId || p.id),
+      title:    p.title,
+      price:    `R$ ${parseFloat(p.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      priceOld: "",
+      img:      p.image || "",
     }));
     saveFavs(favs);
   } catch {}

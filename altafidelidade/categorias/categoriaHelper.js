@@ -6,23 +6,16 @@ function formatPriceBR(n) {
 }
 
 function buildCardCategoria(p) {
-  const badge = p.em_destaque
+  const badge = p.destaque
     ? `<span class="badge badge-flash">oferta relâmpago</span>`
-    : p.com_cashback
-      ? `<span class="badge badge-cash">com cashback</span>`
-      : "";
-
-  const priceWas = p.preco_original
-    ? `<div class="price-was">R$${formatPriceBR(p.preco_original)}</div>`
     : "";
 
-  const promo = p.frete_gratis
-    ? `<div class="promo-row"><span class="ship-pill"><span>frete grátis</span></span></div>`
-    : "";
+  const priceWas = "";
+  const promo    = "";
 
-  const link = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img  = p.imagem_url || "/altafidelidade/home/img/ventiladorbritania.webp";
-  const preco = parseFloat(p.preco);
+  const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
+  const img   = p.image || "/altafidelidade/home/img/ventiladorbritania.webp";
+  const preco = parseFloat(p.price);
 
   return `
     <article class="card">
@@ -53,7 +46,7 @@ async function renderProdutosCategoria(categoriaSlug) {
 
   try {
     const resposta = await window.api.produtos.listar(`?categoria=${categoriaSlug}`);
-    const lista = resposta.produtos || resposta;
+    const lista = resposta.data || resposta;
     if (lista.length === 0) {
       grid.innerHTML = `<p style="padding:2rem;text-align:center">Nenhum produto encontrado nesta categoria.</p>`;
       return;

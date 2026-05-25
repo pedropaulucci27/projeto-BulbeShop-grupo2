@@ -29,7 +29,7 @@ btnConcluir?.addEventListener("click", async () => {
     btnConcluir.disabled = true;
     try {
       const resp = await window.api.pedidos.pagarPix(pedidoId);
-      const chave = resp.chave_pix || resp.pixKey || "";
+      const chave = resp.pagamento?.chavePix || resp.pagamento?.qrCode || "";
       if (chave) {
         const pixCodeEl = document.getElementById("pixCode");
         if (pixCodeEl) pixCodeEl.value = chave;

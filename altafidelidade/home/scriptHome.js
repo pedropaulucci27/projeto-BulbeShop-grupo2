@@ -181,13 +181,13 @@ function mapearProdutoApi(p) {
   return {
     id:       String(p.id),
     type:     "product",
-    badge:    p.em_destaque ? "flash" : null,
-    img:      p.imagem_url || "./img/ventiladorbritania.webp",
-    alt:      p.nome,
-    title:    p.nome,
-    price:    parseFloat(p.preco),
-    priceOld: p.preco_original ? parseFloat(p.preco_original) : null,
-    promo:    p.frete_gratis ? { type: "ship", text: "frete grátis" } : null,
+    badge:    p.destaque ? "flash" : null,
+    img:      p.image || "./img/ventiladorbritania.webp",
+    alt:      p.title,
+    title:    p.title,
+    price:    parseFloat(p.price),
+    priceOld: null,
+    promo:    null,
     footnote: null,
     link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
   };
@@ -199,7 +199,7 @@ async function renderProdutos() {
 
   try {
     const resposta = await window.api.produtos.listar();
-    const lista = (resposta.produtos || resposta).map(mapearProdutoApi);
+    const lista = (resposta.data || resposta).map(mapearProdutoApi);
     grid.innerHTML = lista.map(buildCard).join("");
   } catch {
     try {

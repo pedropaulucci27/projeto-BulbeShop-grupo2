@@ -166,15 +166,15 @@ const SVG_HEART_LOJA = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hid
 const SVG_CART_LOJA  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
 
 function buildCardLoja(p) {
-  const preco = parseFloat(p.preco);
+  const preco = parseFloat(p.price);
   const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img   = p.imagem_url || "/altafidelidade/home/img/ventiladorbritania.webp";
+  const img   = p.image || "/altafidelidade/home/img/ventiladorbritania.webp";
   return `
     <article class="card">
       <div class="card-body">
-        <div class="media"><a href="${link}"><img src="${img}" alt="${p.nome}"></a></div>
+        <div class="media"><a href="${link}"><img src="${img}" alt="${p.title}"></a></div>
         <div class="info">
-          <a href="${link}"><h3 class="title">${p.nome}</h3></a>
+          <a href="${link}"><h3 class="title">${p.title}</h3></a>
           <div class="pricebox">
             <div class="price-now" data-preco="${preco}">R$${preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
           </div>

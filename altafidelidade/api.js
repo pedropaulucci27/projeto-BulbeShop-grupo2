@@ -41,7 +41,7 @@ async function requisicao(metodo, caminho, corpo) {
 
   if (!resp.ok) {
     const erro = await resp.json().catch(() => ({}));
-    throw new Error(erro.message || `Erro ${resp.status}`);
+    throw new Error(erro.erro || erro.mensagem || erro.message || `Erro ${resp.status}`);
   }
 
   return resp.json();
@@ -80,7 +80,7 @@ const api = {
   },
 
   pedidos: {
-    criar:    (cupom)                 => requisicao("POST",   "/pedidos", cupom ? { cupom } : {}),
+    criar:    (cupom, endereco)       => requisicao("POST",   "/pedidos/checkout", { ...(cupom ? { cupom } : {}), ...(endereco ? { endereco } : {}) }),
     buscar:   (id)                    => requisicao("GET",    `/pedidos/${id}`),
     listar:   ()                      => requisicao("GET",    "/pedidos"),
     cancelar: (id)                    => requisicao("PATCH",  `/pedidos/${id}/cancelar`),

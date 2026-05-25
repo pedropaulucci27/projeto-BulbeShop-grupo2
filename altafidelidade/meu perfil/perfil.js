@@ -16,7 +16,7 @@ async function carregarPerfil() {
   try {
     const pontos = await window.api.usuario.pontos();
     const btn = document.getElementById('abrirPontosBulbe');
-    if (btn && pontos?.saldo !== undefined) btn.innerHTML = `${pontos.saldo} pts &gt;`;
+    if (btn && pontos?.pontos !== undefined) btn.innerHTML = `${pontos.pontos} pts &gt;`;
   } catch {}
 }
 
