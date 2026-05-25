@@ -1,4 +1,57 @@
-// Mostrar/ocultar senha
+/* =========================================================
+   CARREGAR PERFIL DA API
+   ========================================================= */
+async function carregarPerfil() {
+  if (!window.api?.estaLogado()) return;
+
+  try {
+    const usuario = await window.api.usuario.perfil();
+    const nomeEl = document.querySelector('.user-name');
+    if (nomeEl && usuario.nome) nomeEl.textContent = usuario.nome;
+
+    const emailEl = document.getElementById('email');
+    if (emailEl && usuario.email) emailEl.value = usuario.email;
+  } catch {}
+
+  try {
+    const pontos = await window.api.usuario.pontos();
+    const btn = document.getElementById('abrirPontosBulbe');
+    if (btn && pontos?.saldo !== undefined) btn.innerHTML = `${pontos.saldo} pts &gt;`;
+  } catch {}
+}
+
+async function salvarPerfil(e) {
+  e.preventDefault();
+  if (!window.api?.estaLogado()) return;
+
+  const nome  = document.querySelector('.user-name')?.textContent.trim();
+  const senha = document.getElementById('senha')?.value;
+  const btn   = e.target.querySelector('[type="submit"]');
+
+  const dados = {};
+  if (nome)  dados.nome  = nome;
+  if (senha && senha !== '************') dados.senha = senha;
+
+  if (!Object.keys(dados).length) return;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+
+  try {
+    await window.api.usuario.atualizarPerfil(dados);
+    if (btn) { btn.textContent = 'Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }, 2000); }
+  } catch {
+    if (btn) { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  carregarPerfil();
+  document.querySelector('form.form')?.addEventListener('submit', salvarPerfil);
+});
+
+/* =========================================================
+   MOSTRAR/OCULTAR SENHA
+   ========================================================= */
 const toggle = document.getElementById('toggleSenha');
 const senha = document.getElementById('senha');
 
