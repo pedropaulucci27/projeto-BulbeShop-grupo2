@@ -13,8 +13,11 @@ function saveFavs(arr) {
   localStorage.setItem(LS_KEY_FAVS, JSON.stringify(arr));
 }
 
-function removerFavorito(id) {
+async function removerFavorito(id) {
   saveFavs(getFavs().filter(f => f.id !== id));
+  if (window.api?.estaLogado()) {
+    try { await window.api.favoritos.remover(id); } catch {}
+  }
   renderFavoritos();
 }
 
@@ -105,4 +108,24 @@ function renderFavoritos() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", renderFavoritos);
+async function carregarFavoritosDoServidor() {
+  if (!window.api?.estaLogado()) {
+    renderFavoritos();
+    return;
+  }
+  try {
+    const resposta = await window.api.favoritos.listar();
+    const lista = Array.isArray(resposta) ? resposta : (resposta.favoritos || []);
+    const favs = lista.map(p => ({
+      id:       String(p.id),
+      title:    p.nome,
+      price:    `R$ ${parseFloat(p.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      priceOld: p.preco_original ? `R$ ${parseFloat(p.preco_original).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "",
+      img:      p.imagem_url || "",
+    }));
+    saveFavs(favs);
+  } catch {}
+  renderFavoritos();
+}
+
+document.addEventListener("DOMContentLoaded", carregarFavoritosDoServidor);
