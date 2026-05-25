@@ -5,6 +5,12 @@ function formatPriceBR(n) {
   return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function resolverImagemApi(url) {
+  if (!url) return "/altafidelidade/home/img/ventiladorbritania.webp";
+  if (url.startsWith("http")) return url;
+  return `http://localhost:3000${url}`;
+}
+
 function buildCardCategoria(p) {
   const badge = p.destaque
     ? `<span class="badge badge-flash">oferta relâmpago</span>`
@@ -14,7 +20,7 @@ function buildCardCategoria(p) {
   const promo    = "";
 
   const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img   = p.image || "/altafidelidade/home/img/ventiladorbritania.webp";
+  const img   = resolverImagemApi(p.image);
   const preco = parseFloat(p.price);
 
   return `

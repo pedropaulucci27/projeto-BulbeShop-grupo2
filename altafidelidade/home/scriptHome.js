@@ -177,12 +177,18 @@ function buildCard(p) {
     </article>`;
 }
 
+function resolverImagemApi(url) {
+  if (!url) return "./img/ventiladorbritania.webp";
+  if (url.startsWith("http")) return url;
+  return `http://localhost:3000${url}`;
+}
+
 function mapearProdutoApi(p) {
   return {
     id:       String(p.id),
     type:     "product",
     badge:    p.destaque ? "flash" : null,
-    img:      p.image || "./img/ventiladorbritania.webp",
+    img:      resolverImagemApi(p.image),
     alt:      p.title,
     title:    p.title,
     price:    parseFloat(p.price),

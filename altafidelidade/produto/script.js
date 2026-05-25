@@ -247,9 +247,11 @@ async function carregarProduto() {
     if (priceOldEl) priceOldEl.style.display = "none";
 
     const imgEl = document.getElementById("gallery-img");
-    if (imgEl && p.image) {
-      imgEl.src = p.image;
-      imgEl.alt = p.title;
+    if (imgEl) {
+      const imgUrl = p.image
+        ? (p.image.startsWith("http") ? p.image : `http://localhost:3000${p.image}`)
+        : "";
+      if (imgUrl) { imgEl.src = imgUrl; imgEl.alt = p.title; }
     }
 
     const breadcrumb = document.querySelector(".breadcrumbs");
