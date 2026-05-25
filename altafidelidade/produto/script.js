@@ -248,10 +248,9 @@ async function carregarProduto() {
 
     const imgEl = document.getElementById("gallery-img");
     if (imgEl) {
-      const imgUrl = p.image
-        ? (p.image.startsWith("http") ? p.image : `http://localhost:3000${p.image}`)
-        : "";
-      if (imgUrl) { imgEl.src = imgUrl; imgEl.alt = p.title; }
+      const imgUrl = resolverImagemProduto(p.image);
+      imgEl.src = imgUrl;
+      imgEl.alt = p.title;
     }
 
     const breadcrumb = document.querySelector(".breadcrumbs");

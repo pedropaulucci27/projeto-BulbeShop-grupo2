@@ -165,16 +165,10 @@ if (botaoCarrinho) {
 const SVG_HEART_LOJA = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
 const SVG_CART_LOJA  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
 
-function resolverImagemApi(url) {
-  if (!url) return "/altafidelidade/home/img/ventiladorbritania.webp";
-  if (url.startsWith("http")) return url;
-  return `http://localhost:3000${url}`;
-}
-
 function buildCardLoja(p) {
   const preco = parseFloat(p.price);
   const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img   = resolverImagemApi(p.image);
+  const img   = resolverImagemProduto(p.image);
   return `
     <article class="card">
       <div class="card-body">

@@ -1,5 +1,22 @@
 const API_BASE = "http://localhost:3000/api/v1";
 
+const IMAGENS_PRODUTOS = {
+  "lampada-led-9w.jpg":                   "/altafidelidade/home/img/luz.png",
+  "liquidificador-mondial-1000w.jpg":     "/altafidelidade/home/img/blender.jpg",
+  "garrafa-tupperware.jpg":               "/altafidelidade/home/img/tupperware.jpg",
+  "ventilador-mesa-britania.jpg":         "/altafidelidade/home/img/ventiladorbritania.webp",
+  "livro-energia-fique-por-dentro.jpg":   "/altafidelidade/home/img/livro.jpg",
+};
+
+function resolverImagemProduto(filename) {
+  if (!filename) return "/altafidelidade/home/img/ventiladorbritania.webp";
+  if (filename.startsWith("http") || filename.startsWith("/altafidelidade")) return filename;
+  const local = IMAGENS_PRODUTOS[filename];
+  if (local) return local;
+  if (filename.startsWith("/")) return `http://localhost:3000${filename}`;
+  return "/altafidelidade/home/img/ventiladorbritania.webp";
+}
+
 function getToken() {
   try { return localStorage.getItem("bulbe:token") || null; } catch { return null; }
 }
