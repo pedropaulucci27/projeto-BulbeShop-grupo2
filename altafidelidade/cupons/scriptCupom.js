@@ -64,33 +64,36 @@ document.querySelectorAll(".panel-close").forEach((b) => {
     });
 });
 
-// ===== RESGATAR CUPOM (funciona nos botões dentro e fora do painel) =====
+// ===== RESGATAR CUPOM — valida na API =====
 document.querySelectorAll(".redeem-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-        const isValid = btn.dataset.valid === "true";
-        const code = btn.dataset.code;
-        let merchant = btn.dataset.merchant;
+    btn.addEventListener("click", async () => {
+        const code     = btn.dataset.code;
+        let merchant   = btn.dataset.merchant;
         const discount = btn.dataset.discount;
 
-        // normaliza "Philco"
-        if (merchant && merchant.toLowerCase().includes("phil")) {
-            merchant = "Philco";
-        }
+        if (merchant && merchant.toLowerCase().includes("phil")) merchant = "Philco";
 
-        if (isValid) {
+        btn.disabled = true;
+        try {
+            if (window.api) {
+                await window.api.cupons.buscar(code);
+            }
+            localStorage.setItem("bulbe:cupom", code);
             showToast(
                 "success",
                 "Cupom resgatado com sucesso",
                 `Você ganhou ${discount} em ${merchant}.`,
                 `<small>Código aplicado: <strong>${code}</strong>. Aproveite sua compra!</small>`
             );
-        } else {
+        } catch {
             showToast(
                 "error",
                 "Resgate de cupom inválido",
                 "Não foi possível resgatar o cupom.",
                 `<small>Houve erro ao utilizar o cupom <strong>${code}</strong>. Tente novamente ou escolha outro cupom.</small>`
             );
+        } finally {
+            btn.disabled = false;
         }
     });
 });
