@@ -22,9 +22,29 @@ btnCopiar?.addEventListener("click", async () => {
 // REDIRECIONAR AO CONCLUIR COMPRA
 const btnConcluir = document.getElementById("btnConcluir");
 
-btnConcluir?.addEventListener("click", () => {
-    // troque o nome do arquivo abaixo para a página de destino:
-    window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+btnConcluir?.addEventListener("click", async () => {
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+
+  if (window.api?.estaLogado() && pedidoId) {
+    btnConcluir.disabled = true;
+    try {
+      const resp = await window.api.pedidos.pagarPix(pedidoId);
+      const chave = resp.chave_pix || resp.pixKey || "";
+      if (chave) {
+        const pixCodeEl = document.getElementById("pixCode");
+        if (pixCodeEl) pixCodeEl.value = chave;
+      }
+      localStorage.removeItem("bulbe:pedidoId");
+      localStorage.removeItem("bulbe:cart");
+      localStorage.removeItem("bulbe:checkoutItems");
+      window.location.href = "/altafidelidade/processando compra/html/index.html";
+    } catch {
+      btnConcluir.disabled = false;
+      window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+    }
+  } else {
+    window.location.href = "/altafidelidade/processando compra/html/index.html";
+  }
 });
 
 // (Opcional) clique em "PIX Automático programado"

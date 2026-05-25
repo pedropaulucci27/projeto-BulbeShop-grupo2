@@ -136,19 +136,36 @@ validate();
     });
   }
 
-  // botão concluir compra (ajuste o seletor se necessário)
+  // botão concluir compra
   function wireFinish() {
     const btn = document.getElementById('btnFinish') || document.querySelector('[data-action="finish"]');
     if (!btn) return;
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      // se seu fluxo usa "disabled" quando inválido, respeita
       if (btn.disabled) return;
-      // salva método e formulário
-      try { localStorage.setItem('bulbe:paymentMethod', 'debito'); } catch (e) {}
+
+      try { localStorage.setItem('bulbe:paymentMethod', 'debito'); } catch {}
       saveForm();
-      // redireciona para "processando compra"
-      window.location.href = PROCESSING_URL;
+
+      const pedidoId = localStorage.getItem('bulbe:pedidoId');
+      if (window.api?.estaLogado() && pedidoId) {
+        btn.disabled = true;
+        try {
+          const numero  = document.getElementById('debitNumber')?.value.replace(/\s/g, '') || '';
+          const expiry  = document.getElementById('debitExpiry')?.value || '';
+          const cvv     = document.getElementById('debitCVV')?.value || '';
+          await window.api.pedidos.pagarDebito(pedidoId, { numero, validade: expiry, cvv });
+          localStorage.removeItem('bulbe:pedidoId');
+          localStorage.removeItem('bulbe:cart');
+          localStorage.removeItem('bulbe:checkoutItems');
+          window.location.href = PROCESSING_URL;
+        } catch {
+          btn.disabled = false;
+          window.location.href = '/altafidelidade/pagamento e recusado/status-recusada.html';
+        }
+      } else {
+        window.location.href = PROCESSING_URL;
+      }
     });
   }
 

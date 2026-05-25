@@ -139,11 +139,10 @@ elExpiry?.addEventListener("change", () => {
 wireInstallments();
 refreshCTA();
 
-/* Concluir compra → mantém storage e redireciona */
-btnFinish?.addEventListener("click", () => {
+/* Concluir compra → envia pagamento via API e redireciona */
+btnFinish?.addEventListener("click", async () => {
   if (btnFinish.disabled) return;
 
-  // (opcional) última garantia de salvar tudo
   saveState({
     number: elNumber?.value || "",
     expiry: elExpiry?.value || "",
@@ -152,7 +151,27 @@ btnFinish?.addEventListener("click", () => {
     installment: getSelectedInstallmentText(),
   });
 
-  // vai para a tela de processamento
-  window.location.href =
-    "/altafidelidade/processando compra/html/index.html";
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+
+  if (window.api?.estaLogado() && pedidoId) {
+    btnFinish.disabled = true;
+    try {
+      const parcelas = parseInt(getSelectedInstallmentText()) || 1;
+      await window.api.pedidos.pagarCartao(pedidoId, {
+        numero:    onlyDigits(elNumber?.value || ""),
+        validade:  elExpiry?.value || "",
+        cvv:       onlyDigits(elCVV?.value || ""),
+        parcelas,
+      });
+      localStorage.removeItem("bulbe:pedidoId");
+      localStorage.removeItem("bulbe:cart");
+      localStorage.removeItem("bulbe:checkoutItems");
+      window.location.href = "/altafidelidade/processando compra/html/index.html";
+    } catch {
+      btnFinish.disabled = false;
+      window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+    }
+  } else {
+    window.location.href = "/altafidelidade/processando compra/html/index.html";
+  }
 });

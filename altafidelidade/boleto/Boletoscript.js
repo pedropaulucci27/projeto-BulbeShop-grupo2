@@ -34,11 +34,25 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Botão "Concluir compra" -> ir para página final
+// Botão "Concluir compra" -> registra boleto na API e segue
 const btnConcluir = document.getElementById("btnConcluir");
 
-btnConcluir?.addEventListener("click", () => {
+btnConcluir?.addEventListener("click", async () => {
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
 
-    window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html"
-    ;
+  if (window.api?.estaLogado() && pedidoId) {
+    btnConcluir.disabled = true;
+    try {
+      await window.api.pedidos.pagarBoleto(pedidoId);
+      localStorage.removeItem("bulbe:pedidoId");
+      localStorage.removeItem("bulbe:cart");
+      localStorage.removeItem("bulbe:checkoutItems");
+      window.location.href = "/altafidelidade/processando compra/html/index.html";
+    } catch {
+      btnConcluir.disabled = false;
+      window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+    }
+  } else {
+    window.location.href = "/altafidelidade/processando compra/html/index.html";
+  }
 });
