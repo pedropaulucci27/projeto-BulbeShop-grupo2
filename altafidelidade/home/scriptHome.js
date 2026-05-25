@@ -193,14 +193,27 @@ function mapearProdutoApi(p) {
   };
 }
 
+async function carregarBanners() {
+  try {
+    const res = await fetch("./produtos.json");
+    const data = await res.json();
+    return data.filter(p => p.type === "banner");
+  } catch { return []; }
+}
+
 async function renderProdutos() {
   const grid = document.querySelector(".grid");
   if (!grid) return;
 
+  const imagensMapeadas = Object.keys(IMAGENS_PRODUTOS);
+  const banners = await carregarBanners();
+
   try {
     const resposta = await window.api.produtos.listar();
-    const lista = (resposta.data || resposta).map(mapearProdutoApi);
-    grid.innerHTML = lista.map(buildCard).join("");
+    const lista = (resposta.data || resposta)
+      .filter(p => imagensMapeadas.includes(p.image))
+      .map(mapearProdutoApi);
+    grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
   } catch {
     try {
       const res  = await fetch("./produtos.json");
