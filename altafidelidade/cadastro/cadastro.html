@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta — Bulbe</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../login/login.css">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+
+  <main class="shell">
+    <section class="card">
+      <a class="back-btn" onclick="history.back()" aria-label="Voltar">&#8592;</a>
+
+      <div class="logo-wrap">
+        <a href="/altafidelidade/home/paginicial.html">
+          <img src="/altafidelidade/home/img/bulbelogo.png" alt="Bulbe" class="logo" onerror="this.style.display='none'">
+        </a>
+        <h1 class="titulo">Criar sua conta</h1>
+      </div>
+
+      <form id="formCadastro" novalidate>
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input id="nome" type="text" placeholder="Seu nome" autocomplete="name" required>
+        </div>
+
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="senha">Senha</label>
+          <div class="input-wrap">
+            <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
+            <button type="button" class="toggle-senha" id="toggleSenha" aria-label="Mostrar senha">👁</button>
+          </div>
+        </div>
+
+        <p id="erroCadastro" class="erro" hidden></p>
+
+        <button type="submit" class="btn-primary" id="btnCadastrar">Criar conta</button>
+      </form>
+
+      <p class="link-alt">
+        Já tem conta?
+        <a href="/altafidelidade/login/login.html">Entrar</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="../api.js"></script>
+  <script src="cadastro.js"></script>
+</body>
+</html>
