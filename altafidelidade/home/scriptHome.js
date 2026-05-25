@@ -177,16 +177,38 @@ function buildCard(p) {
     </article>`;
 }
 
+function mapearProdutoApi(p) {
+  return {
+    id:       String(p.id),
+    type:     "product",
+    badge:    p.em_destaque ? "flash" : null,
+    img:      p.imagem_url || "./img/ventiladorbritania.webp",
+    alt:      p.nome,
+    title:    p.nome,
+    price:    parseFloat(p.preco),
+    priceOld: p.preco_original ? parseFloat(p.preco_original) : null,
+    promo:    p.frete_gratis ? { type: "ship", text: "frete grátis" } : null,
+    footnote: null,
+    link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
+  };
+}
+
 async function renderProdutos() {
   const grid = document.querySelector(".grid");
   if (!grid) return;
 
   try {
-    const res  = await fetch("./produtos.json");
-    const data = await res.json();
-    grid.innerHTML = data.map(buildCard).join("");
-  } catch (err) {
-    console.error("Erro ao carregar produtos.json:", err);
+    const resposta = await window.api.produtos.listar();
+    const lista = (resposta.produtos || resposta).map(mapearProdutoApi);
+    grid.innerHTML = lista.map(buildCard).join("");
+  } catch {
+    try {
+      const res  = await fetch("./produtos.json");
+      const data = await res.json();
+      grid.innerHTML = data.map(buildCard).join("");
+    } catch (err) {
+      console.error("Erro ao carregar produtos:", err);
+    }
   }
 }
 
