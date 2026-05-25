@@ -13,26 +13,33 @@
 
   <main class="shell">
     <section class="card">
-      <a class="back-btn" onclick="history.back()" aria-label="Voltar">&#8592;</a>
+      <a class="back-btn" onclick="history.back()" aria-label="Voltar">
+        <img src="/altafidelidade/meu perfil/img/Icon.svg" alt="Voltar" width="24" height="24"
+             onerror="this.replaceWith(document.createTextNode('←'))">
+      </a>
 
-      <div class="logo-wrap">
-        <a href="/altafidelidade/home/paginicial.html">
-          <img src="/altafidelidade/home/img/bulbelogo.png" alt="Bulbe" class="logo" onerror="this.style.display='none'">
-        </a>
-        <h1 class="titulo">Entrar na sua conta</h1>
+      <div class="avatar-wrap">
+        <img class="avatar" src="/altafidelidade/meu perfil/img/Frame 9.svg" alt="Bulbe">
+        <h1 class="titulo">Bem-vindo de volta!</h1>
+        <p class="subtitulo">Entre na sua conta Bulbe</p>
       </div>
 
       <form id="formLogin" novalidate>
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+        <div class="input-group">
+          <label for="email">E-mail:</label>
+          <div class="input-wrap">
+            <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="senha">Senha</label>
+        <div class="input-group">
+          <label for="senha">Senha:</label>
           <div class="input-wrap">
             <input id="senha" type="password" placeholder="••••••••" autocomplete="current-password" required>
-            <button type="button" class="toggle-senha" id="toggleSenha" aria-label="Mostrar senha">👁</button>
+            <button type="button" class="toggle-senha" id="toggleSenha" aria-label="Mostrar senha">
+              <img src="/altafidelidade/meu perfil/img/olhoicon.svg" alt="" width="20" height="20"
+                   onerror="this.replaceWith(document.createTextNode('👁'))">
+            </button>
           </div>
         </div>
 
@@ -42,8 +49,7 @@
       </form>
 
       <p class="link-alt">
-        Não tem conta?
-        <a href="/altafidelidade/cadastro/cadastro.html">Criar conta</a>
+        Não tem conta? <a href="/altafidelidade/cadastro/cadastro.html">Criar conta</a>
       </p>
     </section>
   </main>

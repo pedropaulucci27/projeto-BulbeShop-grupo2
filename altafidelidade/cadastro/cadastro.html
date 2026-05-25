@@ -13,31 +13,40 @@
 
   <main class="shell">
     <section class="card">
-      <a class="back-btn" onclick="history.back()" aria-label="Voltar">&#8592;</a>
+      <a class="back-btn" onclick="history.back()" aria-label="Voltar">
+        <img src="/altafidelidade/meu perfil/img/Icon.svg" alt="Voltar" width="24" height="24"
+             onerror="this.replaceWith(document.createTextNode('←'))">
+      </a>
 
-      <div class="logo-wrap">
-        <a href="/altafidelidade/home/paginicial.html">
-          <img src="/altafidelidade/home/img/bulbelogo.png" alt="Bulbe" class="logo" onerror="this.style.display='none'">
-        </a>
-        <h1 class="titulo">Criar sua conta</h1>
+      <div class="avatar-wrap">
+        <img class="avatar" src="/altafidelidade/meu perfil/img/Frame 9.svg" alt="Bulbe">
+        <h1 class="titulo">Crie sua conta</h1>
+        <p class="subtitulo">Cadastre-se na Bulbe</p>
       </div>
 
       <form id="formCadastro" novalidate>
-        <div class="field">
-          <label for="nome">Nome completo</label>
-          <input id="nome" type="text" placeholder="Seu nome" autocomplete="name" required>
+        <div class="input-group">
+          <label for="nome">Nome completo:</label>
+          <div class="input-wrap">
+            <input id="nome" type="text" placeholder="Seu nome completo" autocomplete="name" required>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+        <div class="input-group">
+          <label for="email">E-mail:</label>
+          <div class="input-wrap">
+            <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="senha">Senha</label>
+        <div class="input-group">
+          <label for="senha">Senha:</label>
           <div class="input-wrap">
             <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
-            <button type="button" class="toggle-senha" id="toggleSenha" aria-label="Mostrar senha">👁</button>
+            <button type="button" class="toggle-senha" id="toggleSenha" aria-label="Mostrar senha">
+              <img src="/altafidelidade/meu perfil/img/olhoicon.svg" alt="" width="20" height="20"
+                   onerror="this.replaceWith(document.createTextNode('👁'))">
+            </button>
           </div>
         </div>
 
@@ -47,8 +56,7 @@
       </form>
 
       <p class="link-alt">
-        Já tem conta?
-        <a href="/altafidelidade/login/login.html">Entrar</a>
+        Já tem conta? <a href="/altafidelidade/login/login.html">Entrar</a>
       </p>
     </section>
   </main>
