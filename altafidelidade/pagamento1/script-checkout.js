@@ -107,24 +107,39 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // Fluxo do CTA
-  btn?.addEventListener('click', () => {
+  btn?.addEventListener('click', async () => {
     if (btn.disabled) return;
 
     const method = localStorage.getItem('payMethod') || '';
-    // define a próxima página depois do cadastro
     let nextAfterCadastro = '';
     if (method === 'débito' || method === 'debito') {
       nextAfterCadastro = '/altafidelidade/cartao de debito/index.html';
     } else if (method === 'crédito' || method === 'credito') {
       nextAfterCadastro = '/altafidelidade/pagamento3/pagamento3.html';
-    } else if (method === 'pix' || method === 'boleto bancário' || method === 'boleto bancario') {
-      // se for implementar depois, já fica salvo
-      nextAfterCadastro = method;
+    } else if (method === 'pix') {
+      nextAfterCadastro = '/altafidelidade/pix/pix.html';
+    } else if (method === 'boleto bancário' || method === 'boleto bancario') {
+      nextAfterCadastro = '/altafidelidade/boleto/boleto.html';
     }
 
     localStorage.setItem('nextAfterCadastro', nextAfterCadastro);
 
-    // vai para o cadastro (pagamento2)
+    // Cria o pedido na API se o usuário estiver logado
+    if (window.api?.estaLogado()) {
+      btn.disabled = true;
+      btn.textContent = 'Processando…';
+      try {
+        const cupom = localStorage.getItem('bulbe:cupom') || undefined;
+        const pedido = await window.api.pedidos.criar(cupom);
+        localStorage.setItem('bulbe:pedidoId', String(pedido.id || pedido.pedido?.id || ''));
+      } catch {
+        // segue sem pedido registrado se API falhar
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continuar';
+      }
+    }
+
     window.location.href = '/altafidelidade/pagamento2/pagamento2.html';
   });
 });
