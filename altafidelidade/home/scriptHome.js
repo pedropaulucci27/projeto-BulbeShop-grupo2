@@ -159,7 +159,7 @@ function buildCard(p) {
       <div class="card-body">
         ${badge}
         <div class="media">
-          <a href="${p.link}"><img src="${p.img}" alt="${p.alt}"></a>
+          <a href="${p.link}"><img src="${p.img}" alt="${p.alt}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a>
         </div>
         <div class="info">
           <a href="${p.link}"><h3 class="title">${p.title}</h3></a>

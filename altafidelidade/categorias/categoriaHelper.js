@@ -22,10 +22,10 @@ function buildCardCategoria(p) {
       <div class="card-body">
         ${badge}
         <div class="media">
-          <a href="${link}"><img src="${img}" alt="${p.nome}"></a>
+          <a href="${link}"><img src="${img}" alt="${p.title}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a>
         </div>
         <div class="info">
-          <a href="${link}"><h3 class="title">${p.nome}</h3></a>
+          <a href="${link}"><h3 class="title">${p.title}</h3></a>
           <div class="pricebox">
             <div class="price-now" data-preco="${preco}">R$${formatPriceBR(preco)}</div>
             ${priceWas}

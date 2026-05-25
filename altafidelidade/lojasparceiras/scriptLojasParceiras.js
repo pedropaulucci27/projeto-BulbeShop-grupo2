@@ -172,7 +172,7 @@ function buildCardLoja(p) {
   return `
     <article class="card">
       <div class="card-body">
-        <div class="media"><a href="${link}"><img src="${img}" alt="${p.title}"></a></div>
+        <div class="media"><a href="${link}"><img src="${img}" alt="${p.title}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a></div>
         <div class="info">
           <a href="${link}"><h3 class="title">${p.title}</h3></a>
           <div class="pricebox">
