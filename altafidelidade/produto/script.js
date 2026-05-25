@@ -220,34 +220,91 @@ if (botaoCarrinho) {
 }
 
 /* =========================================================
-   ADICIONAR AO CARRINHO — SISTEMA REAL
+   CARREGAR PRODUTO DA API
    ========================================================= */
-const PRODUTO_ID = "ventilador-bvt301";
+let _produtoAtual = null;
 
+function formatPriceBR(n) {
+  return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function carregarProduto() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id || !window.api) return;
+
+  try {
+    const p = await window.api.produtos.buscar(id);
+    _produtoAtual = p;
+
+    const titleEl = document.querySelector(".product-title");
+    if (titleEl) titleEl.textContent = p.nome;
+
+    const priceEl = document.querySelector(".price-current");
+    if (priceEl) priceEl.textContent = `R$ ${formatPriceBR(p.preco)}`;
+
+    const priceOldEl = document.querySelector(".price-old");
+    if (priceOldEl && p.preco_original) priceOldEl.textContent = `R$ ${formatPriceBR(p.preco_original)}`;
+
+    const imgEl = document.getElementById("gallery-img");
+    if (imgEl && p.imagem_url) {
+      imgEl.src = p.imagem_url;
+      imgEl.alt = p.nome;
+    }
+
+    const breadcrumb = document.querySelector(".breadcrumbs");
+    if (breadcrumb) breadcrumb.innerHTML = `Você está em: <a href="/altafidelidade/home/paginicial.html">produtos</a> › ${p.nome}`;
+
+    const stockEl = document.querySelector(".stock");
+    if (stockEl) stockEl.textContent = p.estoque > 0 ? "Em estoque" : "Produto indisponível";
+
+    const btnAdd = document.getElementById("btn-add");
+    if (btnAdd && p.estoque <= 0) {
+      btnAdd.disabled = true;
+      btnAdd.textContent = "Indisponível";
+    }
+  } catch {
+    // mantém o conteúdo estático do HTML se a API não estiver disponível
+  }
+}
+
+document.addEventListener("DOMContentLoaded", carregarProduto);
+
+/* =========================================================
+   ADICIONAR AO CARRINHO
+   ========================================================= */
 document.getElementById("btn-add")?.addEventListener("click", () => {
+  const qty = parseInt(document.getElementById("qty-select")?.value || "1", 10);
+
+  let id, title, price, img, alt;
+
+  if (_produtoAtual) {
+    id    = String(_produtoAtual.id);
+    title = _produtoAtual.nome;
+    price = parseFloat(_produtoAtual.preco);
+    img   = _produtoAtual.imagem_url || "./img/image 1.png";
+    alt   = _produtoAtual.nome;
+  } else {
+    id    = "ventilador-bvt301";
+    title = "Ventilador Britânia BVT301";
+    price = 179.90;
+    img   = "./img/image 1.png";
+    alt   = "Ventilador Britânia BVT301";
+  }
+
   let carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
-
-  const novo = {
-    id: PRODUTO_ID,
-    title: "Ventilador Britânia BVT301",
-    price: 179.90,
-    qty: parseInt(document.getElementById("qty-select").value, 10),
-    cor: document.querySelector('[data-variation="color"] .chip.is-active')?.textContent.trim(),
+  const existente = carrinho.find(p => p.id === id);
+  if (existente) existente.qty += qty;
+  else carrinho.push({
+    id, title, price, qty,
+    cor:      document.querySelector('[data-variation="color"] .chip.is-active')?.textContent.trim(),
     voltagem: document.querySelector('[data-variation="voltage"] .chip.is-active')?.textContent.trim(),
-    img: "./assets/img/image 1.png",
-    alt: "Ventilador Britânia BVT301"
-  };
-
-  const existente = carrinho.find(p => p.id === PRODUTO_ID);
-  if (existente) existente.qty += novo.qty;
-  else carrinho.push(novo);
+    img, alt,
+  });
 
   localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
-  localStorage.setItem("bulbe:lastAddedId", PRODUTO_ID);
+  localStorage.setItem("bulbe:lastAddedId", id);
 
   showToast("Produto adicionado ao carrinho!");
-
-  setTimeout(() => {
-    location.href = "/altafidelidade/carrinhos/carrinho.html";
-  }, 600);
+  setTimeout(() => { location.href = "/altafidelidade/carrinhos/carrinho.html"; }, 600);
 });
