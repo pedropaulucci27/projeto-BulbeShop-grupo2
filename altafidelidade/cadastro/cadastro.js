@@ -27,7 +27,7 @@ document.getElementById("formCadastro")?.addEventListener("submit", async (e) =>
   try {
     const resp = await window.api.auth.cadastro(nome, email, senha);
     window.api.salvarToken(resp.token);
-    window.api.salvarUsuario(resp.usuario || resp.user || { nome, email });
+    window.api.salvarUsuario(window.api.extrairUsuarioDoToken(resp.token) || { nome, email });
     window.location.href = "/altafidelidade/home/paginicial.html";
   } catch (err) {
     erroEl.textContent = err.message || "Não foi possível criar a conta. Tente novamente.";

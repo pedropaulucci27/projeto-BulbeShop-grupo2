@@ -20,7 +20,7 @@ document.getElementById("formLogin")?.addEventListener("submit", async (e) => {
   try {
     const resp = await window.api.auth.login(email, senha);
     window.api.salvarToken(resp.token);
-    window.api.salvarUsuario(resp.usuario || resp.user || { email });
+    window.api.salvarUsuario(window.api.extrairUsuarioDoToken(resp.token) || { email });
 
     const destino = new URLSearchParams(window.location.search).get("next")
       || "/altafidelidade/home/paginicial.html";

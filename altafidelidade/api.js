@@ -41,6 +41,13 @@ function removerUsuario() {
   try { localStorage.removeItem("bulbe:usuario"); } catch {}
 }
 
+function extrairUsuarioDoToken(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return { id: payload.sub, nome: payload.nome, papel: payload.papel };
+  } catch { return null; }
+}
+
 async function requisicao(metodo, caminho, corpo) {
   const token = getToken();
   const headers = { "Content-Type": "application/json" };
@@ -97,7 +104,7 @@ const api = {
   },
 
   pedidos: {
-    criar:    (cupom, endereco)       => requisicao("POST",   "/pedidos/checkout", { ...(cupom ? { cupom } : {}), ...(endereco ? { endereco } : {}) }),
+    criar:    (cupom, endereco)       => requisicao("POST",   "/pedidos", { ...(cupom ? { cupom } : {}), ...(endereco ? { endereco } : {}) }),
     buscar:   (id)                    => requisicao("GET",    `/pedidos/${id}`),
     listar:   ()                      => requisicao("GET",    "/pedidos"),
     cancelar: (id)                    => requisicao("PATCH",  `/pedidos/${id}/cancelar`),
@@ -131,6 +138,7 @@ const api = {
   getUsuario,
   salvarUsuario,
   removerUsuario,
+  extrairUsuarioDoToken,
 };
 
 window.api = api;
