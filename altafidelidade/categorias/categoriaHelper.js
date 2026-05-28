@@ -33,8 +33,8 @@ function buildCardCategoria(p) {
           ${promo}
         </div>
         <div class="actions">
-          <button class="icon-btn heart" aria-label="Favoritar">${SVG_HEART}</button>
-          <button class="icon-btn cart"  aria-label="Adicionar ao carrinho">${SVG_CART}</button>
+          <button class="icon-btn heart" data-id="${p.id}" aria-label="Favoritar">${SVG_HEART}</button>
+          <button class="icon-btn cart" data-id="${p.id}" aria-label="Adicionar ao carrinho">${SVG_CART}</button>
         </div>
       </div>
     </article>`;
