@@ -1,4 +1,4 @@
-// === MENU DE FILTRO ===
+// MENU DE FILTRO
 const filterBtn = document.getElementById("filter-btn");
 const filterMenu = document.getElementById("filter-menu");
 
@@ -14,7 +14,7 @@ if (filterBtn && filterMenu) {
     });
 }
 
-// === PLACEHOLDER ANIMADO ===
+// PLACEHOLDER ANIMADO
 const searchInput = document.getElementById("search-input");
 const text = "Busque por marcas, categorias ou produtos";
 let index = 0;
@@ -35,7 +35,7 @@ function typeEffect() {
 }
 typeEffect();
 
-// === BUSCA FUNCIONAL ===
+// BUSCA FUNCIONAL
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl = document.querySelector(".search-btn");
 const cards = document.querySelectorAll(".card");
@@ -58,7 +58,7 @@ searchInputEl?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") filtrarProdutos();
 });
 
-// === SCROLL DRAG NAV (se existir) ===
+// SCROLL
 const navScroll = document.querySelector(".nav-scroll");
 if (navScroll) {
     let isDown = false;
@@ -81,19 +81,18 @@ if (navScroll) {
     });
 }
 
-// === CATEGORIAS (atalho) ===
+// CATEGORIAS
 document.querySelectorAll(".categoria").forEach((item) => {
     item.addEventListener("click", () => {
         const url = item.dataset.url;
         if (url) window.location.href = url;
     });
 });
-// === ÍCONES (toggle de estado visual) ===
+// ÍCONES
 document.querySelectorAll(".icon-btn").forEach((btn) => {
     btn.addEventListener("click", (event) => {
         btn.classList.toggle("active");
 
-        // *** AQUI: ação de adicionar ao carrinho ***
         if (btn.classList.contains("cart")) {
             const card =
                 btn.closest('.card, .produto, .card-body, [data-card="produto"], [data-produto]') || document;
@@ -118,7 +117,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
             const payload = { title, price: Number(price || 0), img, alt, qty: 1, when: Date.now() };
             try { localStorage.setItem("bulbe:addToCart", JSON.stringify(payload)); } catch { }
 
-            // URL estável do carrinho (ajuste prefixo se usar subpasta)
             const p = location.pathname;
             const i = p.indexOf("/altafidelidade/");
             const cartUrl = i >= 0
@@ -127,14 +125,12 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
             try { window.location.href = cartUrl; } catch { }
         }
 
-        // não propagar para o card
+
         event.stopPropagation();
     });
 });
 
-/* ==== [ADDON PERSISTÊNCIA] HOME -> salva no carrinho do usuário ==== */
 (() => {
-    // Gera um "id" simples e estável para o item (título normalizado + preço)
     function makeId(title, price) {
         const t = String(title || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 200);
         const p = Number(price || 0).toFixed(2);
@@ -148,7 +144,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         try { localStorage.setItem('bulbe:cart', JSON.stringify(arr)); } catch { }
     }
 
-    // Intercepta o salvamento que já fazemos ao clicar no ícone do carrinho
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.icon-btn.cart, .btn-cart, [data-action="add-to-cart"]');
         if (!btn) return;
@@ -171,7 +166,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         const alt = imgEl?.getAttribute('alt') || title;
         const id = makeId(title, price);
 
-        // 1) Atualiza bulbe:cart (persistente)
         const cart = loadCart();
         const ix = cart.findIndex(it => it.id === id);
         if (ix >= 0) {
@@ -181,15 +175,13 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         }
         saveCart(cart);
 
-        // 2) Guarda o último adicionado (para o Carrinho saber qual aplicar)
         try { localStorage.setItem('bulbe:lastAddedId', id); } catch { }
 
-        // 3) Mantém o comportamento já existente (bulbe:addToCart) para render imediato
         try { localStorage.setItem('bulbe:addToCart', JSON.stringify({ title, price, img, alt, qty: 1, id })); } catch { }
-    }, { capture: true }); // capture para executar antes de event.stopPropagation() de outros handlers
+    }, { capture: true });
 })();
 
-// === CATEGORIAS (atalho) ===
+// CATEGORIAS
 document.querySelectorAll(".categoria").forEach((item) => {
     item.addEventListener("click", () => {
         const url = item.dataset.url;
@@ -197,9 +189,8 @@ document.querySelectorAll(".categoria").forEach((item) => {
     });
 });
 
-/* =========================================================
-   MENU OCULTO - CATEGORIAS
-   ========================================================= */
+
+// MENU OCULTO DE CATEGORIAS
 const btnCategorias = document.getElementById("btn-categorias");
 const menuCategorias = document.getElementById("menu-categorias");
 const fecharMenu = document.getElementById("fechar-menu");
@@ -218,11 +209,11 @@ function fecharMenuCategorias() {
 }
 
 btnCategorias?.addEventListener("click", (e) => {
-    e.preventDefault(); // evita scroll pro topo por causa do href="#"
+    e.preventDefault();
     abrirMenuCategorias();
 });
 
 fecharMenu?.addEventListener("click", fecharMenuCategorias);
 overlay?.addEventListener("click", fecharMenuCategorias);
 
-document.addEventListener('DOMContentLoaded', () => renderProdutosCategoria('educacao'));
+document.addEventListener('DOMContentLoaded', () => renderProdutosCategoria('Educação'));
