@@ -1,4 +1,4 @@
-// === MENU DE FILTRO ===
+// MENU DE FILTRO
 const filterBtn = document.getElementById("filter-btn");
 const filterMenu = document.getElementById("filter-menu");
 
@@ -14,7 +14,7 @@ if (filterBtn && filterMenu) {
     });
 }
 
-// === PLACEHOLDER ANIMADO ===
+// PLACEHOLDER ANIMADO
 const searchInput = document.getElementById("search-input");
 const text = "Busque por marcas, categorias ou produtos";
 let index = 0;
@@ -35,30 +35,35 @@ function typeEffect() {
 }
 typeEffect();
 
-// === BUSCA FUNCIONAL ===
+// BUSCA FUNCIONAL
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl = document.querySelector(".search-btn");
-const cards = document.querySelectorAll(".card");
 
-function filtrarProdutos() {
-    const termo = (searchInputEl?.value || "").trim().toLowerCase();
-    if (termo === "") {
-        cards.forEach((card) => (card.style.display = "block"));
-        return;
-    }
-    cards.forEach((card) => {
-        const titulo = card.querySelector(".title")?.textContent.toLowerCase() || "";
-        const preco = card.querySelector(".price-now")?.textContent.toLowerCase() || "";
-        const texto = `${titulo} ${preco}`;
-        card.style.display = texto.includes(termo) ? "block" : "none";
-    });
+async function filtrarProdutos() {
+  const termo = (searchInputEl?.value || '').trim();
+  if (termo === '') {
+    renderProdutosCategoria('Economia de energia');
+    return;
+  }
+  const grid = document.querySelector('.grid');
+  if (!grid) return;
+  try {
+    const resposta = await window.api.produtos.listar(`?busca=${encodeURIComponent(termo)}`);
+    const lista = resposta.data || resposta;
+    grid.innerHTML = lista.length
+      ? lista.map(buildCardCategoria).join('')
+      : '<p style="padding:2rem;text-align:center">Nenhum produto encontrado.</p>';
+  } catch {
+    console.error('Erro na busca');
+  }
 }
+
 searchBtnEl?.addEventListener("click", filtrarProdutos);
 searchInputEl?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") filtrarProdutos();
 });
 
-// === SCROLL DRAG NAV (se existir) ===
+// SCROLL DRAG NAV
 const navScroll = document.querySelector(".nav-scroll");
 if (navScroll) {
     let isDown = false;
@@ -81,7 +86,7 @@ if (navScroll) {
     });
 }
 
-// === CATEGORIAS (atalho) ===
+// CATEGORIAS
 document.querySelectorAll(".categoria").forEach((item) => {
     item.addEventListener("click", () => {
         const url = item.dataset.url;
@@ -132,8 +137,6 @@ document.querySelectorAll(".categoria").forEach((item) => {
 
 // ADDON PERSISTÊNCIA
 /* (() => {
-
-    // Gera um ID simples e estável para o item
     function makeId(title, price) {
         const t = String(title || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 200);
         const p = Number(price || 0).toFixed(2);
@@ -178,15 +181,13 @@ document.querySelectorAll(".categoria").forEach((item) => {
         }
         saveCart(cart);
 
-        // Guarda o último adicionado
         try { localStorage.setItem('bulbe:lastAddedId', id); } catch { }
 
-        // Mantém o comportamento já existente
         try { localStorage.setItem('bulbe:addToCart', JSON.stringify({ title, price, img, alt, qty: 1, id })); } catch { }
     }, { capture: true });
 })(); */
 
-// === CATEGORIAS (atalho) ===
+// CATEGORIAS
 document.querySelectorAll(".categoria").forEach((item) => {
     item.addEventListener("click", () => {
         const url = item.dataset.url;
@@ -194,10 +195,7 @@ document.querySelectorAll(".categoria").forEach((item) => {
     });
 });
 
-
-/* =========================================================
-   MENU OCULTO - CATEGORIAS
-   ========================================================= */
+// MENU OCULTO DE CATEGORIAS
 const btnCategorias = document.getElementById("btn-categorias");
 const menuCategorias = document.getElementById("menu-categorias");
 const fecharMenu = document.getElementById("fechar-menu");
@@ -216,7 +214,7 @@ function fecharMenuCategorias() {
 }
 
 btnCategorias?.addEventListener("click", (e) => {
-    e.preventDefault(); // evita scroll pro topo por causa do href="#"
+    e.preventDefault();
     abrirMenuCategorias();
 });
 
