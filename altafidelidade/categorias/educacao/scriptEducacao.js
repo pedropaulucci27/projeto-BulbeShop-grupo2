@@ -38,21 +38,27 @@ typeEffect();
 // BUSCA FUNCIONAL
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl = document.querySelector(".search-btn");
-const cards = document.querySelectorAll(".card");
 
-function filtrarProdutos() {
+async function filtrarProdutos() {
     const termo = (searchInputEl?.value || "").trim().toLowerCase();
     if (termo === "") {
-        cards.forEach((card) => (card.style.display = "block"));
+        renderProdutosCategoria("Educação");
         return;
     }
-    cards.forEach((card) => {
-        const titulo = card.querySelector(".title")?.textContent.toLowerCase() || "";
-        const preco = card.querySelector(".price-now")?.textContent.toLowerCase() || "";
-        const texto = `${titulo} ${preco}`;
-        card.style.display = texto.includes(termo) ? "block" : "none";
-    });
+
+    const grid = document.querySelector(".grid");
+    if (!grid) return;
+    try {
+        const resposta = await window.api.produtos.listar(`?busca=${encodeURIComponent(termo)}`);
+        const lista = resposta.data || resposta;
+        grid.innerHTML = lista.length
+            ? lista.map(buildCardCategoria).join("")
+            : '<p style="padding:2rem;text-align:center">Nenhum produto encontrado.</p>';
+    } catch {
+        console.error("Erro na busca");
+    }
 }
+
 searchBtnEl?.addEventListener("click", filtrarProdutos);
 searchInputEl?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") filtrarProdutos();
@@ -88,107 +94,6 @@ document.querySelectorAll(".categoria").forEach((item) => {
         if (url) window.location.href = url;
     });
 });
-// ÍCONES
-document.querySelectorAll(".icon-btn").forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-        btn.classList.toggle("active");
-
-        if (btn.classList.contains("cart")) {
-            const card =
-                btn.closest('.card, .produto, .card-body, [data-card="produto"], [data-produto]') || document;
-
-            const imgEl = card.querySelector(".media img, .card-img img, picture img, img");
-            const titleEl = card.querySelector(".title, .card-title, .nome, h3, h2");
-            const priceEl = card.querySelector(".price-now, .price, .valor, .card-price, [data-preco]");
-
-            const parsePrecoBR = (txt) => {
-                if (!txt) return 0;
-                const n = parseFloat(String(txt).replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
-                return Number.isFinite(n) ? n : 0;
-            };
-
-            const title = (titleEl?.textContent || "").replace(/\s+/g, " ").trim() || "Produto";
-            const price = priceEl?.dataset?.preco
-                ? parseFloat(priceEl.dataset.preco)
-                : parsePrecoBR(priceEl?.textContent || "0");
-            const img = imgEl?.getAttribute("src") || "";
-            const alt = imgEl?.getAttribute("alt") || title;
-
-            const payload = { title, price: Number(price || 0), img, alt, qty: 1, when: Date.now() };
-            try { localStorage.setItem("bulbe:addToCart", JSON.stringify(payload)); } catch { }
-
-            const p = location.pathname;
-            const i = p.indexOf("/altafidelidade/");
-            const cartUrl = i >= 0
-                ? p.slice(0, i + "/altafidelidade/".length) + "carrinhos/carrinho.html"
-                : "/altafidelidade/carrinhos/carrinho.html";
-            try { window.location.href = cartUrl; } catch { }
-        }
-
-
-        event.stopPropagation();
-    });
-});
-
-(() => {
-    function makeId(title, price) {
-        const t = String(title || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 200);
-        const p = Number(price || 0).toFixed(2);
-        return `${t}|${p}`;
-    }
-
-    function loadCart() {
-        try { return JSON.parse(localStorage.getItem('bulbe:cart')) || []; } catch { return []; }
-    }
-    function saveCart(arr) {
-        try { localStorage.setItem('bulbe:cart', JSON.stringify(arr)); } catch { }
-    }
-
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.icon-btn.cart, .btn-cart, [data-action="add-to-cart"]');
-        if (!btn) return;
-
-        const card = btn.closest('.card, .produto, .card-body, [data-card="produto"], [data-produto]') || document;
-
-        const imgEl = card.querySelector('.media img, .card-img img, picture img, img');
-        const titleEl = card.querySelector('.title, .card-title, .nome, h3, h2');
-        const priceEl = card.querySelector('.price-now, .price, .valor, .card-price, [data-preco]');
-
-        const parsePrecoBR = (txt) => {
-            if (!txt) return 0;
-            const n = parseFloat(String(txt).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.'));
-            return Number.isFinite(n) ? n : 0;
-        };
-
-        const title = (titleEl?.textContent || '').replace(/\s+/g, ' ').trim() || 'Produto';
-        const price = priceEl?.dataset?.preco ? parseFloat(priceEl.dataset.preco) : parsePrecoBR(priceEl?.textContent || '0');
-        const img = imgEl?.getAttribute('src') || '';
-        const alt = imgEl?.getAttribute('alt') || title;
-        const id = makeId(title, price);
-
-        const cart = loadCart();
-        const ix = cart.findIndex(it => it.id === id);
-        if (ix >= 0) {
-            cart[ix].qty = Math.min(999, Number(cart[ix].qty || 0) + 1);
-        } else {
-            cart.push({ id, title, price: Number(price || 0), img, alt, qty: 1 });
-        }
-        saveCart(cart);
-
-        try { localStorage.setItem('bulbe:lastAddedId', id); } catch { }
-
-        try { localStorage.setItem('bulbe:addToCart', JSON.stringify({ title, price, img, alt, qty: 1, id })); } catch { }
-    }, { capture: true });
-})();
-
-// CATEGORIAS
-document.querySelectorAll(".categoria").forEach((item) => {
-    item.addEventListener("click", () => {
-        const url = item.dataset.url;
-        if (url) window.location.href = url;
-    });
-});
-
 
 // MENU OCULTO DE CATEGORIAS
 const btnCategorias = document.getElementById("btn-categorias");
