@@ -88,16 +88,16 @@ document.querySelectorAll(".categoria").forEach((item) => {
         if (url) window.location.href = url;
     });
 });
-// === ÍCONES (toggle de estado visual) ===
-document.querySelectorAll(".icon-btn").forEach((btn) => {
+
+// ÍCONES
+/* document.querySelectorAll(".icon-btn").forEach((btn) => {
     btn.addEventListener("click", (event) => {
         btn.classList.toggle("active");
 
-        // *** AQUI: ação de adicionar ao carrinho ***
+        // Ação de adicionar ao carrinho
         if (btn.classList.contains("cart")) {
             const card =
                 btn.closest('.card, .produto, .card-body, [data-card="produto"], [data-produto]') || document;
-
             const imgEl = card.querySelector(".media img, .card-img img, picture img, img");
             const titleEl = card.querySelector(".title, .card-title, .nome, h3, h2");
             const priceEl = card.querySelector(".price-now, .price, .valor, .card-price, [data-preco]");
@@ -118,7 +118,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
             const payload = { title, price: Number(price || 0), img, alt, qty: 1, when: Date.now() };
             try { localStorage.setItem("bulbe:addToCart", JSON.stringify(payload)); } catch { }
 
-            // URL estável do carrinho (ajuste prefixo se usar subpasta)
             const p = location.pathname;
             const i = p.indexOf("/altafidelidade/");
             const cartUrl = i >= 0
@@ -127,14 +126,14 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
             try { window.location.href = cartUrl; } catch { }
         }
 
-        // não propagar para o card
         event.stopPropagation();
     });
-});
+}); */  
 
-/* ==== [ADDON PERSISTÊNCIA] HOME -> salva no carrinho do usuário ==== */
-(() => {
-    // Gera um "id" simples e estável para o item (título normalizado + preço)
+// ADDON PERSISTÊNCIA
+/* (() => {
+
+    // Gera um ID simples e estável para o item
     function makeId(title, price) {
         const t = String(title || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 200);
         const p = Number(price || 0).toFixed(2);
@@ -148,7 +147,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         try { localStorage.setItem('bulbe:cart', JSON.stringify(arr)); } catch { }
     }
 
-    // Intercepta o salvamento que já fazemos ao clicar no ícone do carrinho
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.icon-btn.cart, .btn-cart, [data-action="add-to-cart"]');
         if (!btn) return;
@@ -171,7 +169,6 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         const alt = imgEl?.getAttribute('alt') || title;
         const id = makeId(title, price);
 
-        // 1) Atualiza bulbe:cart (persistente)
         const cart = loadCart();
         const ix = cart.findIndex(it => it.id === id);
         if (ix >= 0) {
@@ -181,13 +178,13 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
         }
         saveCart(cart);
 
-        // 2) Guarda o último adicionado (para o Carrinho saber qual aplicar)
+        // Guarda o último adicionado
         try { localStorage.setItem('bulbe:lastAddedId', id); } catch { }
 
-        // 3) Mantém o comportamento já existente (bulbe:addToCart) para render imediato
+        // Mantém o comportamento já existente
         try { localStorage.setItem('bulbe:addToCart', JSON.stringify({ title, price, img, alt, qty: 1, id })); } catch { }
-    }, { capture: true }); // capture para executar antes de event.stopPropagation() de outros handlers
-})();
+    }, { capture: true });
+})(); */
 
 // === CATEGORIAS (atalho) ===
 document.querySelectorAll(".categoria").forEach((item) => {
