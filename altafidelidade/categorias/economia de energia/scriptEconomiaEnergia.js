@@ -38,21 +38,27 @@ typeEffect();
 // Busca funcional
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl = document.querySelector(".search-btn");
-const cards = document.querySelectorAll(".card");
 
-function filtrarProdutos() {
+async function filtrarProdutos() {
     const termo = (searchInputEl?.value || "").trim().toLowerCase();
     if (termo === "") {
-        cards.forEach((card) => (card.style.display = "block"));
+        renderProdutosCategoria("Economia de energia");
         return;
     }
-    cards.forEach((card) => {
-        const titulo = card.querySelector(".title")?.textContent.toLowerCase() || "";
-        const preco = card.querySelector(".price-now")?.textContent.toLowerCase() || "";
-        const texto = `${titulo} ${preco}`;
-        card.style.display = texto.includes(termo) ? "block" : "none";
-    });
-}
+
+    const grid = document.querySelector(".grid");
+    if (!grid) return;
+    try {
+        const resposta = await window.api.produtos.listar(`?busca=${encodeURIComponent(termo)}`);
+        const lista = resposta.data || resposta;
+        grid.innerHTML = lista.length
+            ? lista.map(buildCardCategoria).join("")
+            : '<p style="padding:2rem;text-align:center">Nenhum produto encontrado.</p>';
+    } catch {
+        console.error("Erro na busca");
+    }
+}    
+
 searchBtnEl?.addEventListener("click", filtrarProdutos);
 searchInputEl?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") filtrarProdutos();
@@ -88,8 +94,9 @@ document.querySelectorAll(".categoria").forEach((item) => {
         if (url) window.location.href = url;
     });
 });
+
 // Ícones
-document.querySelectorAll(".icon-btn").forEach((btn) => {
+/* document.querySelectorAll(".icon-btn").forEach((btn) => {
     btn.addEventListener("click", (event) => {
         btn.classList.toggle("active");
 
@@ -179,7 +186,7 @@ document.querySelectorAll(".icon-btn").forEach((btn) => {
 
         try { localStorage.setItem('bulbe:addToCart', JSON.stringify({ title, price, img, alt, qty: 1, id })); } catch { }
     }, { capture: true });
-})();
+})(); */
 
 // Categorias (atalho)
 document.querySelectorAll(".categoria").forEach((item) => {
@@ -188,7 +195,6 @@ document.querySelectorAll(".categoria").forEach((item) => {
         if (url) window.location.href = url;
     });
 });
-
 
 // Menu oculto em Categorias
 const btnCategorias = document.getElementById("btn-categorias");

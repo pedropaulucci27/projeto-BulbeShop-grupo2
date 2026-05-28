@@ -53,7 +53,58 @@ async function renderProdutosCategoria(categoriaSlug) {
     }
     grid.innerHTML = lista.map(buildCardCategoria).join("");
   } catch {
-    // mantém os cards hardcoded do HTML se a API não estiver disponível
+
+ grid.querySelectorAll('.icon-btn.cart').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (!id) return;
+
+        if (!window.api.estaLogado()) {
+            window.location.href = '/altafidelidade/login/login.html';
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            await window.api.carrinho.adicionar(Number(id), 1);
+            btn.classList.add('active');
+        } catch (err) {
+            console.error('Erro ao adicionar ao carrinho:', err);
+        } finally {
+            btn.disabled = false;
+        }
+    });
+ });
+
+ grid.querySelectorAll('.icon-btn.heart').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (!id) return;
+
+        if (!window.api.estaLogado()) {
+            window.location.href = '/altafidelidade/login/login.html';
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            if (btn.classList.contains('active')) {
+                await window.api.favoritos.remover(Number(id));
+                btn.classList.remove('active');
+            } else {
+                await window.api.favoritos.adicionar(Number(id));
+                btn.classList.add('active');
+            }
+        } catch (err) {
+            console.error('Erro ao atualizar favorito:', err);
+        } finally {
+            btn.disabled = false;
+        }
+     });
+   });
+   
   }
 }
 
