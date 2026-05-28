@@ -205,23 +205,16 @@ async function renderProdutos() {
   const grid = document.querySelector(".grid");
   if (!grid) return;
 
-  const imagensMapeadas = Object.keys(IMAGENS_PRODUTOS);
   const banners = await carregarBanners();
 
   try {
     const resposta = await window.api.produtos.listar();
-    const lista = (resposta.data || resposta)
-      .filter(p => imagensMapeadas.includes(p.image))
-      .map(mapearProdutoApi);
+    const lista = (resposta.data || resposta).map(mapearProdutoApi);
     grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
   } catch {
-    try {
-      const res  = await fetch("./produtos.json");
-      const data = await res.json();
-      grid.innerHTML = data.map(buildCard).join("");
-    } catch (err) {
-      console.error("Erro ao carregar produtos:", err);
-    }
+    // Se o backend cair, mostra apenas os banners e nenhum produto estático
+    grid.innerHTML = banners.map(buildCard).join("");
+    console.error("Servidor backend offline. Produtos não puderam ser carregados.");
   }
 }
 

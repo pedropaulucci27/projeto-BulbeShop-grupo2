@@ -162,49 +162,58 @@ if (botaoCarrinho) {
 /* =========================================================
    LOJAS PARCEIRAS — carrega da API
    ========================================================= */
-const SVG_HEART_LOJA = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
-const SVG_CART_LOJA  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
-
-function buildCardLoja(p) {
-  const preco = parseFloat(p.price);
-  const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img   = resolverImagemProduto(p.image);
-  return `
-    <article class="card">
-      <div class="card-body">
-        <div class="media"><a href="${link}"><img src="${img}" alt="${p.title}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a></div>
-        <div class="info">
-          <a href="${link}"><h3 class="title">${p.title}</h3></a>
-          <div class="pricebox">
-            <div class="price-now" data-preco="${preco}">R$${preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="icon-btn heart" aria-label="Favoritar">${SVG_HEART_LOJA}</button>
-          <button class="icon-btn cart"  aria-label="Adicionar ao carrinho">${SVG_CART_LOJA}</button>
-        </div>
-      </div>
-    </article>`;
-}
 
 async function carregarLojasParceiras() {
   const grid = document.querySelector(".grid");
-  if (!grid || !window.api) return;
+  if (!grid) return;
 
   try {
-    const lojas = await window.api.lojas.listar();
-    const lista = Array.isArray(lojas) ? lojas : (lojas.lojas || []);
+    const res = await fetch("http://localhost:3000/api/v1/lojas-parceiras");
+    if (!res.ok) throw new Error("Falha na requisição");
+    
+    const lojas = await res.json();
+    
+    if (lojas.length === 0) {
+      console.warn("A API não retornou lojas. Mantendo os cards estáticos de fallback.");
+      return; // Se a API não tiver lojas, preservamos o HTML fixo para não ficar em branco
+    }
 
-    if (lista.length === 0) return;
-
-    const todosProdutos = await Promise.all(
-      lista.map(l => window.api.lojas.produtos(l.id).catch(() => []))
-    );
-
-    const produtos = todosProdutos.flat();
-    if (produtos.length > 0) grid.innerHTML = produtos.map(buildCardLoja).join("");
-  } catch {
-    // mantém cards hardcoded se API indisponível
+    // Limpar o container principal apenas se tivermos dados
+    grid.innerHTML = "";
+    
+    // Iterar e criar cards dinamicamente para cada loja
+    lojas.forEach(loja => {
+      const link = `../loja araujo/paginaaraujo.html?id=${loja.id}`;
+      
+      // Dicionário de imagens baseado no ID das lojas (já que a API não possui coluna de imagem para lojas)
+      const imagensLojas = {
+        1: './img/logo_drogaria-araujo.png',
+        2: './img/logopontofrio.jpeg'
+      };
+      
+      const img = loja.imagem || imagensLojas[loja.id] || '/altafidelidade/home/img/bulbelogo2.png';
+      
+      const cardHTML = `
+        <article class="card">
+          <div class="card-body">
+            <div class="media">
+              <a href="${link}"><img src="${img}" alt="${loja.nome}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/bulbelogo2.png'"></a>
+            </div>
+            <div class="info">
+              <a href="${link}"><h3 class="title">${loja.nome}</h3></a>
+              <p style="margin-top: 5px; font-size: 0.9em; color: #555;">${loja.endereco || ''}</p>
+            </div>
+            <div class="actions" style="margin-top: 15px; width: 100%;">
+              <a href="${link}" style="display: block; width: 100%; text-align: center; background-color: var(--primary-color, #ff4c00); color: #fff; padding: 10px; text-decoration: none; border-radius: 4px; font-weight: bold; border: 1px solid var(--primary-color, #ff4c00); cursor: pointer;">Ver Loja</a>
+            </div>
+          </div>
+        </article>`;
+        
+      grid.innerHTML += cardHTML;
+    });
+  } catch (error) {
+    console.error("Erro ao buscar lojas:", error);
+    // Em caso de erro, a grid permanecerá vazia ou com placeholders (se estivessem na string vazia)
   }
 }
 
