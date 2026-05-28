@@ -16,7 +16,8 @@
 <body>
     <!-- HEADER -->
     <header class="header">
-    <!--ICONE Menu-->
+
+    <!-- ÍCONE MENU -->
         <a class="home-btn" id="home-btn" href="/altafidelidade/home/paginicial.html" aria-label="Ir para Home">
             <img src="/altafidelidade/home/img/home-05.png" alt="Home"> 
         </a>
@@ -33,8 +34,8 @@
     </header>
 
     <div class="overlay" id="overlay"></div>
-    <!--Barra de Pesquisa-->
 
+    <!-- BARRA DE PESQUISA -->
     <div class="search-container">
         <button class="filter-btn" id="filter-btn">
             <img src="/altafidelidade/home/img/filtoicon.png" alt="Filtro"> filtro
@@ -46,7 +47,8 @@
             <img src="/altafidelidade/home/img/searchicon.png" alt="Buscar">
         </button>
     </div>
-    <!--FILTRO MENU-->
+
+    <!-- FILTRO MENU -->
     <div class="filter-menu" id="filter-menu">
         <ul>
             <li>Eletrônicos</li>
@@ -56,7 +58,8 @@
             <li>Família e Educação</li>
         </ul>
     </div>
-    <!--NAV BAR SCROLAVEL-->
+
+    <!-- NAV BAR SCROLAVEL -->
     <div class="nav-scroll">
         <a href="#" class="nav-item" id="btn-categorias">
             <img src="/altafidelidade/home/img/categoriaicon.png" alt="Categorias">
@@ -79,7 +82,8 @@
             <span>Favoritos</span>
         </a>
     </div>
-    <!--Menu cuculto em Categorias-->
+
+    <!-- MENU OCULTO DE CATEGORIAS -->
     <div class="menu-categorias" id="menu-categorias">
         <div class="menu-content">
             <button id="fechar-menu">✕</button>
@@ -94,8 +98,8 @@
             </div>
         </div>
     </div>
-    <!--Carrosel de Categorias-->
 
+    <!-- CARROSSEL DE CATEGORIAS -->
     <section class="carousel">
 
         <a class="categoria" href="/altafidelidade/categorias/eletronicos/eletronico.html">
@@ -126,12 +130,13 @@
             <p>Educação</p>
         </a>
     </section>
-    <!--CARDS-->
+
+    <!-- CARDS -->
     <main class="wrap">
         <h2 class="section-title">Economia de Energia</h2>
 
-        <section class="grid">
-            <!-- CARD 1 -->
+        <!-- Produtos carregados via API pelo categoriaHelper.js -->
+        <!-- <section class="grid">
             <article class="card">
                 <div class="card-body">
                     <span class="badge badge-flash">oferta relâmpago</span>
@@ -159,7 +164,6 @@
 
                     <div class="actions">
                         <button class="icon-btn heart" aria-label="Favoritar">
-                            <!-- coração (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path
                                     d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
@@ -168,7 +172,6 @@
                         </button>
 
                         <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                            <!-- carrinho (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
                                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
@@ -180,7 +183,6 @@
                     </div>
             </article>
 
-            <!-- CARD 2 -->
             <article class="card">
                 <div class="card-body">
                     <span class="badge badge-cash">com cashback</span>
@@ -208,7 +210,6 @@
                     </div>
                     <div class="actions">
                         <button class="icon-btn heart" aria-label="Favoritar">
-                            <!-- coração (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path
                                     d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
@@ -217,7 +218,6 @@
                         </button>
 
                         <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                            <!-- carrinho (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
                                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
@@ -228,7 +228,6 @@
                         </button>
             </article>
 
-            <!-- CARD 3 -->
             <article class="card">
                 <div class="card-body">
                     <span class="badge badge-cash">com cashback</span>
@@ -256,7 +255,6 @@
                     </div>
                     <div class="actions">
                         <button class="icon-btn heart" aria-label="Favoritar">
-                            <!-- coração (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path
                                     d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
@@ -265,7 +263,6 @@
                         </button>
 
                         <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                            <!-- carrinho (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
                                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
@@ -275,8 +272,6 @@
                             </svg>
                         </button>
             </article>
-
-            <!--CARD 4-->
 
             <article class="card">
                 <div class="card-body">
@@ -297,7 +292,6 @@
 
                     <div class="actions">
                         <button class="icon-btn heart" aria-label="Favoritar">
-                            <!-- coração (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path
                                     d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
@@ -306,7 +300,6 @@
                         </button>
 
                         <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
-                            <!-- carrinho (stroke) -->
                             <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
                                 <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
                                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
@@ -317,9 +310,10 @@
                         </button>
                     </div>
             </article>
-        </section>
+        </section> -->
 
         <script src="../../api.js"></script>
+        <script src="/altafidelidade/auth-header.js"></script>
         <script src="../categoriaHelper.js"></script>
         <script src="scriptEconimiaEnergia.js"></script>
 </body>
