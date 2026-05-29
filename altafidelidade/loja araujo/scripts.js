@@ -114,3 +114,71 @@ document.querySelectorAll('.icon-btn').forEach(btn => {
         }
     });
 });
+
+// === INTEGRAÇÃO COM API (LOJA ESPECÍFICA) ===
+document.addEventListener("DOMContentLoaded", async () => {
+    // Tarefa 2 - Correção 1: Captura de ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const lojaId = urlParams.get('id');
+
+    if (lojaId) {
+        try {
+            // Correção 2: Cabeçalho da Loja
+            const resLoja = await fetch(`http://localhost:3000/api/v1/lojas-parceiras/${lojaId}`);
+            if (resLoja.ok) {
+                const lojaData = await resLoja.json();
+                
+                // Atualiza DOM
+                const nomeEl = document.querySelector('.nome-loja') || document.querySelector('h1');
+                const enderecoEl = document.querySelector('.endereco-loja') || document.querySelector('.address') || document.querySelector('.loja-info p:nth-child(2)');
+                const horarioEl = document.querySelector('.horario-loja') || document.querySelector('.hours') || document.querySelector('.loja-info p:nth-child(3)');
+                
+                if (nomeEl) nomeEl.textContent = lojaData.nome;
+                if (enderecoEl) enderecoEl.textContent = lojaData.endereco;
+                if (horarioEl) horarioEl.textContent = lojaData.horario || lojaData.horario_funcionamento || 'Horário não informado';
+            }
+
+            // Correção 3: Produtos da Loja
+            const resProdutos = await fetch(`http://localhost:3000/api/v1/lojas-parceiras/${lojaId}/produtos`);
+            if (resProdutos.ok) {
+                const produtosData = await resProdutos.json();
+                
+                // IMPORTANTE: Ajustei o seletor para pegar a section .grid, que é a que realmente existe no seu HTML
+                const vitrine = document.querySelector('.grid') || document.querySelector('.produtos') || document.querySelector('.vitrine');
+                
+                if (vitrine) {
+                    vitrine.innerHTML = ''; // Limpa os hardcoded
+                    
+                    produtosData.forEach(produto => {
+                        const preco = parseFloat(produto.preco || produto.price || 0);
+                        const img = produto.image || produto.imagem || '/altafidelidade/home/img/produto_placeholder.webp';
+                        const titulo = produto.title || produto.nome || 'Produto Sem Nome';
+                        const produtoHTML = `
+                            <article class="produto card" data-produto="${produto.id}">
+                                <div class="card-body">
+                                    <div class="media">
+                                        <img src="${img}" alt="${titulo}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/produto_placeholder.webp'">
+                                    </div>
+                                    <div class="info">
+                                        <h3 class="titulo-produto">${titulo}</h3>
+                                        <div class="preco-atual" data-preco="${preco}">R$ ${preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                                    </div>
+                                    <div class="actions">
+                                        <button class="icon-btn heart" aria-label="Favoritar">
+                                            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                                        </button>
+                                        <button class="icon-btn cart" aria-label="Adicionar ao carrinho">
+                                            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>`;
+                        vitrine.innerHTML += produtoHTML;
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Erro ao buscar dados da loja:", error);
+        }
+    }
+});
