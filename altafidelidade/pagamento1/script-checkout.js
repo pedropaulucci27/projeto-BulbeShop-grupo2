@@ -54,37 +54,19 @@ async function renderCheckoutItems() {
       console.error('Erro ao carregar carrinho:', err);
     }
 
-  /* let items = [];
-  try { items = JSON.parse(localStorage.getItem('bulbe:checkoutItems')) || []; } catch {}
-
-    total += (item.price || 0) * (item.qty || 1);
-    const art = document.createElement('article');
-    art.className = 'cart-card';
-    art.innerHTML = `
-      <img class="cart-card__thumb" src="${item.img || ''}" alt="${item.title || 'Produto'}"
-           onerror="this.style.display='none'">
-      <div class="cart-card__body">
-        <h4 class="cart-card__title">${item.title || 'Produto'}</h4>
-        <div class="cart-card__price-row">
-          <div class="price">
-            <span class="price__curr">R$</span>
-            <span class="price__big">${(item.price || 0).toFixed(2).replace('.', ',')}</span>
-          </div>
-          <div class="units">(${item.qty || 1} unidade${(item.qty || 1) > 1 ? 's' : ''})</div>
-        </div>
-      </div>`;
-    cartSection.appendChild(art);
-  });
-
-  const totalFormatado = `R$ ${total.toFixed(2).replace('.', ',')}`;
-  const elTotal = document.querySelector('.review-row .value');
-  const elPedido = document.querySelector('.review-total strong');
-  if (elTotal) elTotal.textContent = totalFormatado;
-  if (elPedido) elPedido.textContent = totalFormatado;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   renderCheckoutItems();
+
+  if (window.api.estaLogado()) {
+    window.api.usuario.pontos()
+      .then(dados => {
+        const saldo = dados.saldo || dados.pontos || 0;
+        const elPontos = document.querySelector('.value--link');
+        if (elPontos) elPontos.textContent = `${saldo} pontos disponíveis >`;
+      })
+      .catch(() => {});
+  }
+
   const box    = document.getElementById('paySelect');
   if (!box) return;
 
@@ -100,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function refreshCTA(){
     if (!btn) return;
-    // habilita somente quando NÃO for “Selecionado”
     const isDefault = getMethod() === 'selecionado' || getMethod() === '';
     btn.disabled = isDefault;
   }
@@ -165,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const pedido = await window.api.pedidos.criar(cupom);
         localStorage.setItem('bulbe:pedidoId', String(pedido.id || pedido.pedido?.id || ''));
       } catch {
-        // segue sem pedido registrado se API falhar
       } finally {
         btn.disabled = false;
         btn.textContent = 'Continuar';
@@ -186,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     backBtn.style.cursor = 'pointer';
     backBtn.addEventListener('click', () => window.history.back());
   }
-\
+
   if (logoImg) {
     logoImg.style.cursor = 'pointer';
     logoImg.addEventListener('click', () => {
@@ -194,5 +174,5 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = override || HOME_URL;
     });
   }
-})(); */
+})();
 }
