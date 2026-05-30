@@ -27,7 +27,6 @@
 
       <div class="steps__bar">
         <ol class="steps__list">
-          <!-- 1: Checar (concluído) -->
           <li class="step is-done">
             <div class="step__circle">
               <span class="step__icon">✓</span>
@@ -35,7 +34,6 @@
             <span class="step__text">Checar</span>
           </li>
 
-          <!-- 2: Cadastro (etapa atual) -->
           <li class="step is-current">
             <div class="step__circle">
               <span class="step__number">2</span>
@@ -43,7 +41,6 @@
             <span class="step__text">Cadastro</span>
           </li>
 
-          <!-- 3: Pagamento (próxima) -->
           <li class="step">
             <div class="step__circle">
               <span class="step__number">3</span>
@@ -51,7 +48,6 @@
             <span class="step__text">Pagamento</span>
           </li>
 
-          <!-- 4: Confirmação (próxima) -->
           <li class="step">
             <div class="step__circle">
               <span class="step__number">4</span>
@@ -61,14 +57,12 @@
         </ol>
       </div>
     </section>
-    <!-- PAÍS -->
     <section class="card">
       <header class="card__title">
         <img src="../pagamento2/.assets/img/globe-05.svg" alt="" class="ico">
         <span>País <b class="req">*</b></span>
       </header>
 
-      <!-- Abre “empurrando” o conteúdo, sem sobrepor -->
       <div class="select-block" id="countrySelect" aria-expanded="false">
         <button type="button" class="select-head" aria-haspopup="listbox">
           <span class="select-placeholder">Selecionar</span>
@@ -86,7 +80,6 @@
       </div>
     </section>
 
-    <!-- DADOS DO COMPRADOR -->
     <label class="field">
       <span class="label">Nome completo: <b class="req">*</b></span>
       <input id="nomeCompleto" class="input" type="text" placeholder="Digite seu nome">
@@ -102,7 +95,6 @@
       <input id="cpf" class="input" type="text" inputmode="numeric" placeholder="Digite seu CPF">
     </label>
 
-    <!-- ENDEREÇO DE ENTREGA -->
     <label class="field">
       <span class="label">CEP: <b class="req">*</b></span>
       <input id="cep" class="input" type="text" inputmode="numeric" placeholder="Digite o CEP">
@@ -135,7 +127,6 @@
       <input id="bairro" class="input" type="text" placeholder="Digite o bairro">
     </label>
 
-    <!-- Estado e Cidade: um embaixo do outro, com a mesma animação -->
     <div class="row-2 row-stack">
       <label class="field">
         <span class="label">Estado: <b class="req">*</b></span>
@@ -228,8 +219,8 @@
 
   </main>
 
-
+  <script src="/altafidelidade/api.js"></script>
   <script src="../pagamento2/.assets/script.js"></script>
-</body>
 
+</body>
 </html>
