@@ -1,8 +1,7 @@
-// /altafidelidade/pagamento2/.assets/script.js
 (function () {
   const btn = document.getElementById('btnSave');
 
-  // ---------- País (select-block) ----------
+  // País
   const selPais   = document.getElementById('countrySelect');
   const paisHead  = selPais?.querySelector('.select-head');
   const paisList  = selPais?.querySelector('.select-list');
@@ -30,7 +29,7 @@
     });
   }
 
-  // ---------- Estado/Cidade (inline-enhanced) ----------
+  // Estado/Cidade
   const selEstado = document.getElementById('stateSelect');
   const selCidade = document.getElementById('citySelect');
 
@@ -59,7 +58,7 @@
     });
   }
 
-  // ---------- Campos básicos ----------
+  // Campos básicos
   const sectionCards = Array.from(document.querySelectorAll('.card'));
   const camposComprador = sectionCards[1]?.querySelectorAll('.field .input') || [];
   const [inpNome, inpFone, inpCPF] = camposComprador;
@@ -79,9 +78,10 @@
     }
   });
 
-  // ---------- Frete (obrigatório e exclusivo) ----------
+  // Frete (obrigatório e exclusivo)
   const ulFrete = document.getElementById('freteList');
   const fretes  = Array.from(ulFrete?.querySelectorAll('input[name="frete"]') || []);
+  
   function getFreteValue() {
     const el = fretes.find(f => f.checked);
     if (!el) return '';
@@ -90,29 +90,30 @@
     const priceText = li?.querySelector('strong')?.textContent?.trim() || '';
     return `${labelText} | ${priceText}`;
   }
+
   fretes.forEach(chk => {
     chk.addEventListener('change', () => {
       if (chk.checked) fretes.forEach(o => { if (o !== chk) o.checked = false; });
     });
   });
 
-  // ---------- Reidratar se houver ----------
+  // Reidratar se houver
   const saved = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
   if (saved.pais && paisLabel) paisLabel.textContent = saved.pais;
 
-  if (inpNome && saved.nome)   inpNome.value = saved.nome;
-  if (inpFone && saved.fone)   inpFone.value = saved.fone;
-  if (inpCPF  && saved.cpf)    inpCPF.value  = saved.cpf;
+  if (inpNome   && saved.nome)   inpNome.value   = saved.nome;
+  if (inpFone   && saved.fone)   inpFone.value   = saved.fone;
+  if (inpCPF    && saved.cpf)    inpCPF.value    = saved.cpf;
+  if (inpCEP    && saved.cep)    inpCEP.value    = saved.cep;
+  if (inpRua    && saved.rua)    inpRua.value    = saved.rua;
+  if (inpCompl  && saved.compl)  inpCompl.value  = saved.compl;
+  if (inpBairro && saved.bairro) inpBairro.value = saved.bairro;
 
-  if (inpCEP   && saved.cep)    inpCEP.value   = saved.cep;
-  if (inpRua   && saved.rua)    inpRua.value   = saved.rua;
   if (inpNumero && saved.numero && saved.numero !== 'S/N') inpNumero.value = saved.numero;
   if (cbSemNumero && saved.numero === 'S/N') {
     cbSemNumero.checked = true;
     if (inpNumero) inpNumero.disabled = true;
   }
-  if (inpCompl && saved.compl)  inpCompl.value  = saved.compl;
-  if (inpBairro && saved.bairro)inpBairro.value = saved.bairro;
 
   if (saved.estado) setInlineValue(selEstado, saved.estado);
   if (saved.cidade) setInlineValue(selCidade, saved.cidade);
@@ -125,7 +126,18 @@
     });
   }
 
-  // ---------- Coletar + Validar ----------
+  if (window.api && window.api.estaLogado()) {
+    window.api.usuario.perfil()
+      .then(perfil => {
+        if (inpNome && !inpNome.value && perfil.nome)     inpNome.value = perfil.nome;
+        if (inpFone && !inpFone.value && perfil.telefone) inpFone.value = perfil.telefone;
+        if (inpCPF  && !inpCPF.value  && perfil.cpf)     inpCPF.value  = perfil.cpf;
+        validarCampos();
+      })
+      .catch(() => {});
+  }
+
+  // Coletar e validar
   function collect() {
     const data = {
       pais:   getPaisValue(),
@@ -150,7 +162,7 @@
   wireInline(selEstado);
   wireInline(selCidade);
 
-  // ---------- Salvar + redirecionar ----------
+  // Salvar e redirecionar
   btn?.addEventListener('click', () => {
     if (btn.disabled) return;
     const data = collect();
@@ -175,31 +187,30 @@
     }
 
 
-    // fallback
+    // Fallback
     window.location.href = '/altafidelidade/pagamento1/pagamento.html';
   });
 })();
 
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-  const btnSave = document.getElementById("btnSave");
+  const btnSave = document.getElementById('btnSave');
 
-  // Lista dos campos obrigatórios por ID
+  // Validação dos campos obrigatórios
   const camposObrigatorios = [
-    "nomeCompleto",
-    "telefone",
-    "cpf",
-    "cep",
-    "rua",
-    "numero",
-    "bairro"
+    'nomeCompleto',
+    'telefone',
+    'cpf',
+    'cep',
+    'rua',
+    'numero',
+    'bairro'
   ];
 
   function validarCampos() {
     let valido = true;
 
-    // Validação dos campos de texto
     camposObrigatorios.forEach(id => {
       const campo = document.getElementById(id);
       if (!campo.value.trim()) {
@@ -207,31 +218,25 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    // Validação do País
     const paisSelecionado =
       document.querySelector("#countrySelect .select-placeholder").textContent.trim() !== "Selecionar";
     if (!paisSelecionado) valido = false;
 
-    // Estado
     const estadoSelecionado =
       document.querySelector("#stateSelect .inline-label").textContent.trim() !== "Selecione o estado";
     if (!estadoSelecionado) valido = false;
 
-    // Cidade
     const cidadeSelecionada =
       document.querySelector("#citySelect .inline-label").textContent.trim() !== "Selecione a cidade";
     if (!cidadeSelecionada) valido = false;
 
-    // Frete
     const freteSelecionado = document.querySelector("input[name='frete']:checked");
     if (!freteSelecionado) valido = false;
 
-    // Ativa / Desativa botão
     btnSave.disabled = !valido;
     btnSave.classList.toggle("enabled", valido);
   }
 
-  // Eventos de atualização
   camposObrigatorios.forEach(id => {
     document.getElementById(id).addEventListener("input", validarCampos);
   });
@@ -240,10 +245,9 @@ document.addEventListener("DOMContentLoaded", function () {
     el.addEventListener("change", validarCampos);
   });
 
-  document.getElementById("countrySelect").addEventListener("click", validarCampos);
-  document.getElementById("stateSelect").addEventListener("click", validarCampos);
-  document.getElementById("citySelect").addEventListener("click", validarCampos);
+  document.getElementById('countrySelect').addEventListener("click", validarCampos);
+  document.getElementById('stateSelect').addEventListener("click", validarCampos);
+  document.getElementById('citySelect').addEventListener("click", validarCampos);
 
-  validarCampos(); // Evita botão ativado inicial
+  validarCampos();
 });
-
