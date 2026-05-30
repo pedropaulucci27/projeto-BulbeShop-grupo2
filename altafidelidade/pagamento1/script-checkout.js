@@ -46,13 +46,16 @@ async function renderCheckoutItems() {
 
     const fmt = `R$ ${total.toFixed(2).replace('.', ',')}`;
     const elTotal  = document.querySelector('.review-row .value');
+    const elSubtotal = document.querySelector('.value--muted');
     const elPedido = document.querySelector('.review-total strong');
     if (elTotal)  elTotal.textContent  = fmt;
+    if (elSubtotal) elSubtotal.textContent = fmt;
     if (elPedido) elPedido.textContent = fmt;
 
     } catch (err) {
       console.error('Erro ao carregar carrinho:', err);
     }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   renderCheckoutItems();
@@ -84,8 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const list   = box.querySelector('.selectbox__list');
   const label  = box.querySelector('.selectbox__label');
   const btn    = document.querySelector('.cta__btn');
-
-  const BLUE = '#08068D';
 
   function norm(s=''){ return s.trim().toLowerCase(); }
   function getMethod(){ return norm(label?.textContent || ''); }
@@ -174,15 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (backBtn) {
     backBtn.style.cursor = 'pointer';
-    backBtn.addEventListener('click', () => window.history.back());
+    backBtn.addEventListener('click', () => {
+      window.location.href = '/altafidelidade/carrinhos/carrinho.html';
+    });
   }
 
   if (logoImg) {
     logoImg.style.cursor = 'pointer';
     logoImg.addEventListener('click', () => {
-      const override = logoImg.getAttribute('data-home'); // opcional
+      const override = logoImg.getAttribute('data-home');
       window.location.href = override || HOME_URL;
     });
   }
 })();
-}
