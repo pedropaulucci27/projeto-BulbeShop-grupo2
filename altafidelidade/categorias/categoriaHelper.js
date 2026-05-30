@@ -6,12 +6,13 @@ function formatPriceBR(n) {
 }
 
 function buildCardCategoria(p) {
-  const badge = p.destaque
-    ? `<span class="badge badge-flash">oferta relâmpago</span>`
+  const badge = p.promo
+    ? `<span class="badge badge-flash">$${formatPriceBR(p.promo)}</span>`
     : "";
 
-  const priceWas = "";
-  const promo    = "";
+    const priceWas = p.price_was
+    ? `<div class="price-was">R$${formatPriceBR(p.price_was)}</div>`
+    : "";
 
   const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
   const img   = resolverImagemProduto(p.image);
