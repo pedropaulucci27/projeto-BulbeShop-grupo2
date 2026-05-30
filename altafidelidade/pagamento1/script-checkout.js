@@ -67,6 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(() => {});
   }
 
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elNome = document.querySelector('.address-card__title');
+  const elEnd  = document.querySelector('.address-card__sub');
+  if (elNome && cliente.nome) elNome.textContent = cliente.nome;
+  if (elEnd  && cliente.rua) {
+    elEnd.innerHTML =
+      `${cliente.rua}, ${cliente.numero || 'S/N'}${cliente.compl ? ', ' + cliente.compl : ''}<br>`
+      + `${cliente.cep} ${cliente.cidade}, ${cliente.estado}`;
+  }
+
   const box    = document.getElementById('paySelect');
   if (!box) return;
 
