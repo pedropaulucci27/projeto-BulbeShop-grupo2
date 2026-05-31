@@ -175,3 +175,63 @@ btnFinish?.addEventListener("click", async () => {
     window.location.href = "/altafidelidade/processando compra/html/index.html";
   }
 });
+
+async function carregarDadosDinamicos() {
+  // 1. O Endereço puxamos do localStorage (que é onde a tela de checkout salva os dados do cliente)
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elEndereco = document.getElementById("enderecoCobranca");
+  
+  if (elEndereco && cliente.rua) {
+    elEndereco.innerHTML = `${cliente.rua}, ${cliente.numero || 'S/N'} ${cliente.compl ? ', ' + cliente.compl : ''}<br>${cliente.cep || ''} ${cliente.cidade || ''}, ${cliente.estado || ''}`;
+  } else if (elEndereco) {
+    elEndereco.innerHTML = "Endereço não encontrado.";
+  }
+
+  // 2. O Total nós puxamos direto do PEDIDO recém criado no Backend
+  const elGrid = document.getElementById("parcelGrid");
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+
+  // Só continua se tiver os elementos, estiver logado e houver um ID de pedido salvo
+  if (!elGrid || !pedidoId || !window.api?.estaLogado()) return;
+
+  try {
+    // Bate no backend: GET /api/v1/pedidos/:id
+    const pedido = await window.api.pedidos.buscar(pedidoId);
+    const total = pedido.total; // Pega o total exato do banco de dados já com descontos
+
+    if (total > 0) {
+      elGrid.innerHTML = ""; // Limpa os botões mockados do HTML
+      const maxParcelas = 6;
+      
+      for (let i = 1; i <= maxParcelas; i++) {
+        // Regra simples: para as últimas parcelas (a partir de 4x) aplica juros
+        let valorComJuros = total;
+        if (i > 3) valorComJuros = total * (1 + (i * 0.02)); 
+
+        const valorParcela = (valorComJuros / i).toFixed(2).replace(".", ",");
+        const valorJurosStr = (valorComJuros - total).toFixed(2).replace(".", ",");
+        
+        const btn = document.createElement("button");
+        btn.className = "parcel" + (i === 1 ? " is-selected" : "");
+        btn.setAttribute("role", "radio");
+        btn.setAttribute("aria-checked", i === 1 ? "true" : "false");
+        btn.dataset.val = `${i}x ${valorParcela}`;
+        
+        let jurosTexto = i <= 3 ? "Sem taxa de juros" : `R$${valorJurosStr} de juros`;
+        
+        btn.innerHTML = `
+          <strong>${i} x R$${valorParcela}</strong>
+          <small>${jurosTexto}</small>
+        `;
+        elGrid.appendChild(btn);
+      }
+      wireInstallments(); // Reconecta o evento de clique aos novos botões
+      refreshCTA();
+    }
+  } catch (error) {
+    console.error("Erro ao buscar pedido do backend:", error);
+  }
+}
+
+// Invoca a função
+carregarDadosDinamicos();
