@@ -8,16 +8,22 @@ document.getElementById('btnLogo')?.addEventListener('click', () => {
   window.location.href = '/altafidelidade/home/paginicial.html';
 });
 
-// ——— carrega dados do pedido / cartão (salvos na etapa de pagamento)
+// ——— carrega dados do pedido vindos da API (salvos após confirmação do pagamento)
 (function hydrateFromStorage(){
   try {
-    // Busca o ID real que guardamos durante a compra
-    const pedidoIdReal = localStorage.getItem('bulbe:pedidoId') || 'Pendente';
-
-    // Insere direto na tela, sem gerar código falso
+    const pedidoIdReal = localStorage.getItem('bulbe:pedidoId') || '';
     const el = document.getElementById('orderInfo');
     if(el){
-      el.innerHTML = `Número do pedido: ${pedidoIdReal}<br>Código de rastreio: (será atualizado em breve)`;
+      el.innerHTML = pedidoIdReal ? `Número do pedido: ${pedidoIdReal}` : 'Número do pedido: aguardando confirmação';
+    }
+    const trackingCode = localStorage.getItem('bulbe:trackingCode');
+    if(trackingCode){
+      const trackingEl = document.getElementById('trackingInfo');
+      const codeEl = document.getElementById('trackingCode');
+      if(trackingEl && codeEl){
+        codeEl.textContent = trackingCode;
+        trackingEl.hidden = false;
+      }
     }
   } catch(e) {}
 })();

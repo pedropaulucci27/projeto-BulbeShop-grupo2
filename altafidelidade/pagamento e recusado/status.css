@@ -162,6 +162,10 @@ body {
   grid-template-columns: 1fr 1fr
 }
 
+.actions--one {
+  grid-template-columns: 1fr
+}
+
 .btn {
   height: 40px;
   border-radius: 10px;
