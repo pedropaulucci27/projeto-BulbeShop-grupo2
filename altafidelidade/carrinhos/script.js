@@ -9,6 +9,28 @@ const moedaBR = (n) =>
     maximumFractionDigits: 2,
   })}`;
 
+/* Injeta CSS para o estado selecionado do botão (mesmo comportamento do script original) */
+(function injetarEstilosSelecao() {
+  if (document.getElementById("bulbe-selecao-css")) return;
+  const style = document.createElement("style");
+  style.id = "bulbe-selecao-css";
+  style.textContent = `
+    .btn-selecao {
+      cursor: pointer; user-select: none;
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .35rem .75rem; border-radius: 9999px;
+      border: 1px solid rgba(8,6,141,.28); background: #fff;
+      font-weight: 600; line-height: 1; font-size: .95rem;
+    }
+    .cartao-produto.is-selecionado .btn-selecao {
+      background: #08068D;
+      border-color: #08068D;
+      color: #fff;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
 /* Estado interno */
 let itensCarrinho = []; // array normalizado [{id, produtoId, quantidade, produto:{title,price,image}}]
 const selecionados = new Set(); // Set de itemId (string)
@@ -68,7 +90,7 @@ function buildCard(item) {
     <article class="cartao-produto" data-item-id="${item.id}">
       <label class="checkbox-produto">
         <input type="checkbox" class="selecao-individual">
-        <span class="texto-checkbox">Selecionar</span>
+        <span class="texto-checkbox btn-selecao">Selecionar</span>
       </label>
       <div class="imagem-produto">
         <img src="${img}" alt="${item.produto.title}"
@@ -126,6 +148,8 @@ function renderItens() {
       if (cb.checked) selecionados.add(itemId);
       else selecionados.delete(itemId);
       card.classList.toggle("is-selecionado", cb.checked);
+      const span = card.querySelector(".btn-selecao");
+      if (span) span.textContent = cb.checked ? "Selecionado" : "Selecionar";
       atualizarSelecionarTudo();
       atualizarResumo();
     });
@@ -329,6 +353,8 @@ document.getElementById("selecionarTudo")?.addEventListener("change", (e) => {
     if (!cb || !id) return;
     cb.checked = marcar;
     card.classList.toggle("is-selecionado", marcar);
+    const span = card.querySelector(".btn-selecao");
+    if (span) span.textContent = marcar ? "Selecionado" : "Selecionar";
     if (marcar) selecionados.add(id);
     else selecionados.delete(id);
   });
