@@ -58,61 +58,73 @@ navScroll.addEventListener("mousemove", (e) => {
     navScroll.scrollLeft = scrollLeft - walk;
 });
 
-// === ÍCONES (coração / carrinho) ===
-document.querySelectorAll('.icon-btn').forEach(btn => {
-    btn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        btn.classList.toggle('active');
+// === ÍCONES (coração / carrinho) via event delegation ===
+document.addEventListener('click', (event) => {
+    const btn = event.target.closest('.icon-btn');
+    if (!btn) return;
 
-        const card = btn.closest('.card, [data-produto], .produto') || null;
-        if (!card) return;
+    event.stopPropagation();
+    btn.classList.toggle('active');
 
-        const imgEl   = card.querySelector('img');
-        const titleEl = card.querySelector('.titulo-produto, .title, h3, h2');
-        const priceEl = card.querySelector('.preco-atual, .price-now, .price, [data-preco]');
+    const card = btn.closest('.card, [data-produto], .produto') || null;
+    if (!card) return;
 
-        const parsePrecoBR = (txt) => {
-            if (!txt) return 0;
-            return parseFloat(String(txt).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
-        };
+    const imgEl   = card.querySelector('img');
+    const titleEl = card.querySelector('.titulo-produto, .title, h3, h2');
+    const priceEl = card.querySelector('.preco-atual, .price-now, .price, [data-preco]');
 
-        const title = (titleEl?.textContent || '').trim() || 'Produto';
-        const price = priceEl?.dataset?.preco
-            ? parseFloat(priceEl.dataset.preco)
-            : parsePrecoBR(priceEl?.textContent || '0');
-        const img = imgEl?.src || '';
-        const alt = imgEl?.alt || title;
+    const parsePrecoBR = (txt) => {
+        if (!txt) return 0;
+        return parseFloat(String(txt).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+    };
 
-        // === FAVORITAR ===
-        if (btn.classList.contains('heart')) {
-            const id = `araujo-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
-            let favs = [];
-            try { favs = JSON.parse(localStorage.getItem('bulbe:favorites')) || []; } catch {}
-            const jaFav = favs.find(f => f.id === id);
-            if (jaFav) {
-                favs = favs.filter(f => f.id !== id);
-                btn.classList.remove('active');
-            } else {
-                favs.push({ id, title, price: `R$ ${price.toFixed(2).replace('.', ',')}`, priceOld: '', img });
-                btn.classList.add('active');
-            }
-            try { localStorage.setItem('bulbe:favorites', JSON.stringify(favs)); } catch {}
-            return;
+    const title = (titleEl?.textContent || '').trim() || 'Produto';
+    const price = priceEl?.dataset?.preco
+        ? parseFloat(priceEl.dataset.preco)
+        : parsePrecoBR(priceEl?.textContent || '0');
+    const img = imgEl?.src || '';
+    const alt = imgEl?.alt || title;
+    const prodId = card.dataset.produto || `${title.toLowerCase()}|${price.toFixed(2)}`;
+
+    // === FAVORITAR ===
+    if (btn.classList.contains('heart')) {
+        const id = `araujo-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
+        let favs = [];
+        try { favs = JSON.parse(localStorage.getItem('bulbe:favorites')) || []; } catch {}
+        const jaFav = favs.find(f => f.id === id);
+        if (jaFav) {
+            favs = favs.filter(f => f.id !== id);
+            btn.classList.remove('active');
+        } else {
+            favs.push({ id, title, price: `R$ ${price.toFixed(2).replace('.', ',')}`, priceOld: '', img });
+            btn.classList.add('active');
+        }
+        try { localStorage.setItem('bulbe:favorites', JSON.stringify(favs)); } catch {}
+        return;
+    }
+
+    // === ADICIONAR AO CARRINHO ===
+    if (btn.classList.contains('cart')) {
+        const id = prodId;
+
+        // NOVO: Sincroniza com API do Backend para não dar erro no checkout
+        if (window.api && window.api.estaLogado()) {
+            try {
+                let numId = Number(id);
+                if(isNaN(numId)) numId = 1;
+                window.api.carrinho.adicionar(numId, 1);
+            } catch(e) { console.error("Erro ao adicionar no back-end:", e) }
         }
 
-        // === ADICIONAR AO CARRINHO ===
-        if (btn.classList.contains('cart')) {
-            const id = `${title.toLowerCase()}|${price.toFixed(2)}`;
-            let carrinho = [];
-            try { carrinho = JSON.parse(localStorage.getItem('bulbe:cart')) || []; } catch {}
-            const existente = carrinho.find(p => p.id === id);
-            if (existente) existente.qty++;
-            else carrinho.push({ id, title, price, img, alt, qty: 1 });
-            localStorage.setItem('bulbe:cart', JSON.stringify(carrinho));
-            localStorage.setItem('bulbe:lastAddedId', id);
-            window.location.href = '/altafidelidade/carrinhos/carrinho.html';
-        }
-    });
+        let carrinho = [];
+        try { carrinho = JSON.parse(localStorage.getItem('bulbe:cart')) || []; } catch {}
+        const existente = carrinho.find(p => p.id === id);
+        if (existente) existente.qty++;
+        else carrinho.push({ id, title, price, img, alt, qty: 1 });
+        localStorage.setItem('bulbe:cart', JSON.stringify(carrinho));
+        localStorage.setItem('bulbe:lastAddedId', id);
+        window.location.href = '/altafidelidade/carrinhos/carrinho.html';
+    }
 });
 
 // === INTEGRAÇÃO COM API (LOJA ESPECÍFICA) ===
@@ -154,7 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const img = produto.image || produto.imagem || '/altafidelidade/home/img/produto_placeholder.webp';
                         const titulo = produto.title || produto.nome || 'Produto Sem Nome';
                         const produtoHTML = `
-                            <article class="produto card" data-produto="${produto.id}">
+                            <article class="produto card" data-produto="${produto.id}" onclick="window.location.href='/altafidelidade/produto/produto.html?id=${produto.id}'" style="cursor: pointer;">
                                 <div class="card-body">
                                     <div class="media">
                                         <img src="${img}" alt="${titulo}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/produto_placeholder.webp'">
