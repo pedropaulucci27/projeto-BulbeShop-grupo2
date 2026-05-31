@@ -69,6 +69,7 @@
           <img class="chev" src="../pagamento2/.assets/img/chevron-right.svg" alt="">
         </button>
 
+        <!-- Apenas esses países, já que só eles compoem o público alvo atual da BulbeShop -->
         <ul class="select-list" role="listbox">
           <li class="opt">Brasil</li>
           <li class="opt">Argentina</li>
@@ -129,60 +130,13 @@
 
     <div class="row-2 row-stack">
       <label class="field">
-        <span class="label">Estado: <b class="req">*</b></span>
-        <div class="select-inline inline-enhanced" data-inline id="stateSelect" aria-expanded="false">
-          <button class="inline-head" type="button">
-            <span class="inline-label">Selecione o estado</span>
-            <img class="inline-chev" src="../pagamento2/.assets/img/chevron-right.svg" alt="">
-          </button>
-          <ul class="inline-list">
-            <li class="inline-opt">AC</li>
-            <li class="inline-opt">AL</li>
-            <li class="inline-opt">AP</li>
-            <li class="inline-opt">AM</li>
-            <li class="inline-opt">BA</li>
-            <li class="inline-opt">CE</li>
-            <li class="inline-opt">DF</li>
-            <li class="inline-opt">ES</li>
-            <li class="inline-opt">GO</li>
-            <li class="inline-opt">MA</li>
-            <li class="inline-opt">MT</li>
-            <li class="inline-opt">MS</li>
-            <li class="inline-opt">MG</li>
-            <li class="inline-opt">PA</li>
-            <li class="inline-opt">PB</li>
-            <li class="inline-opt">PR</li>
-            <li class="inline-opt">PE</li>
-            <li class="inline-opt">PI</li>
-            <li class="inline-opt">RJ</li>
-            <li class="inline-opt">RN</li>
-            <li class="inline-opt">RS</li>
-            <li class="inline-opt">RO</li>
-            <li class="inline-opt">RR</li>
-            <li class="inline-opt">SC</li>
-            <li class="inline-opt">SP</li>
-            <li class="inline-opt">SE</li>
-            <li class="inline-opt">TO</li>
-          </ul>
-        </div>
+        <span class="label">Estado:</span>
+        <input id="estado" class="input" type="text" placeholder="Preenchido automaticamente pelo CEP" readonly>
       </label>
 
       <label class="field">
-        <span class="label">Cidade: <b class="req">*</b></span>
-        <div class="select-inline inline-enhanced" data-inline id="citySelect" aria-expanded="false">
-          <button class="inline-head" type="button">
-            <span class="inline-label">Selecione a cidade</span>
-            <img class="inline-chev" src="../pagamento2/.assets/img/chevron-right.svg" alt="">
-          </button>
-          <ul class="inline-list">
-            <li class="inline-opt">São Paulo</li>
-            <li class="inline-opt">Rio de Janeiro</li>
-            <li class="inline-opt">Belo Horizonte</li>
-            <li class="inline-opt">Curitiba</li>
-            <li class="inline-opt">Porto Alegre</li>
-            <li class="inline-opt">Recife</li>
-          </ul>
-        </div>
+        <span class="label">Cidade:</span>
+        <input id="cidade" class="input" type="text" placeholder="Preenchida automaticamente pelo CEP" readonly>
       </label>
     </div>
     </section>
