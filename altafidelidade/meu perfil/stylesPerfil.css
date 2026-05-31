@@ -237,6 +237,17 @@ body {
     transform: translateY(1px);
 }
 
+.erro-msg {
+    margin: 4px 0 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    font-size: 13px;
+    text-align: center;
+}
+
 /* ====== Responsividade ====== */
 @media (min-width: 480px) {
     .card {
