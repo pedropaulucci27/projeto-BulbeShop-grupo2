@@ -155,7 +155,7 @@ validate();
           const expiry  = document.getElementById('debitExpiry')?.value || '';
           const cvv     = document.getElementById('debitCVV')?.value || '';
           await window.api.pedidos.pagarDebito(pedidoId, { numero, validade: expiry, cvv });
-          localStorage.removeItem('bulbe:pedidoId');
+          // localStorage.removeItem('bulbe:pedidoId'); // comentado para a tela final conseguir ler
           localStorage.removeItem('bulbe:cart');
           localStorage.removeItem('bulbe:checkoutItems');
           window.location.href = PROCESSING_URL;
@@ -174,3 +174,52 @@ validate();
   wireAutosave();
   wireFinish();
 })();
+
+async function carregarDadosDebito() {
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elEndereco = document.getElementById("enderecoCobranca");
+  
+  if (elEndereco && cliente.rua) {
+    elEndereco.innerHTML = `${cliente.rua}, ${cliente.numero || 'S/N'}${cliente.compl ? ', ' + cliente.compl : ''}<br>${cliente.cep || ''} ${cliente.cidade || ''}, ${cliente.estado || ''}`;
+  } else if (elEndereco) {
+    elEndereco.innerHTML = "Endereço não encontrado.";
+  }
+
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+  let total = 0;
+
+  if (pedidoId && window.api?.estaLogado()) {
+    try {
+      const pedido = await window.api.pedidos.buscar(pedidoId);
+      total = pedido.total;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // Fallback: Se falhar por causa do ID, busca o último pedido do histórico da pessoa
+  if ((!total || total <= 0) && window.api?.estaLogado()) {
+      try {
+          const historico = await window.api.pedidos.listar();
+          if (historico && historico.length > 0) {
+              total = historico[0].total; // pega o mais recente
+              localStorage.setItem("bulbe:pedidoId", historico[0].id); // corrige o ID salvo
+          }
+      } catch(e) {}
+  }
+
+  // Último recurso: carrinho offline
+  if (!total || total <= 0) {
+      try {
+          const checkoutItems = JSON.parse(localStorage.getItem('bulbe:checkoutItems') || '[]');
+          total = checkoutItems.reduce((soma, item) => soma + (parseFloat(item.price || 0) * parseInt(item.qty || 1)), 0);
+      } catch(e) {}
+  }
+
+  const boxValor = document.getElementById("valorTotalBox");
+  if (boxValor) {
+    boxValor.innerHTML = `R$ ${total.toFixed(2).replace('.', ',')}`;
+  }
+}
+
+carregarDadosDebito();

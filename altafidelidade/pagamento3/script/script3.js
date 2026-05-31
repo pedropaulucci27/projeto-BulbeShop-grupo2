@@ -139,7 +139,7 @@ elExpiry?.addEventListener("change", () => {
 wireInstallments();
 refreshCTA();
 
-/* Concluir compra → envia pagamento via API e redireciona */
+/* Concluir compra → envia pagamento via API e redireciona APENAS se houver sucesso */
 btnFinish?.addEventListener("click", async () => {
   if (btnFinish.disabled) return;
 
@@ -153,25 +153,134 @@ btnFinish?.addEventListener("click", async () => {
 
   const pedidoId = localStorage.getItem("bulbe:pedidoId");
 
-  if (window.api?.estaLogado() && pedidoId) {
-    btnFinish.disabled = true;
-    try {
-      const parcelas = parseInt(getSelectedInstallmentText()) || 1;
-      await window.api.pedidos.pagarCartao(pedidoId, {
-        numero:    onlyDigits(elNumber?.value || ""),
-        validade:  elExpiry?.value || "",
-        cvv:       onlyDigits(elCVV?.value || ""),
-        parcelas,
-      });
-      localStorage.removeItem("bulbe:pedidoId");
-      localStorage.removeItem("bulbe:cart");
-      localStorage.removeItem("bulbe:checkoutItems");
-      window.location.href = "/altafidelidade/processando compra/html/index.html";
-    } catch {
-      btnFinish.disabled = false;
-      window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
-    }
-  } else {
-    window.location.href = "/altafidelidade/processando compra/html/index.html";
+  // SE NÃO ESTIVER LOGADO OU FALTAR PEDIDO: Bloqueia a aprovação mágica!
+  if (!window.api?.estaLogado() || !pedidoId) {
+    alert("Erro: Você precisa estar logado e com pedido ativo para finalizar a compra.");
+    window.location.href = "/altafidelidade/login/login.html"; 
+    return; 
   }
-});
+
+  btnFinish.disabled = true;
+  try {
+    const parcelasStr = getSelectedInstallmentText() || "1x";
+    const parcelas = parseInt(parcelasStr.split("x")[0]) || 1; // Ex: pega apenas o "3" do "3x"
+
+    // Envia para a API real do backend
+    await window.api.pedidos.pagarCartao(pedidoId, {
+      numero:    onlyDigits(elNumber?.value || ""),
+      validade:  elExpiry?.value || "",
+      cvv:       onlyDigits(elCVV?.value || ""),
+      parcelas,
+    });
+    
+    // Apenas se a API não der erro -> Vai para o Processando (e sucesso)
+    // localStorage.removeItem("bulbe:pedidoId"); // Comentado para a tela final conseguir ler
+    localStorage.removeItem("bulbe:cart");
+    localStorage.removeItem("bulbe:checkoutItems");
+    window.location.href = "/altafidelidade/processando compra/html/index.html";
+
+  } catch (erro) {
+    // Se a API retornar erro/status falho -> Vai para a Recusada
+    btnFinish.disabled = false;
+    window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+  }
+}
+);
+
+// 1. FUNÇÃO PARA CARREGAR OS DADOS DO CHECKOUT (TELA DE PAGAMENTO)
+async function carregarDadosDinamicos() {
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elEndereco = document.getElementById("enderecoCobranca");
+  
+  if (elEndereco && cliente.rua) {
+    elEndereco.innerHTML = `${cliente.rua}, ${cliente.numero || 'S/N'} ${cliente.compl ? ', ' + cliente.compl : ''}<br>${cliente.cep || ''} ${cliente.cidade || ''}, ${cliente.estado || ''}`;
+  } else if (elEndereco) {
+    elEndereco.innerHTML = "Endereço não encontrado.";
+  }
+
+  const elGrid = document.getElementById("parcelGrid");
+  if (!elGrid) return;
+
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+  let total = 0;
+
+  if (pedidoId && window.api?.estaLogado()) {
+    try {
+      const pedido = await window.api.pedidos.buscar(pedidoId);
+      total = pedido.total;
+    } catch (e) { 
+      console.error("Erro ao buscar pedido do backend:", e); 
+    }
+  }
+
+  // Fallback: Se falhar por causa do ID, busca o último pedido do histórico da pessoa
+  if ((!total || total <= 0) && window.api?.estaLogado()) {
+      try {
+          const historico = await window.api.pedidos.listar();
+          if (historico && historico.length > 0) {
+              total = historico[0].total; // pega o mais recente
+              localStorage.setItem("bulbe:pedidoId", historico[0].id); // corrige o ID salvo
+          }
+      } catch(e) {}
+  }
+
+  // Último recurso: carrinho offline
+  if (!total || total <= 0) {
+      try {
+          const checkoutItems = JSON.parse(localStorage.getItem('bulbe:checkoutItems') || '[]');
+          total = checkoutItems.reduce((soma, item) => soma + (parseFloat(item.price || 0) * parseInt(item.qty || 1)), 0);
+      } catch(e) {}
+  }
+
+  elGrid.innerHTML = "";
+  const maxParcelas = 6;
+  
+  for (let i = 1; i <= maxParcelas; i++) {
+    let valorComJuros = total;
+    if (i > 3) valorComJuros = total * (1 + (i * 0.02)); 
+
+    const valorParcela = (valorComJuros / i).toFixed(2).replace(".", ",");
+    const valorJurosStr = (valorComJuros - total).toFixed(2).replace(".", ",");
+    
+    const btn = document.createElement("button");
+    btn.className = "parcel" + (i === 1 ? " is-selected" : "");
+    btn.setAttribute("role", "radio");
+    btn.setAttribute("aria-checked", i === 1 ? "true" : "false");
+    btn.dataset.val = `${i}x ${valorParcela}`;
+    
+    let jurosTexto = i <= 3 ? "Sem taxa de juros" : `R$${valorJurosStr} de juros`;
+    
+    btn.innerHTML = `
+      <strong>${i} x R$${valorParcela}</strong>
+      <small>${jurosTexto}</small>
+    `;
+    elGrid.appendChild(btn);
+  }
+  
+  if (typeof wireInstallments === "function") wireInstallments();
+  if (typeof refreshCTA === "function") refreshCTA();
+}
+
+// 2. FUNÇÃO PARA EXIBIR SUCESSO (DEVE SER CHAMADA NA TELA DE OBRIGADO)
+function finalizarPedidoNaTelaDeSucesso() {
+  try {
+    // Busca o ID do pedido que foi guardado no localStorage
+    const pedidoRealId = localStorage.getItem("bulbe:pedidoId") || 'Desconhecido';
+    const el = document.getElementById('orderInfo');
+    
+    if (el) {
+      el.innerHTML = `Número do pedido: <strong>#${pedidoRealId}</strong><br>Código de rastreio: (será atualizado em breve)`;
+    }
+    
+    if (pedidoRealId !== 'Desconhecido') {
+      localStorage.removeItem('bulbe:pedidoId');
+      localStorage.removeItem('bulbe:cart');
+      localStorage.removeItem('bulbe:checkoutItems');
+    }
+  } catch (e) { 
+    console.error("Erro ao finalizar pedido na tela:", e); 
+  }
+}
+
+// Invoca a função
+carregarDadosDinamicos();

@@ -3,6 +3,38 @@
     box-sizing: border-box;
 }
 
+/* ====== Header padrão ====== */
+.appbar-perfil {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(8, 6, 141, 0.85);
+    position: relative;
+    z-index: 10;
+}
+
+.appbar-perfil__back {
+    border: 0;
+    background: transparent;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.appbar-perfil__back img {
+    width: 22px;
+    height: 22px;
+    filter: brightness(0) invert(1);
+}
+
+.appbar-perfil__title {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
 html,
 body {
     height: 100%;
@@ -48,7 +80,7 @@ body {
     position: relative;
 }
 
-back-btn {
+.back-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -92,6 +124,18 @@ back-btn {
     font-size: 18px;
     font-weight: 600;
     color: #0b1b3a;
+    border: 1px solid #e7ecf5;
+    border-radius: 8px;
+    padding: 4px 10px;
+    text-align: center;
+    background: #f7f9fc;
+    width: 100%;
+    outline: none;
+}
+
+.user-name:focus {
+    border-color: #cfe0ff;
+    background: #fff;
 }
 
 /* ====== Form ====== */
@@ -191,6 +235,17 @@ back-btn {
 
 .primary:active {
     transform: translateY(1px);
+}
+
+.erro-msg {
+    margin: 4px 0 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    font-size: 13px;
+    text-align: center;
 }
 
 /* ====== Responsividade ====== */

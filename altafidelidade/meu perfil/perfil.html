@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil do Usuário</title>
+    <title>Meu Perfil • Bulbe</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="stylesPerfil.css">
@@ -13,18 +13,25 @@
 <body>
     <div class="bg-pattern"></div>
 
+    <header class="appbar-perfil">
+        <button type="button" class="appbar-perfil__back" aria-label="Voltar" onclick="history.back()">
+            <img src="./img/Icon.svg" alt="">
+        </button>
+        <span class="appbar-perfil__title">Meu Perfil</span>
+    </header>
+
     <main class="shell">
         <section class="card">
             <!-- Botão de voltar (imagem + link para outra página) -->
-            <a class="back-btn" aria-label="Voltar" onclick="history.back()">
+            <button type="button" class="back-btn" aria-label="Voltar" onclick="history.back()">
                 <img src="./img/Icon.svg" alt="Voltar">
-            </a>
+            </button>
             <div class="avatar-wrap">
                 <!-- Imagem do perfil -->
                 <img class="avatar" src="./img/Frame 9.svg" alt="Foto do usuário">
 
                 <div class="user-label">Usuário:</div>
-                <h2 class="user-name">Jeferson Soares</h2>
+                <input type="text" id="nomeUsuario" class="user-name" value="Jeferson Soares" aria-label="Nome do usuário">
                 <p class="user-points">
                     Pontos Bulbe:
                     <button type="button" class="points-link" id="abrirPontosBulbe">
@@ -80,6 +87,7 @@
                     </div>
                 </div>
 
+                <p id="erro-perfil" class="erro-msg" hidden role="alert"></p>
                 <button class="primary" type="submit">Alterar Perfil</button>
             </form>
         </section>

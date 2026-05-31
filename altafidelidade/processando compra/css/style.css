@@ -109,3 +109,33 @@ body {
   margin: 0 auto;
   height: auto;
 }
+
+/* SPINNER DE LOADING */
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 20px auto 0;
+  max-width: 420px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--gray-100);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-txt {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-400);
+  font-weight: 600;
+}

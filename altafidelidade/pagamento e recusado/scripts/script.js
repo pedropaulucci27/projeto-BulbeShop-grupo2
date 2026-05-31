@@ -10,22 +10,22 @@ document.getElementById('btnLogo')?.addEventListener('click', () => {
 
 // ——— carrega dados do pedido vindos da API (salvos após confirmação do pagamento)
 (function hydrateFromStorage(){
-  try{
-    const data = JSON.parse(localStorage.getItem('bulbeCheckout') || '{}');
+  try {
+    const pedidoIdReal = localStorage.getItem('bulbe:pedidoId') || '';
     const el = document.getElementById('orderInfo');
     if(el){
-      const pedido = data.orderId ? `Número do pedido: ${data.orderId}` : 'Número do pedido: aguardando confirmação';
-      el.innerHTML = pedido;
+      el.innerHTML = pedidoIdReal ? `Número do pedido: ${pedidoIdReal}` : 'Número do pedido: aguardando confirmação';
     }
-    if(data.trackingCode){
+    const trackingCode = localStorage.getItem('bulbe:trackingCode');
+    if(trackingCode){
       const trackingEl = document.getElementById('trackingInfo');
       const codeEl = document.getElementById('trackingCode');
       if(trackingEl && codeEl){
-        codeEl.textContent = data.trackingCode;
+        codeEl.textContent = trackingCode;
         trackingEl.hidden = false;
       }
     }
-  }catch(e){}
+  } catch(e) {}
 })();
 
 // ——— botões da página
