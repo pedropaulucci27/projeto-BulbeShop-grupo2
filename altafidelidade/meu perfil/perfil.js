@@ -24,13 +24,21 @@ async function salvarPerfil(e) {
   e.preventDefault();
   if (!window.api?.estaLogado()) return;
 
-  const nome  = document.getElementById('nomeUsuario')?.value.trim();
-  const senha = document.getElementById('senha')?.value;
-  const btn   = e.target.querySelector('[type="submit"]');
+  const nome     = document.getElementById('nomeUsuario')?.value.trim();
+  const email    = document.getElementById('email')?.value.trim();
+  const senha    = document.getElementById('senha')?.value;
+  const telefone = document.getElementById('telefone')?.value.trim();
+  const cpf      = document.getElementById('cpf')?.value.trim();
+  const endereco = document.getElementById('endereco')?.value.trim();
+  const btn      = e.target.querySelector('[type="submit"]');
 
   const dados = {};
-  if (nome)  dados.nome  = nome;
+  if (nome)     dados.nome     = nome;
+  if (email)    dados.email    = email;
   if (senha && senha !== '************') dados.senha = senha;
+  if (telefone) dados.telefone = telefone;
+  if (cpf)      dados.cpf      = cpf;
+  if (endereco) dados.endereco = endereco;
 
   if (!Object.keys(dados).length) return;
 
@@ -41,6 +49,8 @@ async function salvarPerfil(e) {
     if (btn) { btn.textContent = 'Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }, 2000); }
   } catch {
     if (btn) { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }
+    const errEl = document.getElementById('erro-perfil');
+    if (errEl) { errEl.textContent = 'Erro ao salvar perfil. Tente novamente.'; errEl.hidden = false; }
   }
 }
 
