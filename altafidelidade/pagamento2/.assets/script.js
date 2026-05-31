@@ -163,7 +163,7 @@
   wirePais();
 
   // ── Expõe funções globalmente ─────────────────────────────────────
-  window.buscarFrete      = buscarFrete;
+  window.buscarFrete       = buscarFrete;
   window.renderOpcoesFrete = renderOpcoesFrete;
 
   // ── Salva e redireciona para o método de pagamento ────────────────
@@ -215,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelector('#countrySelect .select-placeholder').textContent.trim() !== 'Selecionar';
     if (!paisSelecionado) valido = false;
 
-    // Estado e cidade são preenchidos automaticamente pelo CEP
     const estadoPreenchido = (document.getElementById('estado')?.value || '').trim() !== '';
     if (!estadoPreenchido) valido = false;
 
@@ -229,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
     btnSave.classList.toggle('enabled', valido);
   }
 
-  // Expõe globalmente para o bloco do frete poder chamar
   window.validarCampos = validarCampos;
 
   camposObrigatorios.forEach(id => {
