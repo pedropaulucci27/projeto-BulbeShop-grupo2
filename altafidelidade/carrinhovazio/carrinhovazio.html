@@ -11,213 +11,38 @@
 </head>
 
 <body>
-    <!-- CABEÇALHO -->
     <header class="barra-superior">
         <a class="botao-voltar" aria-label="Voltar" href="../home/paginicial.html">
             <img src="./assets/img/corner-up-left (2).svg" alt="Voltar">
         </a>
-
-        <a href="/altafidelidade/home/paginicial.html"><img class="logo-bulbe" src="./assets/img/logo.svg" alt="Bulbe"></a>
+        <a href="/altafidelidade/home/paginicial.html">
+            <img class="logo-bulbe" src="./assets/img/logo.svg" alt="Bulbe">
+        </a>
     </header>
 
     <main class="conteudo-principal">
-        <!-- TÍTULO + Selecionar tudo -->
         <section class="cabecalho-carrinho">
             <div class="lado-esquerdo-cabecalho">
                 <img class="icone-carrinho" src="./assets/img/carrinho.svg" alt="">
                 <h1>Carrinho</h1>
             </div>
-            <label class="selecao-geral">
-                <input type="checkbox" id="selecionarTudo">
-                <span class="caixa-selecao-falsa"></span>
-                <span>Selecionar tudo</span>
-            </label>
         </section>
 
-        <!-- CARRINHO VAZIO -->
         <div class="carrinho-vazio">
             <img src="./assets/img/carrinhovazio.svg" alt="Carrinho vazio" class="img-vazio">
-
             <div class="texto-vazio">
                 <img src="./assets/img/sadface.svg" alt="" class="icone-user">
                 <span>O carrinho está vazio</span>
             </div>
         </div>
 
-
-        <!-- ITEM 1 — LÂMPADA -->
-        <article class="cartao-produto" data-produto="lampada">
-            <label class="checkbox-produto">
-                <input type="checkbox" class="selecao-individual">
-                <span class="texto-checkbox">Selecionar</span>
-            </label>
-
-            <div class="imagem-produto">
-                <img src="./assets/img/lamp.svg" alt="Lâmpada">
-            </div>
-
-            <div class="informacoes-produto">
-                <h3 class="titulo-produto">
-                    Lâmpada de LED E27 Bulbo 9W 803lm<br>
-                    Luz Branca Bivolt Black + Decker
-                </h3>
-
-                <div class="preco-produto">
-                    <span class="simbolo-reais">R$</span>
-                    <span class="valor-produto" data-preco="4.59">4,59</span>
-                </div>
-
-                <div class="controle-quantidade">
-                    <div class="contador" data-produto="lampada">
-                        <button class="botao-quantidade" data-acao="diminuir">–</button>
-                        <span class="quantidade-atual" data-quantidade>5</span>
-                        <button class="botao-quantidade" data-acao="aumentar">+</button>
-                    </div>
-                    <div class="texto-unidades">(5 unidades)</div>
-                </div>
-            </div>
-        </article>
-
-        <!-- ITEM 2 — PARAFUSADEIRA -->
-        <article class="cartao-produto" data-produto="parafusadeira">
-            <label class="checkbox-produto">
-                <input type="checkbox" class="selecao-individual">
-                <span class="texto-checkbox">Selecionar</span>
-            </label>
-
-            <div class="imagem-produto">
-                <img src="./assets/img/parafusadeira.svg" alt="Parafusadeira">
-            </div>
-
-            <div class="informacoes-produto">
-                <h3 class="titulo-produto">
-                    Parafusadeira Philco Force PPF120 3<br>em 1 1500RPM
-                </h3>
-
-                <div class="preco-antigo">De <s>R$ 399,90</s> por</div>
-
-                <div class="preco-produto">
-                    <span class="simbolo-reais">R$</span>
-                    <span class="valor-produto" data-preco="199.90">199,90</span>
-                </div>
-
-                <div class="controle-quantidade">
-                    <div class="contador" data-produto="parafusadeira">
-                        <button class="botao-quantidade" data-acao="diminuir">–</button>
-                        <span class="quantidade-atual" data-quantidade>1</span>
-                        <button class="botao-quantidade" data-acao="aumentar">+</button>
-                    </div>
-                    <div class="texto-unidades">(1<br> unidade)</div>
-                </div>
-            </div>
-
-            <footer class="faixa-desconto">
-                <span>Na Bulbe sai:</span>
-                <strong>–R$ 200,00</strong>
-                <div class="icone-faixa">
-                    <img src="./assets/img/logo-e.svg" alt="">
-                </div>
-            </footer>
-        </article>
-
-        <!-- SEÇÃO DE ITENS ADICIONAIS -->
-        <section class="secao-adicionar-itens">
-            <div class="conteudo-adicional">
-                <h2>Recomendações para você:</h2>
-                <div class="grupo-adicional">
-
-
-                    <div class="carrossel">
-                        <button class="seta-carrossel esquerda" aria-label="Anterior">‹</button>
-
-                        <div class="trilha-carrossel" id="trilhaCarrossel">
-                            <!-- CARD 1 -->
-                            <article class="cartao-mini">
-                                <span class="tag-oferta">Oferta relâmpago</span>
-
-                                <div class="miniatura-produto">
-                                    <img src="./assets/img/ferramenta2.svg" alt="Caixa de Ferramentas Philco">
-                                </div>
-
-                                <h4 class="titulo-mini">Caixa de Ferramentas Philco…</h4>
-
-                                <div class="preco-mini">
-                                    <strong>R$59,90</strong>
-                                    <s>R$119,90</s>
-                                </div>
-
-                                <div class="acoes-mini">
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (1).svg" alt=""></button>
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (2).svg" alt=""></button>
-                                </div>
-                            </article>
-
-
-                            <!-- CARD 2 -->
-                            <article class="cartao-mini">
-                                <div class="miniatura-produto">
-                                    <img src="./assets/img/ferramenta.svg" alt="Caixa de Ferramentas Philco">
-                                </div>
-                                <h4 class="titulo-mini">Caixa de Ferramentas Philco…</h4>
-                                <div class="preco-mini">
-                                    <strong>R$179,30</strong>
-                                </div>
-                                <div class="acoes-mini">
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (1).svg" alt=""></button>
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (2).svg" alt=""></button>
-                                </div>
-                            </article>
-
-                            <!-- CARD 3 -->
-                            <article class="cartao-mini">
-                                <span class="tag-oferta">Oferta relâmpago</span>
-
-                                <div class="miniatura-produto">
-                                    <img src="./assets/img/fone.svg" alt="Fone in-ear branco">
-                                </div>
-
-                                <h4 class="titulo-mini">Fone in-ear branco</h4>
-
-                                <div class="preco-mini">
-                                    <strong>R$24,95</strong>
-                                    <s>R$49,90</s>
-                                </div>
-                                <div class="acoes-mini">
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (1).svg" alt=""></button>
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (2).svg" alt=""></button>
-                                </div>
-                            </article>
-
-                            <!-- CARD 4 -->
-                            <article class="cartao-mini">
-                                <div class="miniatura-produto">
-                                    <img src="./assets/img/carregador.svg" alt="Cabo reforçado">
-                                </div>
-                                <h4 class="titulo-mini">Cabo reforçado</h4>
-                                <div class="preco-mini">
-                                    <strong>R$19,90</strong>
-                                </div>
-                                <div class="acoes-mini">
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (1).svg" alt=""></button>
-                                    <button class="botao-icone"><img src="./assets/img/Exclude (2).svg" alt=""></button>
-                                </div>
-                            </article>
-                        </div>
-
-                        <button class="seta-carrossel direita" aria-label="Próximo">›</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- LOGO FINAL DA PÁGINA -->
         <div class="logo-final">
             <img src="./assets/img/logo 2.svg" alt="Bulbe — sua próxima energia">
         </div>
-
     </main>
 
+    <script src="../api.js"></script>
     <script src="./script.js"></script>
-    <script src="./assets/script-carrossel.js"></script>
 </body>
 
 </html>
