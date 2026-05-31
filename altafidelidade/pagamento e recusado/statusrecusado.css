@@ -174,7 +174,7 @@ body {
 }
 
 .btn--ok {
-    background: var(--red)
+    background: var(--blue-cta)
 }
 
 .btn--ghost {
