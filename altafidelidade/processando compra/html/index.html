@@ -14,7 +14,7 @@
 
   <!-- HEADER -->
   <header class="appbar">
-    <button class="appbar__back" aria-label="Voltar">
+    <button class="appbar__back" aria-label="Voltar" hidden>
       <img src="../.assets/img/corner-up-left (2).svg" alt="">
     </button>
     <a href="/altafidelidade/home/paginicial.html"><img class="appbar__logo" src="../.assets/img/logo-base (1).svg" alt="Bulbe"></a>
@@ -25,9 +25,15 @@
     <img class="brand" src="../.assets/img/Component 1.svg" alt="Bulbe">
     <div class="imagem-superior">
       
-    <img src="/altafidelidade/processando compra/.assets/img/image 25.svg" alt="Imagem acima">
+    <img src="../.assets/img/image 25.svg" alt="Imagem acima">
   </div>
   </main>
+
+  <!-- SPINNER DE LOADING -->
+  <div class="loading-wrap" id="loadingSpinner" aria-live="polite" aria-label="Processando pagamento">
+    <div class="spinner"></div>
+    <p class="loading-txt">Processando seu pagamento...</p>
+  </div>
 
   <!-- TOAST COMO IMAGEM (USAR O ARQUIVO ENVIADO) -->
   <figure class="toast-img-wrap">
