@@ -184,6 +184,8 @@ btnFinish?.addEventListener("click", async () => {
     btnFinish.disabled = false;
     window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
   }
+}
+);
 
 async function carregarDadosDinamicos() {
   // 1. O Endereço puxamos do localStorage (que é onde a tela de checkout salva os dados do cliente)
