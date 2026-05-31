@@ -17,6 +17,14 @@ document.getElementById('btnLogo')?.addEventListener('click', () => {
       const pedido = data.orderId ? `Número do pedido: ${data.orderId}` : 'Número do pedido: aguardando confirmação';
       el.innerHTML = pedido;
     }
+    if(data.trackingCode){
+      const trackingEl = document.getElementById('trackingInfo');
+      const codeEl = document.getElementById('trackingCode');
+      if(trackingEl && codeEl){
+        codeEl.textContent = data.trackingCode;
+        trackingEl.hidden = false;
+      }
+    }
   }catch(e){}
 })();
 
