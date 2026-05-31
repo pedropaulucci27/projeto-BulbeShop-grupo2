@@ -139,7 +139,7 @@ elExpiry?.addEventListener("change", () => {
 wireInstallments();
 refreshCTA();
 
-/* Concluir compra → envia pagamento via API e redireciona */
+/* Concluir compra → envia pagamento via API e redireciona APENAS se houver sucesso */
 btnFinish?.addEventListener("click", async () => {
   if (btnFinish.disabled) return;
 
@@ -153,28 +153,37 @@ btnFinish?.addEventListener("click", async () => {
 
   const pedidoId = localStorage.getItem("bulbe:pedidoId");
 
-  if (window.api?.estaLogado() && pedidoId) {
-    btnFinish.disabled = true;
-    try {
-      const parcelas = parseInt(getSelectedInstallmentText()) || 1;
-      await window.api.pedidos.pagarCartao(pedidoId, {
-        numero:    onlyDigits(elNumber?.value || ""),
-        validade:  elExpiry?.value || "",
-        cvv:       onlyDigits(elCVV?.value || ""),
-        parcelas,
-      });
-      localStorage.removeItem("bulbe:pedidoId");
-      localStorage.removeItem("bulbe:cart");
-      localStorage.removeItem("bulbe:checkoutItems");
-      window.location.href = "/altafidelidade/processando compra/html/index.html";
-    } catch {
-      btnFinish.disabled = false;
-      window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
-    }
-  } else {
-    window.location.href = "/altafidelidade/processando compra/html/index.html";
+  // SE NÃO ESTIVER LOGADO OU FALTAR PEDIDO: Bloqueia a aprovação mágica!
+  if (!window.api?.estaLogado() || !pedidoId) {
+    alert("Erro: Você precisa estar logado e com pedido ativo para finalizar a compra.");
+    window.location.href = "/altafidelidade/login/login.html"; 
+    return; 
   }
-});
+
+  btnFinish.disabled = true;
+  try {
+    const parcelasStr = getSelectedInstallmentText() || "1x";
+    const parcelas = parseInt(parcelasStr.split("x")[0]) || 1; // Ex: pega apenas o "3" do "3x"
+
+    // Envia para a API real do backend
+    await window.api.pedidos.pagarCartao(pedidoId, {
+      numero:    onlyDigits(elNumber?.value || ""),
+      validade:  elExpiry?.value || "",
+      cvv:       onlyDigits(elCVV?.value || ""),
+      parcelas,
+    });
+    
+    // Apenas se a API não der erro -> Vai para o Processando (e sucesso)
+    localStorage.removeItem("bulbe:pedidoId");
+    localStorage.removeItem("bulbe:cart");
+    localStorage.removeItem("bulbe:checkoutItems");
+    window.location.href = "/altafidelidade/processando compra/html/index.html";
+
+  } catch (erro) {
+    // Se a API retornar erro/status falho -> Vai para a Recusada
+    btnFinish.disabled = false;
+    window.location.href = "/altafidelidade/pagamento e recusado/status-recusada.html";
+  }
 
 async function carregarDadosDinamicos() {
   // 1. O Endereço puxamos do localStorage (que é onde a tela de checkout salva os dados do cliente)
