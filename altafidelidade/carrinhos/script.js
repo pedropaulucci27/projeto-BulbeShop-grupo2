@@ -216,7 +216,7 @@ function atualizarResumo() {
     resumo.style.display = "none";
     return;
   }
-  resumo.style.display = "";
+  resumo.style.display = "block";
 
   const total = sel.reduce((acc, i) => acc + i.produto.price * i.quantidade, 0);
   const primeiro = sel[0];
