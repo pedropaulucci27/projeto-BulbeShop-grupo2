@@ -264,6 +264,15 @@ async function carregarProduto() {
       btnAdd.disabled = true;
       btnAdd.textContent = "Indisponível";
     }
+
+    const variationsCard = document.querySelector(".card.variations");
+    if (variationsCard) {
+      if (!p.variations || p.variations === '[]' || p.variations === 'null') {
+          variationsCard.style.display = "none";
+      } else {
+          variationsCard.style.display = "block";
+      }
+    }
   } catch {
     // mantém o conteúdo estático do HTML se a API não estiver disponível
   }
@@ -272,11 +281,10 @@ async function carregarProduto() {
 document.addEventListener("DOMContentLoaded", carregarProduto);
 
 /* =========================================================
-   ADICIONAR AO CARRINHO
+   ADICIONAR AO CARRINHO E COMPRAR
    ========================================================= */
-document.getElementById("btn-add")?.addEventListener("click", () => {
+async function adicionarItem(redirecionarPara) {
   const qty = parseInt(document.getElementById("qty-select")?.value || "1", 10);
-
   let id, title, price, img, alt;
 
   if (_produtoAtual) {
@@ -293,6 +301,25 @@ document.getElementById("btn-add")?.addEventListener("click", () => {
     alt   = "Ventilador Britânia BVT301";
   }
 
+  // 1. Tenta adicionar ao carrinho do back-end, se logado
+  if (window.api?.estaLogado()) {
+    try {
+      // É importante garantir que o id é numérico se o backend esperar um Number
+      let numId = Number(id);
+      if (isNaN(numId)) {
+          // Fallback se for um ID ficticio estático sem número
+          numId = 1; 
+      }
+      await window.api.carrinho.adicionar(numId, qty);
+    } catch (e) {
+      console.error("Erro ao sincronizar com backend", e);
+    }
+  } else if (redirecionarPara === '/altafidelidade/pagamento1/pagamento.html') {
+      window.location.href = '/altafidelidade/login/login.html';
+      return;
+  }
+
+  // 2. Salva localmente pro carrinho local
   let carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
   const existente = carrinho.find(p => p.id === id);
   if (existente) existente.qty += qty;
@@ -306,6 +333,9 @@ document.getElementById("btn-add")?.addEventListener("click", () => {
   localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
   localStorage.setItem("bulbe:lastAddedId", id);
 
-  showToast("Produto adicionado ao carrinho!");
-  setTimeout(() => { location.href = "/altafidelidade/carrinhos/carrinho.html"; }, 600);
-});
+  showToast("Adicionando...");
+  setTimeout(() => { location.href = redirecionarPara; }, 600);
+}
+
+document.getElementById("btn-add")?.addEventListener("click", () => adicionarItem("/altafidelidade/carrinhos/carrinho.html"));
+document.getElementById("btn-buy")?.addEventListener("click", () => adicionarItem("/altafidelidade/pagamento1/pagamento.html"));

@@ -156,14 +156,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const cupom = localStorage.getItem('bulbe:cupom') || undefined;
         const pedido = await window.api.pedidos.criar(cupom);
         localStorage.setItem('bulbe:pedidoId', String(pedido.id || pedido.pedido?.id || ''));
-      } catch {
+        window.location.href = '/altafidelidade/pagamento2/pagamento2.html';
+      } catch (err) {
+        alert("Erro ao criar pedido: " + (err.message || "Carrinho vazio ou estoque insuficiente."));
       } finally {
         btn.disabled = false;
         btn.textContent = 'Continuar';
       }
+    } else {
+        window.location.href = '/altafidelidade/pagamento2/pagamento2.html';
     }
-
-    window.location.href = '/altafidelidade/pagamento2/pagamento2.html';
   });
 });
 

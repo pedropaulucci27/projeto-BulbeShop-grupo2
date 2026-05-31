@@ -155,7 +155,7 @@ validate();
           const expiry  = document.getElementById('debitExpiry')?.value || '';
           const cvv     = document.getElementById('debitCVV')?.value || '';
           await window.api.pedidos.pagarDebito(pedidoId, { numero, validade: expiry, cvv });
-          localStorage.removeItem('bulbe:pedidoId');
+          // localStorage.removeItem('bulbe:pedidoId'); // comentado para a tela final conseguir ler
           localStorage.removeItem('bulbe:cart');
           localStorage.removeItem('bulbe:checkoutItems');
           window.location.href = PROCESSING_URL;
@@ -197,8 +197,23 @@ async function carregarDadosDebito() {
     }
   }
 
+  // Fallback: Se falhar por causa do ID, busca o último pedido do histórico da pessoa
+  if ((!total || total <= 0) && window.api?.estaLogado()) {
+      try {
+          const historico = await window.api.pedidos.listar();
+          if (historico && historico.length > 0) {
+              total = historico[0].total; // pega o mais recente
+              localStorage.setItem("bulbe:pedidoId", historico[0].id); // corrige o ID salvo
+          }
+      } catch(e) {}
+  }
+
+  // Último recurso: carrinho offline
   if (!total || total <= 0) {
-    total = 192.31;
+      try {
+          const checkoutItems = JSON.parse(localStorage.getItem('bulbe:checkoutItems') || '[]');
+          total = checkoutItems.reduce((soma, item) => soma + (parseFloat(item.price || 0) * parseInt(item.qty || 1)), 0);
+      } catch(e) {}
   }
 
   const boxValor = document.getElementById("valorTotalBox");
