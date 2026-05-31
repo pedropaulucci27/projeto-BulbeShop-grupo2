@@ -284,57 +284,36 @@ document.addEventListener("DOMContentLoaded", carregarProduto);
    ADICIONAR AO CARRINHO E COMPRAR
    ========================================================= */
 async function adicionarItem(redirecionarPara) {
-  const qty = parseInt(document.getElementById("qty-select")?.value || "1", 10);
-  let id, title, price, img, alt;
-
-  if (_produtoAtual) {
-    id    = String(_produtoAtual.id);
-    title = _produtoAtual.title;
-    price = parseFloat(_produtoAtual.price);
-    img   = _produtoAtual.image || "./img/image 1.png";
-    alt   = _produtoAtual.title;
-  } else {
-    id    = "ventilador-bvt301";
-    title = "Ventilador Britânia BVT301";
-    price = 179.90;
-    img   = "./img/image 1.png";
-    alt   = "Ventilador Britânia BVT301";
+  // Produto deve estar carregado da API antes do clique
+  if (!_produtoAtual) {
+    showToast("Produto não carregado. Recarregue a página.");
+    return;
   }
 
-  // 1. Tenta adicionar ao carrinho do back-end, se logado
-  if (window.api?.estaLogado()) {
-    try {
-      // É importante garantir que o id é numérico se o backend esperar um Number
-      let numId = Number(id);
-      if (isNaN(numId)) {
-          // Fallback se for um ID ficticio estático sem número
-          numId = 1; 
-      }
-      await window.api.carrinho.adicionar(numId, qty);
-    } catch (e) {
-      console.error("Erro ao sincronizar com backend", e);
-    }
-  } else if (redirecionarPara === '/altafidelidade/pagamento1/pagamento.html') {
-      window.location.href = '/altafidelidade/login/login.html';
-      return;
+  // Usuário deve estar logado
+  if (!window.api?.estaLogado()) {
+    window.location.href =
+      "/altafidelidade/login/login.html?next=" +
+      encodeURIComponent(window.location.pathname);
+    return;
   }
 
-  // 2. Salva localmente pro carrinho local
-  let carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
-  const existente = carrinho.find(p => p.id === id);
-  if (existente) existente.qty += qty;
-  else carrinho.push({
-    id, title, price, qty,
-    cor:      document.querySelector('[data-variation="color"] .chip.is-active')?.textContent.trim(),
-    voltagem: document.querySelector('[data-variation="voltage"] .chip.is-active')?.textContent.trim(),
-    img, alt,
-  });
+  const qty   = parseInt(document.getElementById("qty-select")?.value || "1", 10);
+  const numId = Number(_produtoAtual.id);
 
-  localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
-  localStorage.setItem("bulbe:lastAddedId", id);
+  if (!numId || isNaN(numId)) {
+    showToast("ID de produto inválido.");
+    return;
+  }
 
-  showToast("Adicionando...");
-  setTimeout(() => { location.href = redirecionarPara; }, 600);
+  try {
+    await window.api.carrinho.adicionar(numId, qty);
+    showToast("Adicionando...");
+    setTimeout(() => { location.href = redirecionarPara; }, 600);
+  } catch (e) {
+    console.error("Erro ao adicionar ao carrinho", e);
+    showToast("Não foi possível adicionar ao carrinho. Tente novamente.");
+  }
 }
 
 document.getElementById("btn-add")?.addEventListener("click", () => adicionarItem("/altafidelidade/carrinhos/carrinho.html"));
