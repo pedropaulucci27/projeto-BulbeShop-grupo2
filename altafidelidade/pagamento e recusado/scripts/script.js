@@ -10,21 +10,16 @@ document.getElementById('btnLogo')?.addEventListener('click', () => {
 
 // ——— carrega dados do pedido / cartão (salvos na etapa de pagamento)
 (function hydrateFromStorage(){
-  try{
-    const data = JSON.parse(localStorage.getItem('bulbeCheckout') || '{}');
+  try {
+    // Busca o ID real que guardamos durante a compra
+    const pedidoIdReal = localStorage.getItem('bulbe:pedidoId') || 'Pendente';
 
-    // gera e mostra (se não existir) um nº de pedido simples
-    if(!data.orderId){
-      const rnd = Math.random().toString(36).slice(2,8).toUpperCase();
-      data.orderId = `AP${Date.now().toString().slice(-6)}${rnd}`;
-      localStorage.setItem('bulbeCheckout', JSON.stringify(data));
-    }
-
+    // Insere direto na tela, sem gerar código falso
     const el = document.getElementById('orderInfo');
     if(el){
-      el.innerHTML = `Número do pedido: ${data.orderId}<br>Código de rastreio: (será atualizado em breve)`;
+      el.innerHTML = `Número do pedido: ${pedidoIdReal}<br>Código de rastreio: (será atualizado em breve)`;
     }
-  }catch(e){}
+  } catch(e) {}
 })();
 
 // ——— botões da página

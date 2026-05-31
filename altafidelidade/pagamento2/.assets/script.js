@@ -49,6 +49,7 @@
     } else {
       if (inpNumero) inpNumero.disabled = false;
     }
+    if (window.validarCampos) window.validarCampos();
   });
 
   // ── Frete via API ─────────────────────────────────────────────────
@@ -208,18 +209,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     camposObrigatorios.forEach(id => {
       const campo = document.getElementById(id);
-      if (!campo.value.trim()) valido = false;
+      if (id === 'numero' && document.querySelector('.checkbox-inline input[type="checkbox"]')?.checked) {
+        // se marcou 'Sem número', o campo numero não precisa ser validado
+      } else if (!campo.value.trim()) {
+        valido = false;
+      }
     });
 
     const paisSelecionado =
-      document.querySelector('#countrySelect .select-placeholder').textContent.trim() !== 'Selecionar';
+      document.querySelector('#countrySelect .select-placeholder')?.textContent.trim() !== 'Selecionar';
     if (!paisSelecionado) valido = false;
 
+    // Cidade e Estado não bloqueiam mais o botão
     const estadoPreenchido = (document.getElementById('estado')?.value || '').trim() !== '';
-    if (!estadoPreenchido) valido = false;
-
     const cidadePreenchida = (document.getElementById('cidade')?.value || '').trim() !== '';
-    if (!cidadePreenchida) valido = false;
 
     const freteSelecionado = document.querySelector("input[name='frete']:checked");
     if (!freteSelecionado) valido = false;
