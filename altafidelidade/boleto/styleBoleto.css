@@ -418,3 +418,10 @@ body {
 .modal-footer {
     margin-top: 12px;
 }
+
+#valorPedido{
+    margin-top: 10px;
+     color: var(--primary);
+}
+    
+    
