@@ -174,3 +174,37 @@ validate();
   wireAutosave();
   wireFinish();
 })();
+
+async function carregarDadosDebito() {
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elEndereco = document.getElementById("enderecoCobranca");
+  
+  if (elEndereco && cliente.rua) {
+    elEndereco.innerHTML = `${cliente.rua}, ${cliente.numero || 'S/N'}${cliente.compl ? ', ' + cliente.compl : ''}<br>${cliente.cep || ''} ${cliente.cidade || ''}, ${cliente.estado || ''}`;
+  } else if (elEndereco) {
+    elEndereco.innerHTML = "Endereço não encontrado.";
+  }
+
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+  let total = 0;
+
+  if (pedidoId && window.api?.estaLogado()) {
+    try {
+      const pedido = await window.api.pedidos.buscar(pedidoId);
+      total = pedido.total;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  if (!total || total <= 0) {
+    total = 192.31;
+  }
+
+  const boxValor = document.getElementById("valorTotalBox");
+  if (boxValor) {
+    boxValor.innerHTML = `R$ ${total.toFixed(2).replace('.', ',')}`;
+  }
+}
+
+carregarDadosDebito();
