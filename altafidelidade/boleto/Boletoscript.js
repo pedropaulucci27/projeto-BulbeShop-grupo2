@@ -81,24 +81,45 @@ async function carregarDadosBoleto() {
     if (elCodigo) {
         elCodigo.innerText = formatado;
     }
-    // B. Coloca o Email
-    if (clienteStr) {
+    // B. Coloca o Email do Usuário Logado
+    const elEmail = document.getElementById("emailUsuario");
+    if (elEmail) {
+        let emailEncontrado = "Email não encontrado";
         try {
-            const cliente = JSON.parse(clienteStr);
-            const elEmail = document.getElementById("emailUsuario");
-            if (elEmail) elEmail.innerText = cliente.email || "Email não informado";
-        } catch(e) {}
+            if (window.api?.estaLogado()) {
+                const perfil = await window.api.usuario.perfil();
+                if (perfil?.email) emailEncontrado = perfil.email;
+            } else {
+                const usuarioSalvo = JSON.parse(localStorage.getItem("bulbe:usuario") || "{}");
+                if (usuarioSalvo.email) emailEncontrado = usuarioSalvo.email;
+            }
+        } catch (e) {
+            console.error("Erro ao puxar email", e);
+        }
+        elEmail.innerText = emailEncontrado;
     }
-    // C. Coloca o Preço (Tentando API primeiro)
+
+    // C. Calcula o total do pedido
     let total = 0;
-    if (pedidoId && window.api) {
+    if (pedidoId && window.api?.estaLogado()) {
         try {
             const pedido = await window.api.pedidos.buscar(pedidoId);
-            if (pedido && pedido.total) total = pedido.total;
-        } catch (e) { console.error("Erro na API, usando Plano B", e); }
+            total = pedido.total;
+        } catch (e) { console.error("Erro ao buscar pedido por ID", e); }
     }
     
-    // PLANO B ATUALIZADO: Calcula somando os preços da lista de itens do Checkout
+    // Fallback: Se falhar por causa do ID, busca o último pedido do histórico da pessoa
+    if ((!total || total <= 0) && window.api?.estaLogado()) {
+        try {
+            const historico = await window.api.pedidos.listar();
+            if (historico && historico.length > 0) {
+                total = historico[0].total; // pega o mais recente
+                localStorage.setItem("bulbe:pedidoId", historico[0].id); // corrige o ID salvo
+            }
+        } catch(e) { console.error("Erro ao listar histórico", e); }
+    }
+    
+    // Último recurso: carrinho offline
     if (!total || total <= 0) {
         try {
             const checkoutItems = JSON.parse(localStorage.getItem('bulbe:checkoutItems') || '[]');
