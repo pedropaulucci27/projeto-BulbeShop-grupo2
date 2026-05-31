@@ -71,7 +71,7 @@ function normalizarItens(resp) {
     produtoId: String(
       item.produtoId ?? item.produto_id ?? item.produto?.id ?? ""
     ),
-    quantidade: Number(item.quantidade ?? item.quantity ?? 1),
+    quantidade: Number(item.quantidade ?? item.quantity ?? item.qty ?? 1),
     produto: {
       title: item.produto?.title ?? item.title ?? "Produto",
       price: Number(item.produto?.price ?? item.price ?? 0),
