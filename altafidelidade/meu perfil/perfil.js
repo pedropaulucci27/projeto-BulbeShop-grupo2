@@ -6,8 +6,8 @@ async function carregarPerfil() {
 
   try {
     const usuario = await window.api.usuario.perfil();
-    const nomeEl = document.querySelector('.user-name');
-    if (nomeEl && usuario.nome) nomeEl.textContent = usuario.nome;
+    const nomeEl = document.getElementById('nomeUsuario');
+    if (nomeEl && usuario.nome) nomeEl.value = usuario.nome;
 
     const emailEl = document.getElementById('email');
     if (emailEl && usuario.email) emailEl.value = usuario.email;
@@ -24,7 +24,7 @@ async function salvarPerfil(e) {
   e.preventDefault();
   if (!window.api?.estaLogado()) return;
 
-  const nome  = document.querySelector('.user-name')?.textContent.trim();
+  const nome  = document.getElementById('nomeUsuario')?.value.trim();
   const senha = document.getElementById('senha')?.value;
   const btn   = e.target.querySelector('[type="submit"]');
 
