@@ -48,7 +48,7 @@ body {
     position: relative;
 }
 
-back-btn {
+.back-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
