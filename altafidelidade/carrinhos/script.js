@@ -112,11 +112,6 @@ function buildCard(item) {
           </div>
           <div class="texto-unidades">(${qty} unidade${qty > 1 ? "s" : ""})</div>
         </div>
-        <button class="btn-remover-item"
-          style="background:none;border:none;color:#c00;cursor:pointer;
-                 font-size:.8rem;margin-top:4px;padding:0;font-family:inherit;">
-          Remover
-        </button>
       </div>
     </article>`;
 }
@@ -162,9 +157,6 @@ function renderItens() {
       .querySelector('[data-acao="diminuir"]')
       ?.addEventListener("click", () => alterarQuantidade(itemId, -1, card));
 
-    card
-      .querySelector(".btn-remover-item")
-      ?.addEventListener("click", () => removerItem(itemId, card));
   });
 
   atualizarResumo();
@@ -182,7 +174,7 @@ async function alterarQuantidade(itemId, delta, card) {
   }
 
   try {
-    await window.api.carrinho.atualizar(itemId, novaQtd);
+    await window.api.carrinho.atualizar(Number(itemId), novaQtd);
     item.quantidade = novaQtd;
 
     const spanQtd = card.querySelector("[data-quantidade]");
@@ -200,7 +192,7 @@ async function alterarQuantidade(itemId, delta, card) {
 /* Remove um item via API */
 async function removerItem(itemId, card) {
   try {
-    await window.api.carrinho.remover(itemId);
+    await window.api.carrinho.remover(Number(itemId));
     itensCarrinho = itensCarrinho.filter((i) => i.id !== itemId);
     selecionados.delete(itemId);
     card.remove();
