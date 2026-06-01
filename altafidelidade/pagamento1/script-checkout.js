@@ -9,10 +9,10 @@ async function renderCheckoutItems() {
 
   try {
     const resposta = await window.api.carrinho.listar();
-    const items = resposta.itens || resposta.data || resposta || [];
+    const items = Array.isArray(resposta) ? resposta : (resposta.itens || resposta.data || []);
 
     if(!items.length) {
-      window.location.href = '/altafidelidade/carrinhos/carrinho.html';
+      window.location.href = '/altafidelidade/carrinhovazio/carrinhovazio.html';
       return;
     }
 
@@ -44,17 +44,33 @@ async function renderCheckoutItems() {
       cartSection.appendChild(art);
     });
 
-    const fmt = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    const elTotal  = document.querySelector('.review-row .value');
-    const elSubtotal = document.querySelector('.value--muted');
-    const elPedido = document.querySelector('.review-total strong');
-    if (elTotal)  elTotal.textContent  = fmt;
-    if (elSubtotal) elSubtotal.textContent = fmt;
-    if (elPedido) elPedido.textContent = fmt;
+        const fmt = (n) => `R$ ${Number(n || 0).toFixed(2).replace('.', ',')}`;
 
-    } catch (err) {
-      console.error('Erro ao carregar carrinho:', err);
+    const elTotalBruto = document.getElementById('review-total-bruto');
+    const elSubtotal = document.querySelector('.value--muted');
+    const elTotalFinal = document.getElementById('review-total-final');
+    const elFrete = document.getElementById('review-frete');
+    const elCupom = document.getElementById('review-cupom');
+
+    if (elTotalBruto)  elTotalBruto.textContent  = fmt(total);
+    if (elSubtotal) elSubtotal.textContent = fmt(total);
+    if (elTotalFinal) elTotalFinal.textContent = fmt(total);
+
+    const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+    if (elFrete && cliente.frete) {
+      const precoFrete = cliente.frete.split('|')[1]?.trim() || 'GRÁTIS';
+      elFrete.textContent = precoFrete;
+      elFrete.className = 'value';
     }
+
+    if (elCupom) {
+      const cupom = localStorage.getItem('bulbe:cupom');
+      elCupom.textContent = cupom ? `Cupom: ${cupom}` : '-R$ 0,00';
+    }
+
+  } catch (err) {
+    console.error('Erro ao carregar carrinho:', err);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

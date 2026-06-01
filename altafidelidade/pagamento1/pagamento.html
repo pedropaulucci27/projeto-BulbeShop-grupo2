@@ -79,8 +79,8 @@
     </section>
     
     <!-- Produtos escritos à mão no HTML --> 
-    <!-- <section class="cart">
-      <article class="cart-card">
+    <section class="cart">
+      <!-- <article class="cart-card">
         <img class="cart-card__thumb"
           src="/altafidelidade/pagamento1/.assets/img/c6559d49aec17a510b73b50f7689acc97fe64b4d.png" alt="Lâmpada">
         <div class="cart-card__body">
@@ -129,25 +129,19 @@
             <img src="/altafidelidade/pagamento1/.assets/img/Group 427318503.svg" alt="">
           </span>
         </footer>
-      </article>
-    </section> -->
+      </article> -->
+    </section>
 
     <!-- REVISÃO DO PEDIDO -->
     <section class="review-card">
       <h3 class="review-title">Revisão do pedido</h3>
-
-      <div class="review-row"><span class="label">Valor total:</span><span class="value">R$ 413,67</span></div>
-      <div class="review-row"><span class="label">Promoções:</span><span class="value value--neg">-R$ 200,00</span>
-      </div>
-      <div class="review-row"><span class="label">Subtotal:</span><span class="value value--muted">R$ 213,67</span>
-      </div>
-      <div class="review-row"><span class="label">Taxa de envio:</span><span class="value value--free">GRÁTIS</span>
-      </div>
-      <div class="review-row"><span class="label">Cupons:</span><span class="value value--neg">-R$ 21,36 ></span></div>
-      <div class="review-row"><span class="label">Pontos Bulbe:</span><span class="value value--link">178 pontos
-          disponíveis ></span></div>
-
-      <div class="review-total"><span>Total do pedido:</span><strong>R$ 192,31</strong></div>
+      <div class="review-row"><span class="label">Valor total:</span><span class="value" id="review-total-bruto">R$ 0,00</span></div>
+      <div class="review-row"><span class="label">Promoções:</span><span class="value value--neg" id="review-promocoes">-R$ 0,00</span></div>
+      <div class="review-row"><span class="label">Subtotal:</span><span class="value value--muted" id="review-subtotal">R$ 0,00</span></div>
+      <div class="review-row"><span class="label">Taxa de envio:</span><span class="value value--free" id="review-frete">GRÁTIS</span></div>
+      <div class="review-row"><span class="label">Cupons:</span><span class="value value--neg" id="review-cupom">-R$ 0,00</span></div>
+      <div class="review-row"><span class="label">Pontos Bulbe:</span><span class="value value--link" id="review-pontos">carregando...</span></div>
+      <div class="review-total"><span>Total do pedido:</span><strong id="review-total-final">R$ 0,00</strong></div>
     </section>
 
     <!-- MÉTODO DE PAGAMENTO -->
