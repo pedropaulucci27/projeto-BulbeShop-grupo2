@@ -232,9 +232,20 @@ async function carregarProduto() {
 
     const imgEl = document.getElementById("gallery-img");
     if (imgEl) {
-      const imgUrl = resolverImagemProduto(p.image);
+      let imgUrl = resolverImagemProduto(p.image);
+      // Se resolveu para o ventilador (fallback padrão), usa o mapa local pelo ID
+      if (imgUrl.includes("ventiladorbritania") && id !== "4" && PRODUTO_FALLBACK[id]) {
+        imgUrl = PRODUTO_FALLBACK[id].img;
+      }
       imgEl.src = imgUrl;
       imgEl.alt = p.title;
+
+      // Atualiza os dots da galeria para apontarem para a imagem correta do produto
+      document.querySelectorAll(".dots .dot").forEach((dot, i) => {
+        dot.dataset.src = imgUrl;
+        if (i === 0) dot.classList.add("is-active");
+        else dot.classList.remove("is-active");
+      });
     }
 
     const breadcrumb = document.querySelector(".breadcrumbs");
