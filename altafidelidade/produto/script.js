@@ -265,17 +265,47 @@ function starsStr(n) {
   return "★".repeat(Math.max(1, Math.min(5, n)));
 }
 
-function renderizarAvaliacoes(id) {
-  const seed = REVIEWS_SEED[id] || [];
-  const user = getReviewsStorage(id);
-  const all  = [...user, ...seed];
+async function renderizarAvaliacoes(id) {
+  let avaliacoesAPI  = [];
+  let mediaAPI       = null;
+  let totalAPI       = null;
 
+  // Tenta buscar da API
+  if (window.api) {
+    try {
+      const resp = await window.api.avaliacoes.listar(id);
+      // resp = { produto: { media }, total, avaliacoes: [...] }
+      avaliacoesAPI = (resp.avaliacoes || []).map(a => ({
+        nome:     a.autor,
+        estrelas: a.nota,
+        variacao: "",
+        texto:    a.comentario || "",
+      }));
+      mediaAPI = resp.produto?.media;
+      totalAPI = resp.total;
+    } catch (e) {
+      console.warn("API de avaliações indisponível, usando dados locais.", e);
+    }
+  }
+
+  // Se a API não retornou nada, usa os seeds locais
+  const seed = REVIEWS_SEED[id] || [];
+  const user = getReviewsStorage(id); // avaliações salvas localmente (visitantes não logados)
+
+  // Mescla: API tem prioridade, senão usa seed + localStorage
+  const all = avaliacoesAPI.length > 0
+    ? [...user, ...avaliacoesAPI]   // comentários locais pendentes + API
+    : [...user, ...seed];
+
+  // Calcula scores
   const base       = RATINGS_BASE[id] || { score: 5.0, count: 0 };
-  const totalCount = base.count + user.length;
   const userSum    = user.reduce((s, r) => s + r.estrelas, 0);
-  const scoreNum   = user.length
-    ? (base.score * base.count + userSum) / (base.count + user.length)
-    : base.score;
+  const totalCount = totalAPI !== null
+    ? totalAPI + user.length
+    : base.count + user.length;
+  const scoreNum   = mediaAPI !== null
+    ? (user.length ? (mediaAPI * (totalAPI || 1) + userSum) / (totalCount) : mediaAPI)
+    : (user.length ? (base.score * base.count + userSum) / (base.count + user.length) : base.score);
 
   // Atualiza cabeçalho de avaliações
   const scoreEl = document.getElementById("score-big-val");
@@ -286,15 +316,15 @@ function renderizarAvaliacoes(id) {
     `<div><strong>${totalCount}</strong> avaliações</div>` +
     `<div><strong>${all.length}</strong> comentários</div>`;
 
-  // Barras de distribuição (5★→2★) baseadas nas reviews visíveis
-  const dist = [0, 0, 0, 0]; // índice 0 = 5★, ..., 3 = 2★
+  // Barras de distribuição
+  const dist = [0, 0, 0, 0];
   all.forEach(r => { if (r.estrelas >= 2 && r.estrelas <= 5) dist[5 - r.estrelas]++; });
   const maxD = Math.max(...dist, 1);
   document.querySelectorAll(".dist-fill").forEach((fill, i) => {
     fill.style.width = `${Math.round((dist[i] / maxD) * 100)}%`;
   });
 
-  // Atualiza rating-inline do cabeçalho da página
+  // Atualiza rating-inline do topo da página
   const inlineEl = document.querySelector(".rating-inline");
   if (inlineEl) {
     const numEl   = inlineEl.querySelector(".rating-number");
@@ -305,7 +335,7 @@ function renderizarAvaliacoes(id) {
     if (starsEl) starsEl.style.setProperty("--percent", ((scoreNum / 5) * 100).toFixed(1));
   }
 
-  // Renderiza blocos de review (mesma estrutura existente)
+  // Renderiza os blocos de comentário
   const container = document.getElementById("reviews-list");
   if (!container) return;
   container.innerHTML = all.map(r => `
@@ -342,13 +372,31 @@ function wireReviewForm(id) {
     });
   });
 
-  document.getElementById("btn-submit-review")?.addEventListener("click", () => {
+  document.getElementById("btn-submit-review")?.addEventListener("click", async () => {
     const nome  = document.getElementById("review-name")?.value?.trim();
     const texto = document.getElementById("review-text")?.value?.trim();
     if (!nome)          { showToast("Informe seu nome.");      return; }
     if (!selectedStars) { showToast("Selecione uma nota.");    return; }
     if (!texto)         { showToast("Escreva um comentário."); return; }
 
+    // Se o usuário está logado, tenta enviar para a API
+    if (window.api?.estaLogado()) {
+      try {
+        await window.api.avaliacoes.enviar(id, selectedStars, texto);
+        showToast("Avaliação enviada! Obrigado.");
+        document.getElementById("review-name").value  = "";
+        document.getElementById("review-text").value  = "";
+        selectedStars = 0;
+        starOpts.forEach(o => o.classList.remove("active"));
+        renderizarAvaliacoes(id); // atualiza a listagem
+        return;
+      } catch (e) {
+        // Se a API recusar (403 = não comprou), salva localmente como fallback
+        console.warn("API recusou avaliação, salvando localmente:", e.message);
+      }
+    }
+
+    // Fallback: salva no localStorage (visitantes ou offline)
     const prod = SHELF_INFO[id];
     saveReviewStorage(id, {
       nome,
@@ -356,12 +404,10 @@ function wireReviewForm(id) {
       variacao: prod ? prod.title.split(" ").slice(0, 3).join(" ") : "",
       texto,
     });
-
     document.getElementById("review-name").value  = "";
     document.getElementById("review-text").value  = "";
     selectedStars = 0;
     starOpts.forEach(o => o.classList.remove("active"));
-
     showToast("Avaliação enviada! Obrigado.");
     renderizarAvaliacoes(id);
   });
