@@ -862,7 +862,7 @@ function syncSelectionFromCheckboxes() {
 /* ======================================================
    INICIALIZAÇÃO (com proteção contra listeners duplicados)
    ====================================================== */
-function init() {
+async function init() {
   if (window.__bulbeCartInit) return;
   window.__bulbeCartInit = true;
 
@@ -875,10 +875,15 @@ function init() {
   const selecionarTudo = document.getElementById("selecionarTudo");
   if (selecionarTudo) { selecionarTudo.checked = false; selecionarTudo.indeterminate = false; }
 
-  inicializarCarrinhoVazioSeNecessario();
-  ensureParafusadeiraNaoAutoCarrega();
-  importarDoLocalStorage(); // renderExtraCartItems() é chamado aqui dentro
-  enhanceSelecionarUI();    // roda DEPOIS de criar os cards extras, garantindo uniformidade
+  // Tenta carregar da API (usuários logados); cai para localStorage se não logado ou erro
+  const carregouAPI = await carregarCarrinhoAPI();
+  if (!carregouAPI) {
+    inicializarCarrinhoVazioSeNecessario();
+    ensureParafusadeiraNaoAutoCarrega();
+    importarDoLocalStorage();
+  }
+
+  enhanceSelecionarUI();
   removerParafusadeiraResumo();
   bindCheckboxesSelecao();
   ativarContadores();
