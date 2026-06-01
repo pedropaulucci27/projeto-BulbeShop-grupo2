@@ -432,6 +432,78 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* ======================================================
+   CARREGA CARRINHO DA API (fonte de verdade)
+   ====================================================== */
+async function carregarCarrinhoAPI() {
+  if (!window.api?.estaLogado()) return false;
+  try {
+    const dados = await window.api.carrinho.listar();
+    const itens = Array.isArray(dados) ? dados : (dados.itens || []);
+    if (!itens.length) return false;
+
+    // Oculta os cards hardcoded
+    document.querySelectorAll('article.cartao-produto[data-produto="lampada"], article.cartao-produto[data-produto="parafusadeira"]')
+      .forEach(c => { c.style.display = 'none'; });
+
+    // Remove cards de API anteriores para evitar duplicatas
+    document.querySelectorAll('article.cartao-produto[data-api-item-id]').forEach(c => c.remove());
+
+    const insertRef = document.querySelector('article.cartao-produto[data-produto="lampada"]');
+
+    itens.forEach(item => {
+      const key   = `api-item-${item.id}`;
+      const qty   = Number(item.quantidade || 1);
+      const price = Number(item.produto?.preco || 0);
+      const title = item.produto?.nome || 'Produto';
+      const img   = window.resolverImagemProduto
+        ? window.resolverImagemProduto(item.produto?.imagem || '')
+        : resolverImgParaCarrinho(item.produto?.imagem || '');
+
+      if (!produtos[key]) {
+        produtos[key]    = { titulo: title, preco: price, quantidade: qty };
+        selecionados[key] = false;
+      }
+
+      const card = document.createElement('article');
+      card.className           = 'cartao-produto';
+      card.dataset.produto     = key;
+      card.dataset.apiItemId   = String(item.id);
+      card.innerHTML = `
+        <label class="checkbox-produto">
+          <input type="checkbox" class="selecao-individual">
+          <span class="texto-checkbox">Selecionar</span>
+        </label>
+        <div class="imagem-produto">
+          <img src="${img}" alt="${title}">
+        </div>
+        <div class="informacoes-produto">
+          <h3 class="titulo-produto">${title}</h3>
+          <div class="preco-produto">
+            <span class="simbolo-reais">R$</span>
+            <span class="valor-produto" data-preco="${price.toFixed(2)}">${price.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="controle-quantidade">
+            <div class="contador" data-produto="${key}">
+              <button class="botao-quantidade" data-acao="diminuir">–</button>
+              <span class="quantidade-atual" data-quantidade>${qty}</span>
+              <button class="botao-quantidade" data-acao="aumentar">+</button>
+            </div>
+            <div class="texto-unidades">(${qty} unidade${qty > 1 ? 's' : ''})</div>
+          </div>
+        </div>`;
+
+      if (insertRef) insertRef.insertAdjacentElement('beforebegin', card);
+      else document.querySelector('main.conteudo-principal')?.appendChild(card);
+    });
+
+    return true;
+  } catch (err) {
+    console.warn('Erro ao carregar carrinho da API:', err);
+    return false;
+  }
+}
+
+/* ======================================================
    IMPORTAÇÃO E PERSISTÊNCIA (lâmpada como template)
    ====================================================== */
 function aplicarLampadaDoCarrinho() {
