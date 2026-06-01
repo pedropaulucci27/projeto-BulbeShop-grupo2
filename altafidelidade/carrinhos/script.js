@@ -217,7 +217,15 @@ if (acao === "diminuir" && n === 1) {
       const textoUnidades = produtoPai?.querySelector(".texto-unidades");
       if (textoUnidades) textoUnidades.textContent = `(${n} unidade${n > 1 ? "s" : ""})`;
 
-      if (chave === "lampada") syncLampadaToStorageFromUI();
+      // Atualiza via API se logado e item tem ID real
+      const apiItemId = produtoPai?.dataset?.apiItemId;
+      if (apiItemId && window.api?.estaLogado()) {
+        window.api.carrinho.atualizar(Number(apiItemId), n).catch(err => {
+          console.warn('Erro ao atualizar quantidade via API:', err);
+        });
+      } else if (chave === "lampada") {
+        syncLampadaToStorageFromUI();
+      }
 
       atualizarResumo();
       atualizarResumoSelecionados();
