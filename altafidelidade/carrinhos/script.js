@@ -217,7 +217,15 @@ if (acao === "diminuir" && n === 1) {
       const textoUnidades = produtoPai?.querySelector(".texto-unidades");
       if (textoUnidades) textoUnidades.textContent = `(${n} unidade${n > 1 ? "s" : ""})`;
 
-      if (chave === "lampada") syncLampadaToStorageFromUI();
+      // Atualiza via API se logado e item tem ID real
+      const apiItemId = produtoPai?.dataset?.apiItemId;
+      if (apiItemId && window.api?.estaLogado()) {
+        window.api.carrinho.atualizar(Number(apiItemId), n).catch(err => {
+          console.warn('Erro ao atualizar quantidade via API:', err);
+        });
+      } else if (chave === "lampada") {
+        syncLampadaToStorageFromUI();
+      }
 
       atualizarResumo();
       atualizarResumoSelecionados();
@@ -228,76 +236,64 @@ if (acao === "diminuir" && n === 1) {
 /* ======================================================
    REMOÇÃO DE ITEM DO CARRINHO
    ====================================================== */
-function removerItemDoCarrinho(chave, card) {
-  // 1) Estado interno
+async function removerItemDoCarrinho(chave, card) {
+  // 1) Chama API com o ID real do item (evita 404)
+  const apiItemId = card?.dataset?.apiItemId;
+  if (apiItemId && window.api?.estaLogado()) {
+    try {
+      await window.api.carrinho.remover(Number(apiItemId));
+    } catch (err) {
+      console.warn('Erro ao remover item via API:', err);
+    }
+  }
+
+  // 2) Estado interno
   if (produtos[chave]) produtos[chave].quantidade = 0;
 
-  // 2) Seleção: desmarcar e limpar classes/ARIA/label
+  // 3) Seleção: desmarcar e limpar classes/ARIA/label
   const cb = card?.querySelector(".selecao-individual");
   if (cb) cb.checked = false;
   selecionados[chave] = false;
   card?.classList.remove("is-selecionado");
   updateTriggerA11y(card, false);
 
-  // 3) Persistência: remover do bulbe:cart (se existir)
-  // Usa data-cart-id (cards extras) ou reconstrói idGuess (cards hardcoded)
+  // 4) Remove do localStorage (fallback para usuários não logados)
   let cartItemId = card?.dataset?.cartId || null;
   if (!cartItemId) {
-    let title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
-    let priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
-    let unit    = 0;
-    if (priceEl?.dataset?.preco) {
-      unit = Number(priceEl.dataset.preco);
-    } else {
-      unit = Number(
-        (priceEl?.textContent || "0")
-          .replace(/[^\d,.-]/g, "")
-          .replace(/\./g, "")
-          .replace(",", ".")
-      );
-    }
+    const title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
+    const priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
+    const unit    = priceEl?.dataset?.preco
+      ? Number(priceEl.dataset.preco)
+      : Number((priceEl?.textContent || "0").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
     cartItemId = `${String(title).toLowerCase().replace(/\s+/g, " ").slice(0, 200)}|${Number(unit || 0).toFixed(2)}`;
   }
-
   const cartArr = loadCart();
   const idx     = cartArr.findIndex((it) => it.id === cartItemId);
-
-  if (idx >= 0) {
-    cartArr.splice(idx, 1);
-    saveCart(cartArr);
-  }
-
+  if (idx >= 0) { cartArr.splice(idx, 1); saveCart(cartArr); }
   const last = getLastId();
-  if (last && last === cartItemId) {
-    setLastId("");
-  }
+  if (last && last === cartItemId) setLastId("");
 
-  // 4) Remover o card do DOM
+  // 5) Remover o card do DOM
   if (card && typeof card.remove === "function") {
     card.remove();
   } else if (card && card.style) {
     card.style.display = "none";
   }
 
-  // 5) Verificar se ainda existe ALGUM PRODUTO DE CARRINHO
-  //    (ignora os cards do carrossel de recomendados)
-  const aindaTemCardsCarrinho =
-    document.querySelectorAll('article.cartao-produto[data-produto]').length > 0;
-
+  // 6) Verificar se ainda existe algum produto
+  const aindaTemCards = document.querySelectorAll('article.cartao-produto[data-produto]').length > 0;
   const carrinhoAtual = loadCart();
-  const aindaTemNoStorage =
-    Array.isArray(carrinhoAtual) && carrinhoAtual.length > 0;
+  const aindaTemStorage = Array.isArray(carrinhoAtual) && carrinhoAtual.length > 0;
 
-  // Se não sobrou NENHUM produto → carrinho vazio
-  if (!aindaTemCardsCarrinho || !aindaTemNoStorage) {
+  const logado = window.api?.estaLogado();
+  if (!aindaTemCards || (!logado && !aindaTemStorage)) {
     try { localStorage.removeItem("bulbe:cart"); } catch {}
     try { localStorage.removeItem("bulbe:lastAddedId"); } catch {}
-
     window.location.href = "../carrinhovazio/carrinhovazio.html";
-    return; // não precisa atualizar mais nada
+    return;
   }
 
-  // 6) Se ainda tiver produto, só atualiza estados
+  // 7) Atualiza estados visuais
   atualizarSelecionarTudoEstado();
   atualizarResumo();
   atualizarResumoSelecionados();
@@ -430,6 +426,78 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ======================================================
+   CARREGA CARRINHO DA API (fonte de verdade)
+   ====================================================== */
+async function carregarCarrinhoAPI() {
+  if (!window.api?.estaLogado()) return false;
+  try {
+    const dados = await window.api.carrinho.listar();
+    const itens = Array.isArray(dados) ? dados : (dados.itens || []);
+    if (!itens.length) return false;
+
+    // Oculta os cards hardcoded
+    document.querySelectorAll('article.cartao-produto[data-produto="lampada"], article.cartao-produto[data-produto="parafusadeira"]')
+      .forEach(c => { c.style.display = 'none'; });
+
+    // Remove cards de API anteriores para evitar duplicatas
+    document.querySelectorAll('article.cartao-produto[data-api-item-id]').forEach(c => c.remove());
+
+    const insertRef = document.querySelector('article.cartao-produto[data-produto="lampada"]');
+
+    itens.forEach(item => {
+      const key   = `api-item-${item.id}`;
+      const qty   = Number(item.quantidade || 1);
+      const price = Number(item.produto?.preco || 0);
+      const title = item.produto?.nome || 'Produto';
+      const img   = window.resolverImagemProduto
+        ? window.resolverImagemProduto(item.produto?.imagem || '')
+        : resolverImgParaCarrinho(item.produto?.imagem || '');
+
+      if (!produtos[key]) {
+        produtos[key]    = { titulo: title, preco: price, quantidade: qty };
+        selecionados[key] = false;
+      }
+
+      const card = document.createElement('article');
+      card.className           = 'cartao-produto';
+      card.dataset.produto     = key;
+      card.dataset.apiItemId   = String(item.id);
+      card.innerHTML = `
+        <label class="checkbox-produto">
+          <input type="checkbox" class="selecao-individual">
+          <span class="texto-checkbox">Selecionar</span>
+        </label>
+        <div class="imagem-produto">
+          <img src="${img}" alt="${title}">
+        </div>
+        <div class="informacoes-produto">
+          <h3 class="titulo-produto">${title}</h3>
+          <div class="preco-produto">
+            <span class="simbolo-reais">R$</span>
+            <span class="valor-produto" data-preco="${price.toFixed(2)}">${price.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="controle-quantidade">
+            <div class="contador" data-produto="${key}">
+              <button class="botao-quantidade" data-acao="diminuir">–</button>
+              <span class="quantidade-atual" data-quantidade>${qty}</span>
+              <button class="botao-quantidade" data-acao="aumentar">+</button>
+            </div>
+            <div class="texto-unidades">(${qty} unidade${qty > 1 ? 's' : ''})</div>
+          </div>
+        </div>`;
+
+      if (insertRef) insertRef.insertAdjacentElement('beforebegin', card);
+      else document.querySelector('main.conteudo-principal')?.appendChild(card);
+    });
+
+    return true;
+  } catch (err) {
+    console.warn('Erro ao carregar carrinho da API:', err);
+    return false;
+  }
+}
 
 /* ======================================================
    IMPORTAÇÃO E PERSISTÊNCIA (lâmpada como template)
@@ -794,7 +862,7 @@ function syncSelectionFromCheckboxes() {
 /* ======================================================
    INICIALIZAÇÃO (com proteção contra listeners duplicados)
    ====================================================== */
-function init() {
+async function init() {
   if (window.__bulbeCartInit) return;
   window.__bulbeCartInit = true;
 
@@ -807,10 +875,15 @@ function init() {
   const selecionarTudo = document.getElementById("selecionarTudo");
   if (selecionarTudo) { selecionarTudo.checked = false; selecionarTudo.indeterminate = false; }
 
-  inicializarCarrinhoVazioSeNecessario();
-  ensureParafusadeiraNaoAutoCarrega();
-  importarDoLocalStorage(); // renderExtraCartItems() é chamado aqui dentro
-  enhanceSelecionarUI();    // roda DEPOIS de criar os cards extras, garantindo uniformidade
+  // Tenta carregar da API (usuários logados); cai para localStorage se não logado ou erro
+  const carregouAPI = await carregarCarrinhoAPI();
+  if (!carregouAPI) {
+    inicializarCarrinhoVazioSeNecessario();
+    ensureParafusadeiraNaoAutoCarrega();
+    importarDoLocalStorage();
+  }
+
+  enhanceSelecionarUI();
   removerParafusadeiraResumo();
   bindCheckboxesSelecao();
   ativarContadores();
