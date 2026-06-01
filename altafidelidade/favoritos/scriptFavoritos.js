@@ -145,4 +145,68 @@ async function carregarFavoritosDoServidor() {
   renderFavoritos();
 }
 
-document.addEventListener("DOMContentLoaded", carregarFavoritosDoServidor);
+async function carregarMaisItens() {
+  const grid = document.getElementById("mais-itens-grid");
+  if (!grid) return;
+  try {
+    const resp = await window.api.produtos.listar();
+    const produtos = Array.isArray(resp) ? resp : (resp?.data ?? []);
+    if (!produtos.length) { grid.innerHTML = ""; return; }
+
+    grid.innerHTML = produtos.slice(0, 4).map(p => {
+      const img = window.resolverImagemProduto
+        ? window.resolverImagemProduto(p.image || p.imagem || "")
+        : (p.image || p.imagem || "");
+      const preco = Number(p.price || p.preco || 0)
+        .toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      return `
+        <div class="mini-card" data-produto-id="${p.id}">
+          <img src="${img}" alt="${p.title || p.nome || 'Produto'}" class="mini-card__img"
+               onerror="this.src='/altafidelidade/home/img/ventiladorbritania.webp'">
+          <p class="mini-card__nome">${(p.title || p.nome || 'Produto').slice(0, 40)}...</p>
+          <div class="mini-card__precos">
+            <span class="mini-card__atual">${preco}</span>
+          </div>
+          <div class="mini-card__acoes">
+            <button class="icon-btn heart btn-fav-mais" aria-label="Favoritar">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z"
+                  fill="none" stroke="currentColor" stroke-width="1.7" />
+              </svg>
+            </button>
+            <button class="icon-btn cart btn-cart-mais" aria-label="Adicionar ao carrinho">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none"
+                  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="9" cy="20" r="1.6" fill="currentColor" />
+                <circle cx="17" cy="20" r="1.6" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>`;
+    }).join("");
+
+    grid.querySelectorAll(".mini-card").forEach(card => {
+      const pid = Number(card.dataset.produtoId);
+      card.querySelector(".btn-cart-mais")?.addEventListener("click", async () => {
+        if (!window.api?.estaLogado()) {
+          window.location.href = "/altafidelidade/login/login.html";
+          return;
+        }
+        try { await window.api.carrinho.adicionar(pid, 1); window.location.href = "/altafidelidade/carrinhos/carrinho.html"; }
+        catch { alert("Não foi possível adicionar ao carrinho."); }
+      });
+      card.querySelector(".btn-fav-mais")?.addEventListener("click", async () => {
+        if (!window.api?.estaLogado()) return;
+        try { await window.api.favoritos.adicionar(pid); } catch {}
+      });
+    });
+  } catch {
+    grid.innerHTML = "";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  carregarFavoritosDoServidor();
+  carregarMaisItens();
+});
