@@ -6,11 +6,18 @@ async function carregarPerfil() {
 
   try {
     const usuario = await window.api.usuario.perfil();
-    const nomeEl = document.getElementById('nomeUsuario');
-    if (nomeEl && usuario.nome) nomeEl.value = usuario.nome;
 
-    const emailEl = document.getElementById('email');
-    if (emailEl && usuario.email) emailEl.value = usuario.email;
+    const nomeEl     = document.getElementById('nomeUsuario');
+    const emailEl    = document.getElementById('email');
+    const telefoneEl = document.getElementById('telefone');
+    const cpfEl      = document.getElementById('cpf');
+    const enderecoEl = document.getElementById('endereco');
+
+    if (nomeEl     && usuario.nome)     nomeEl.value     = usuario.nome;
+    if (emailEl    && usuario.email)    emailEl.value    = usuario.email;
+    if (telefoneEl && usuario.telefone) telefoneEl.value = usuario.telefone;
+    if (cpfEl      && usuario.cpf)      cpfEl.value      = usuario.cpf;
+    if (enderecoEl && usuario.endereco) enderecoEl.value = usuario.endereco;
   } catch {}
 
   try {
