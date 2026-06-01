@@ -125,6 +125,12 @@ const api = {
     produtos: (id)                    => requisicao("GET", `/lojas-parceiras/${id}/produtos`),
   },
 
+  avaliacoes: {
+  listar:  (produtoId)          => requisicao("GET",  `/produtos/${produtoId}/avaliacoes`),
+  enviar:  (produtoId, nota, comentario) =>
+    requisicao("POST", `/produtos/${produtoId}/avaliacoes`, { nota, comentario }),
+  },
+  
   usuario: {
     perfil:         ()                => requisicao("GET", "/usuarios/perfil"),
     atualizarPerfil:(dados)           => requisicao("PUT", "/usuarios/perfil", dados),
