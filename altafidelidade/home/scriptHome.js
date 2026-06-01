@@ -281,9 +281,8 @@ document.addEventListener("click", async (event) => {
       } catch {
         alert("Não foi possível adicionar ao carrinho. Tente novamente.");
       }
+      event.stopPropagation();
     }
-
-  event.stopPropagation();
 });
 
 /* =========================================================
