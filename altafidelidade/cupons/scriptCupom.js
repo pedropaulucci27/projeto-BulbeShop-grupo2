@@ -38,12 +38,17 @@ function renderCupons(cupons) {
     }
 
     cupons.forEach(cupom => {
-        const codigo    = cupom.codigo || cupom.code || "";
-        const descricao = cupom.descricao || cupom.description || "";
-        const desconto  = cupom.desconto  != null ? `${cupom.desconto}% OFF` : (cupom.discount || "");
-        const validade  = cupom.validade  || cupom.expiry || "";
-        const valido    = cupom.ativo !== false && cupom.valid !== false;
-        const loja      = cupom.loja || cupom.merchant || "";
+        const codigo   = cupom.codigo || cupom.code || "";
+        const validade = cupom.validade || cupom.expiry || "";
+        const valido   = cupom.ativo !== false && cupom.ativo !== 0 && cupom.valid !== false;
+        const loja     = cupom.loja || cupom.merchant || "";
+
+        // Constrói descrição a partir dos campos reais da API
+        const tipo     = cupom.tipo || "%";
+        const valorDesc = cupom.desconto ?? cupom.discount ?? 0;
+        const descontoStr = tipo === "%" ? `${valorDesc}% OFF` : `R$${valorDesc} OFF`;
+        const descricao = cupom.descricao || cupom.description ||
+            (loja ? `${descontoStr} em ${loja}` : `Cupom ${codigo}: ${descontoStr}`);
 
         const dataExp = validade ? new Date(validade) : null;
         const expirado = dataExp ? dataExp < new Date() : !valido;
@@ -68,7 +73,7 @@ function renderCupons(cupons) {
             </div>
             <div class="cta">
                 <button class="btn redeem-btn${expirado ? " btn--expirado" : ""}"
-                    data-code="${codigo}" data-merchant="${loja}" data-discount="${desconto}"
+                    data-code="${codigo}" data-merchant="${loja || codigo}" data-discount="${descontoStr}"
                     ${expirado ? "disabled aria-disabled='true'" : ""}>
                     ${expirado ? "Cupom expirado" : "Resgatar cupom"}
                 </button>
@@ -78,9 +83,9 @@ function renderCupons(cupons) {
                 <div class="panel-row"><span class="badge ${badgeClass}">${codigo}</span></div>
                 <h4 class="panel-title">${descricao}</h4>
                 ${dataFmt ? `<div class="panel-expire">${expirado ? "Expirado em" : "Expira em"} ${dataFmt}</div>` : ""}
-                <div class="panel-info"><span class="i">i</span><span>${cupom.termos || "Consulte as condições."}</span></div>
+                <div class="panel-info"><span class="i">i</span><span>${cupom.termos || "Consulte as condições de uso."}</span></div>
                 <button class="btn redeem-btn${expirado ? " btn--expirado" : ""}"
-                    data-code="${codigo}" data-merchant="${loja}" data-discount="${desconto}"
+                    data-code="${codigo}" data-merchant="${loja || codigo}" data-discount="${descontoStr}"
                     ${expirado ? "disabled aria-disabled='true'" : ""}>
                     ${expirado ? "Cupom expirado" : "Resgatar cupom"}
                 </button>
@@ -104,7 +109,7 @@ async function carregarCupons() {
     try {
         if (window.api) {
             const resposta = await window.api.cupons.listar();
-            const lista = Array.isArray(resposta) ? resposta : (resposta.cupons || resposta.cupons || []);
+            const lista = Array.isArray(resposta) ? resposta : (resposta.cupons || resposta.data || []);
             if (lista.length) { renderCupons(lista); return; }
         }
     } catch (err) {
