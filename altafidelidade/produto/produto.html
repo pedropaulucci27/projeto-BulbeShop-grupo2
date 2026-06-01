@@ -203,8 +203,8 @@
     <!-- Descrição -->
     <h2 class="section-title">Descrição do produto:</h2>
     <div class="card">
-      <p class="desc">
-        Uma opção prática, portátil e mais econômica para mandar embora o calor é o Ventilador, não é mesmo? Se você tá pensando em comprar um novo, olha só esse Ventilador de Mesa da Britânia. O Ventilador Britânia BVT301 é uma ótima opção para refrescar com várias funções para o seu bem-estar! 
+      <p class="desc" id="product-desc">
+        Uma opção prática, portátil e mais econômica para mandar embora o calor é o Ventilador, não é mesmo? Se você tá pensando em comprar um novo, olha só esse Ventilador de Mesa da Britânia. O Ventilador Britânia BVT301 é uma ótima opção para refrescar com várias funções para o seu bem-estar!
       </p>
     </div>
 
@@ -214,14 +214,14 @@
       <div class="ratings-head">
         <div class="ratings-left">
           <div class="ratings-score">
-            <span class="score-big">4.7</span>
+            <span class="score-big" id="score-big-val">4.7</span>
             <svg class="score-star" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 17.3l-6.18 3.25 1.18-6.9L2 8.98l6.91-1 3.09-6.28 3.09 6.28 6.91 1-5 4.67 1.18 6.9z" />
             </svg>
           </div>
-          <div class="ratings-sub">
+          <div class="ratings-sub" id="ratings-sub-val">
             <div><strong>347</strong> avaliações</div>
-            <div><strong>300</strong> comentários</div>
+            <div><strong>2</strong> comentários</div>
           </div>
         </div>
 
@@ -249,116 +249,29 @@
         </div>
       </div>
 
-      <article class="review-block">
-        <header class="review-header">
-          <img class="review-avatar" src="./img/User-avatar.png" alt="Jeferson">
-          <div class="review-meta">
-            <div class="review-name">Jeferson <span class="review-stars">★★★★★</span></div>
-            <div class="review-sub">Ventilador preto | 220V</div>
-          </div>
-        </header>
-        <p class="review-text">ele ventila super bem é bem forte e nesse calor com certeza ajuda muito!</p>
-        <div class="review-photos">
-          <div class="ph"></div>
-          <div class="ph"></div>
-        </div>
-      </article>
+      <!-- Reviews renderizados dinamicamente por produto -->
+      <div id="reviews-list"></div>
 
-      <article class="review-block">
-        <header class="review-header">
-          <img class="review-avatar" src="./img/User-avatar.png" alt="Jeferson">
-          <div class="review-meta">
-            <div class="review-name">Amanda <span class="review-stars">★★★★★</span></div>
-            <div class="review-sub">Ventilador preto | 220V</div>
-          </div>
-        </header>
-        <p class="review-text">Ótimo produto, barato. E pequeno mas venta bastante e possui un design muito bonito!</p>
-        <div class="review-photos">
-          <div class="ph"></div>
-          <div class="ph"></div>
+      <!-- Formulário de avaliação -->
+      <div class="review-form" id="review-form">
+        <p class="review-form-title">Deixe sua avaliação:</p>
+        <div class="star-select" id="star-select" aria-label="Selecione a nota">
+          <span class="star-opt" data-val="1">★</span>
+          <span class="star-opt" data-val="2">★</span>
+          <span class="star-opt" data-val="3">★</span>
+          <span class="star-opt" data-val="4">★</span>
+          <span class="star-opt" data-val="5">★</span>
         </div>
-      </article>
+        <input type="text" id="review-name" placeholder="Seu nome" maxlength="40">
+        <textarea id="review-text" placeholder="Escreva seu comentário..." maxlength="400"></textarea>
+        <button type="button" id="btn-submit-review">Enviar avaliação</button>
+      </div>
     </section>
 
     <!-- Prateleira -->
     <section class="shelf">
       <h3>Quem viu este produto, também viu:</h3>
-      <div class="shelf-grid">
-        <a class="tile" href="#">
-          <span class="label">Oferta relampago</span>
-          <img src="./img/image 3.png" alt="Produto A">
-          <div class="title">Caixa de Ferramentas Philco...</div>
-          <div class="tile-prices">
-            <div class="price">R$59,90</div>
-            <div class="price-old">R$119,90</div>
-          </div>
-          <div class="tile-actions">
-            <img src="/altafidelidade/produto/img/heart-outline.png" alt="Curtir produto" class="btn-fav" data-like-id="tile-a" role="button"
-              tabindex="0" aria-pressed="false">
-            <svg class="icon-cart" viewBox="0 0 24 24">
-              <path fill="currentColor"
-                d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.4-.41 1.73-1.03l3.24-6.16A1 1 0 0 0 20.7 5H6.21L5.27 3H2v2h2l3.6 7.59-1.35 2.44C5.52 16.37 6.48 18 8 18h12v-2H8l1.16-2z" />
-            </svg>
-          </div>
-        </a>
-
-        <a class="tile" href="#">
-          <span class="label">Oferta relampago</span>
-          <img src="./img/image 3.png" alt="Produto B">
-          <div class="title">Caixa de Ferramentas Philco...</div>
-          <div class="tile-prices">
-            <div class="price">R$59,90</div>
-            <div class="price-old">R$119,90</div>
-          </div>
-          <div class="tile-actions">
-            <img src="/altafidelidade/produto/img/heart-outline.png" alt="Curtir produto" class="btn-fav" data-like-id="tile-b" role="button"
-              tabindex="0" aria-pressed="false">
-            <svg class="icon-cart" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor"
-                d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.4-.41 1.73-1.03l3.24-6.16A1 1 0 0 0 20.7 5H6.21L5.27 3H2v2h2l3.6 7.59-1.35 2.44C5.52 16.37 6.48 18 8 18h12v-2H8l1.16-2z" />
-            </svg>
-          </div>
-
-        </a>
-
-        <a class="tile" href="#">
-          <span class="label">Oferta relampago</span>
-          <img src="./img/image 3.png" alt="Produto C">
-          <div class="title">Caixa de Ferramentas Philco...</div>
-          <div class="tile-prices">
-            <div class="price">R$59,90</div>
-            <div class="price-old">R$119,90</div>
-          </div>
-          <div class="tile-actions">
-            <img src="/altafidelidade/produto/img/heart-outline.png" alt="Curtir produto" class="btn-fav" data-like-id="tile-c" role="button"
-              tabindex="0" aria-pressed="false">
-            <svg class="icon-cart" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor"
-                d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.4-.41 1.73-1.03l3.24-6.16A1 1 0 0 0 20.7 5H6.21L5.27 3H2v2h2l3.6 7.59-1.35 2.44C5.52 16.37 6.48 18 8 18h12v-2H8l1.16-2z" />
-            </svg>
-          </div>
-
-        </a>
-
-        <a class="tile" href="#">
-          <span class="label">Oferta relampago</span>
-          <img src="./img/image 3.png" alt="Produto D">
-          <div class="title">Caixa de Ferramentas Philco...</div>
-          <div class="tile-prices">
-            <div class="price">R$59,90</div>
-            <div class="price-old">R$119,90</div>
-          </div>
-          <div class="tile-actions">
-            <img src="/altafidelidade/produto/img/heart-outline.png" alt="Curtir produto" class="btn-fav" data-like-id="tile-d" role="button"
-              tabindex="0" aria-pressed="false">
-            <svg class="icon-cart" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor"
-                d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.4-.41 1.73-1.03l3.24-6.16A1 1 0 0 0 20.7 5H6.21L5.27 3H2v2h2l3.6 7.59-1.35 2.44C5.52 16.37 6.48 18 8 18h12v-2H8l1.16-2z" />
-            </svg>
-          </div>
-
-        </a>
-      </div>
+      <div class="shelf-grid" id="shelf-grid"></div>
     </section>
   </main>
 
