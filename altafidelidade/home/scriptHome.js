@@ -155,7 +155,7 @@ function buildCard(p) {
   }
 
   return `
-    <article class="card">
+    <article class="card" data-produto-id="${p.id || ''}">
       <div class="card-body">
         ${badge}
         <div class="media">
@@ -225,84 +225,57 @@ renderProdutos();
    — usa event delegation para funcionar com cards dinâmicos
    ========================================================= */
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   const btn = event.target.closest(".icon-btn");
   if (!btn) return;
 
     // === FAVORITAR ===
     if (btn.classList.contains("heart")) {
-      btn.classList.toggle("active");
-      const card = btn.closest(".card, [data-produto], .produto") || null;
+      const card = btn.closest(".card") || null;
       if (!card) return;
+      const produtoId = Number(card.dataset.produtoId);
+      if (!produtoId) return;
 
-      const imgEl   = card.querySelector("img");
-      const titleEl = card.querySelector(".title, h3, h2");
-      const priceEl = card.querySelector(".price-now, .price, [data-preco]");
-
-      const parsePrecoBR = (txt) => {
-        if (!txt) return 0;
-        return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
-      };
-
-      const title = titleEl?.textContent.trim() || "Produto";
-      const price = priceEl?.dataset?.preco
-        ? `R$ ${parseFloat(priceEl.dataset.preco).toFixed(2).replace('.', ',')}`
-        : (priceEl?.textContent.trim() || '');
-      const img = imgEl?.src || "";
-      const id  = `home-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
-
-      let favs = [];
-      try { favs = JSON.parse(localStorage.getItem("bulbe:favorites")) || []; } catch {}
-
-      const jaFavoritado = favs.find(f => f.id === id);
-      if (jaFavoritado) {
-        favs = favs.filter(f => f.id !== id);
-        btn.classList.remove("active");
-      } else {
-        favs.push({ id, title, price, priceOld: '', img });
-        btn.classList.add("active");
+      if (!window.api?.estaLogado()) {
+        window.location.href = "/altafidelidade/login/login.html?next=" +
+          encodeURIComponent(window.location.pathname);
+        return;
       }
-      try { localStorage.setItem("bulbe:favorites", JSON.stringify(favs)); } catch {}
+
+      const ativo = btn.classList.contains("active");
+      btn.classList.toggle("active");
+      try {
+        if (ativo) {
+          await window.api.favoritos.remover(produtoId);
+        } else {
+          await window.api.favoritos.adicionar(produtoId);
+        }
+      } catch {
+        btn.classList.toggle("active"); // reverte visual se API falhar
+      }
       return;
     }
 
     // === ADICIONAR AO CARRINHO ===
     if (btn.classList.contains("cart")) {
-      const card =
-        btn.closest(".card, [data-produto], .produto") || null;
-
+      const card = btn.closest(".card") || null;
       if (!card) return;
+      const produtoId = Number(card.dataset.produtoId);
+      if (!produtoId) return;
 
-      const imgEl = card.querySelector("img");
-      const titleEl = card.querySelector(".title, h3, h2");
-      const priceEl = card.querySelector(".price-now, [data-preco]");
+      if (!window.api?.estaLogado()) {
+        window.location.href = "/altafidelidade/login/login.html?next=" +
+          encodeURIComponent(window.location.pathname);
+        return;
+      }
 
-      const parsePrecoBR = (txt) => {
-        if (!txt) return 0;
-        return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
-      };
-
-      const title = titleEl?.textContent.trim() || "Produto";
-      const price = priceEl?.dataset?.preco
-        ? parseFloat(priceEl.dataset.preco)
-        : parsePrecoBR(priceEl?.textContent || "0");
-      const img = imgEl?.src || "";
-      const alt = imgEl?.alt || title;
-
-      const id = `${title.toLowerCase()}|${price.toFixed(2)}`;
-
-      let carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
-
-      const existente = carrinho.find((p) => p.id === id);
-      if (existente) existente.qty++;
-      else carrinho.push({ id, title, price, img, alt, qty: 1 });
-
-      localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
-      localStorage.setItem("bulbe:lastAddedId", id);
-
-      // Feedback visual breve — sem redirecionar
-      btn.classList.add("active");
-      setTimeout(() => btn.classList.remove("active"), 1000);
+      try {
+        await window.api.carrinho.adicionar(produtoId, 1);
+        btn.classList.add("active");
+        setTimeout(() => btn.classList.remove("active"), 1000);
+      } catch {
+        alert("Não foi possível adicionar ao carrinho. Tente novamente.");
+      }
     }
 
   event.stopPropagation();
@@ -314,13 +287,19 @@ document.addEventListener("click", (event) => {
 const btnCarrinhoHeader = document.getElementById("btnCarrinho");
 
 if (btnCarrinhoHeader) {
-  btnCarrinhoHeader.addEventListener("click", () => {
-    const carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
-
-    if (carrinho.length === 0) {
+  btnCarrinhoHeader.addEventListener("click", async () => {
+    if (!window.api?.estaLogado()) {
       window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
-    } else {
-      window.location.href = "/altafidelidade/carrinhos/carrinho.html";
+      return;
+    }
+    try {
+      const resp = await window.api.carrinho.listar();
+      const itens = Array.isArray(resp) ? resp : (resp?.itens ?? []);
+      window.location.href = itens.length > 0
+        ? "/altafidelidade/carrinhos/carrinho.html"
+        : "/altafidelidade/carrinhovazio/carrinhovazio.html";
+    } catch {
+      window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
     }
   });
 }
