@@ -228,76 +228,64 @@ if (acao === "diminuir" && n === 1) {
 /* ======================================================
    REMOÇÃO DE ITEM DO CARRINHO
    ====================================================== */
-function removerItemDoCarrinho(chave, card) {
-  // 1) Estado interno
+async function removerItemDoCarrinho(chave, card) {
+  // 1) Chama API com o ID real do item (evita 404)
+  const apiItemId = card?.dataset?.apiItemId;
+  if (apiItemId && window.api?.estaLogado()) {
+    try {
+      await window.api.carrinho.remover(Number(apiItemId));
+    } catch (err) {
+      console.warn('Erro ao remover item via API:', err);
+    }
+  }
+
+  // 2) Estado interno
   if (produtos[chave]) produtos[chave].quantidade = 0;
 
-  // 2) Seleção: desmarcar e limpar classes/ARIA/label
+  // 3) Seleção: desmarcar e limpar classes/ARIA/label
   const cb = card?.querySelector(".selecao-individual");
   if (cb) cb.checked = false;
   selecionados[chave] = false;
   card?.classList.remove("is-selecionado");
   updateTriggerA11y(card, false);
 
-  // 3) Persistência: remover do bulbe:cart (se existir)
-  // Usa data-cart-id (cards extras) ou reconstrói idGuess (cards hardcoded)
+  // 4) Remove do localStorage (fallback para usuários não logados)
   let cartItemId = card?.dataset?.cartId || null;
   if (!cartItemId) {
-    let title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
-    let priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
-    let unit    = 0;
-    if (priceEl?.dataset?.preco) {
-      unit = Number(priceEl.dataset.preco);
-    } else {
-      unit = Number(
-        (priceEl?.textContent || "0")
-          .replace(/[^\d,.-]/g, "")
-          .replace(/\./g, "")
-          .replace(",", ".")
-      );
-    }
+    const title   = (card?.querySelector(".titulo-produto, .title, h3, h2")?.textContent || "").trim();
+    const priceEl = card?.querySelector(".valor-produto, .price, [data-preco]");
+    const unit    = priceEl?.dataset?.preco
+      ? Number(priceEl.dataset.preco)
+      : Number((priceEl?.textContent || "0").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
     cartItemId = `${String(title).toLowerCase().replace(/\s+/g, " ").slice(0, 200)}|${Number(unit || 0).toFixed(2)}`;
   }
-
   const cartArr = loadCart();
   const idx     = cartArr.findIndex((it) => it.id === cartItemId);
-
-  if (idx >= 0) {
-    cartArr.splice(idx, 1);
-    saveCart(cartArr);
-  }
-
+  if (idx >= 0) { cartArr.splice(idx, 1); saveCart(cartArr); }
   const last = getLastId();
-  if (last && last === cartItemId) {
-    setLastId("");
-  }
+  if (last && last === cartItemId) setLastId("");
 
-  // 4) Remover o card do DOM
+  // 5) Remover o card do DOM
   if (card && typeof card.remove === "function") {
     card.remove();
   } else if (card && card.style) {
     card.style.display = "none";
   }
 
-  // 5) Verificar se ainda existe ALGUM PRODUTO DE CARRINHO
-  //    (ignora os cards do carrossel de recomendados)
-  const aindaTemCardsCarrinho =
-    document.querySelectorAll('article.cartao-produto[data-produto]').length > 0;
-
+  // 6) Verificar se ainda existe algum produto
+  const aindaTemCards = document.querySelectorAll('article.cartao-produto[data-produto]').length > 0;
   const carrinhoAtual = loadCart();
-  const aindaTemNoStorage =
-    Array.isArray(carrinhoAtual) && carrinhoAtual.length > 0;
+  const aindaTemStorage = Array.isArray(carrinhoAtual) && carrinhoAtual.length > 0;
 
-  // Se não sobrou NENHUM produto → carrinho vazio
-  if (!aindaTemCardsCarrinho || !aindaTemNoStorage) {
+  const logado = window.api?.estaLogado();
+  if (!aindaTemCards || (!logado && !aindaTemStorage)) {
     try { localStorage.removeItem("bulbe:cart"); } catch {}
     try { localStorage.removeItem("bulbe:lastAddedId"); } catch {}
-
     window.location.href = "../carrinhovazio/carrinhovazio.html";
-    return; // não precisa atualizar mais nada
+    return;
   }
 
-  // 6) Se ainda tiver produto, só atualiza estados
+  // 7) Atualiza estados visuais
   atualizarSelecionarTudoEstado();
   atualizarResumo();
   atualizarResumoSelecionados();
