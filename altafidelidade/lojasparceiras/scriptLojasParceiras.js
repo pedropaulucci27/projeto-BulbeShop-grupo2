@@ -204,7 +204,7 @@ async function carregarLojasParceiras() {
               <p style="margin-top: 5px; font-size: 0.9em; color: #555;">${loja.endereco || ''}</p>
             </div>
             <div class="actions" style="margin-top: 15px; width: 100%;">
-              <a href="${link}" style="display: block; width: 100%; text-align: center; background-color: var(--primary-color, #ff4c00); color: #fff; padding: 10px; text-decoration: none; border-radius: 4px; font-weight: bold; border: 1px solid var(--primary-color, #ff4c00); cursor: pointer;">Ver Loja</a>
+              <a href="${link}" style="display: block; width: 100%; text-align: center; background-color: #08068D; color: #fff; padding: 10px; text-decoration: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Ver Loja</a>
             </div>
           </div>
         </article>`;
