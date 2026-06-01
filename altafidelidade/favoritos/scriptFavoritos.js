@@ -186,9 +186,31 @@ async function carregarMaisItens() {
         </div>`;
     }).join("");
 
+    // IDs já favoritados pelo usuário (para estado inicial dos corações)
+    const favoritados = new Set(
+      getFavs().map(f => Number(f.id))
+    );
+
     grid.querySelectorAll(".mini-card").forEach(card => {
       const pid = Number(card.dataset.produtoId);
-      card.querySelector(".btn-cart-mais")?.addEventListener("click", async () => {
+      const btnFav  = card.querySelector(".btn-fav-mais");
+      const btnCart = card.querySelector(".btn-cart-mais");
+      const path    = btnFav?.querySelector("path");
+
+      // Estado inicial do coração
+      function aplicarEstadoFav(favoritado) {
+        if (!path) return;
+        if (favoritado) {
+          path.setAttribute("fill", "currentColor");
+          btnFav.setAttribute("aria-label", "Remover dos favoritos");
+        } else {
+          path.setAttribute("fill", "none");
+          btnFav.setAttribute("aria-label", "Favoritar");
+        }
+      }
+      aplicarEstadoFav(favoritados.has(pid));
+
+      btnCart?.addEventListener("click", async () => {
         if (!window.api?.estaLogado()) {
           window.location.href = "/altafidelidade/login/login.html";
           return;
@@ -196,9 +218,25 @@ async function carregarMaisItens() {
         try { await window.api.carrinho.adicionar(pid, 1); window.location.href = "/altafidelidade/carrinhos/carrinho.html"; }
         catch { alert("Não foi possível adicionar ao carrinho."); }
       });
-      card.querySelector(".btn-fav-mais")?.addEventListener("click", async () => {
-        if (!window.api?.estaLogado()) return;
-        try { await window.api.favoritos.adicionar(pid); } catch {}
+
+      btnFav?.addEventListener("click", async () => {
+        if (!window.api?.estaLogado()) {
+          window.location.href = "/altafidelidade/login/login.html";
+          return;
+        }
+        const jaFavoritado = favoritados.has(pid);
+        try {
+          if (jaFavoritado) {
+            await window.api.favoritos.remover(pid);
+            favoritados.delete(pid);
+          } else {
+            await window.api.favoritos.adicionar(pid);
+            favoritados.add(pid);
+          }
+          aplicarEstadoFav(favoritados.has(pid));
+        } catch {
+          alert("Não foi possível atualizar favoritos. Tente novamente.");
+        }
       });
     });
   } catch {
