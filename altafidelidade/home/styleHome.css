@@ -25,13 +25,12 @@ body {
 
 /* HEADER */
 .header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     background-color: var(--header);
     padding: 12px 20px;
     position: relative;
-    gap: 12px;
 }
 
 .header img {
@@ -45,9 +44,8 @@ body {
     height: 20px;
 }
 
-/* LOGO */
+/* LOGO — sempre no centro exato */
 .logo {
-    flex: 1;
     display: flex;
     justify-content: center;
 }
@@ -57,17 +55,17 @@ body {
 }
 
 .home-btn {
-    flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-self: start;
 }
 
-/* ICONS */
+/* ICONS — agrupados à direita */
 .icons {
     display: flex;
     align-items: center;
-    gap: 20px;
-    flex-shrink: 0;
+    gap: 14px;
+    justify-self: end;
 }
 
 .icons img {

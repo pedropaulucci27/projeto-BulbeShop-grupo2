@@ -24,25 +24,27 @@
       wrap.innerHTML = `
         <a href="/altafidelidade/meu perfil/perfil.html"
            style="display:flex;align-items:center;gap:4px;text-decoration:none;color:inherit;">
-          <span style="background:#4361ee;color:#fff;border-radius:50%;width:28px;height:28px;
-                       display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.7rem;">
+          <span style="background:#fff;color:#08068D;border-radius:50%;width:28px;height:28px;
+                       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;">
             ${iniciais}
           </span>
         </a>
         <button id="btnLogout"
-          style="background:none;border:1px solid #ccc;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:.72rem;font-family:inherit;">
+          style="background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;
+                 padding:3px 10px;cursor:pointer;font-size:.72rem;font-family:inherit;">
           Sair
         </button>`;
     } else {
       wrap.innerHTML = `
         <a href="/altafidelidade/login/login.html"
-           style="background:#4361ee;color:#fff;border-radius:6px;padding:4px 12px;
-                  text-decoration:none;font-size:.78rem;font-weight:600;white-space:nowrap;">
+           style="background:#fff;color:#08068D;border-radius:20px;padding:5px 14px;
+                  text-decoration:none;font-size:.78rem;font-weight:700;white-space:nowrap;
+                  box-shadow:0 1px 4px rgba(0,0,0,.15);">
           Entrar
         </a>`;
     }
 
-    iconsEl.prepend(wrap);
+    iconsEl.append(wrap);
 
     document.getElementById("btnLogout")?.addEventListener("click", async () => {
       try { await window.api.auth.logout(); } catch {}
