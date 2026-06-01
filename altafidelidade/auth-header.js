@@ -15,7 +15,7 @@
 
     const wrap = document.createElement("div");
     wrap.id = "auth-indicator";
-    wrap.style.cssText = "display:flex;align-items:center;gap:10px;font-size:.75rem;font-family:Poppins,sans-serif;";
+    wrap.style.cssText = "display:flex;align-items:center;gap:12px;font-size:.75rem;font-family:Poppins,sans-serif;";
 
     if (logado && usuario) {
       const iniciais = (usuario.nome || usuario.email || "U")
@@ -23,22 +23,23 @@
 
       wrap.innerHTML = `
         <a href="/altafidelidade/meu perfil/perfil.html"
-           style="display:flex;align-items:center;gap:4px;text-decoration:none;color:inherit;">
-          <span style="background:#fff;color:#08068D;border-radius:50%;width:28px;height:28px;
-                       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;">
+           style="display:flex;align-items:center;text-decoration:none;color:inherit;">
+          <span style="background:#fff;color:#08068D;border-radius:50%;width:32px;height:32px;
+                       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem;
+                       flex-shrink:0;">
             ${iniciais}
           </span>
         </a>
         <button id="btnLogout"
-          style="background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;
-                 padding:3px 10px;cursor:pointer;font-size:.72rem;font-family:inherit;">
+          style="background:none;border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:8px;
+                 padding:5px 14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap;">
           Sair
         </button>`;
     } else {
       wrap.innerHTML = `
         <a href="/altafidelidade/login/login.html"
-           style="background:#fff;color:#08068D;border-radius:20px;padding:5px 14px;
-                  text-decoration:none;font-size:.78rem;font-weight:700;white-space:nowrap;
+           style="background:#fff;color:#08068D;border-radius:20px;padding:6px 16px;
+                  text-decoration:none;font-size:.8rem;font-weight:700;white-space:nowrap;
                   box-shadow:0 1px 4px rgba(0,0,0,.15);">
           Entrar
         </a>`;
