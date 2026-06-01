@@ -452,7 +452,6 @@ document.addEventListener("click", (event) => {
   INICIALIZAÇÃO
   ========================================================= */
 async function init() {
-  await renderProdutos();
   await carregarFavoritosUsuario();
   sincronizarFavoritosVisuais();
 }
