@@ -1,35 +1,62 @@
 /* =========================================================
   HOME — FILTRO
   ========================================================= */
-const filterBtn = document.getElementById("filter-btn");
+const filterBtn  = document.getElementById("filter-btn");
 const filterMenu = document.getElementById("filter-menu");
 
+// Mapeia o texto do item do filtro para o valor de categoria da API
+const MAP_FILTRO_CATEGORIA = {
+  "Eletrônicos":                "eletrônicos",
+  "Economia de Energia":        "economia de energia",
+  "Casa, Conforto e Bem-Estar": "conforto",
+  "Eletrodomésticos":           "eletrônicos",
+  "Família e Educação":         "educação",
+};
+
+let categoriaAtiva = ""; // controla qual filtro está aplicado
+
 if (filterBtn && filterMenu) {
-  filterBtn.addEventListener("click", () => {
+  // Abre/fecha o menu ao clicar no botão de filtro.
+  // Se já há um filtro ativo e o usuário clica no botão, limpa o filtro.
+  filterBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    // Se há filtro ativo, o clique no botão limpa o filtro
+    if (categoriaAtiva) {
+      categoriaAtiva = "";
+      renderProdutos("");
+      filterMenu.style.display = "none";
+      return;
+    }
+
     filterMenu.style.display =
       filterMenu.style.display === "block" ? "none" : "block";
   });
 
+  // Fecha o menu ao clicar fora
   document.addEventListener("click", (e) => {
     if (!filterBtn.contains(e.target) && !filterMenu.contains(e.target)) {
       filterMenu.style.display = "none";
     }
   });
 
-  const LINKS_FILTRO = {
-    "Eletrônicos":               "/altafidelidade/categorias/eletronicos/eletronico.html",
-    "Economia de Energia":       "/altafidelidade/categorias/economia de energia/economiaEnergia.html",
-    "Casa, Conforto e Bem-Estar":"/altafidelidade/categorias/conforto/conforto.html",
-    "Eletrodomésticos":          "/altafidelidade/categorias/conforto/conforto.html",
-    "Família e Educação":        "/altafidelidade/categorias/educacao/educacao.html",
-  };
-
+  // Ao clicar em um item do filtro: filtra os produtos pela categoria
   filterMenu.querySelectorAll("li").forEach((li) => {
     li.style.cursor = "pointer";
     li.addEventListener("click", () => {
-      const destino = LINKS_FILTRO[li.textContent.trim()];
-      if (destino) window.location.href = destino;
+      const categoria = MAP_FILTRO_CATEGORIA[li.textContent.trim()];
       filterMenu.style.display = "none";
+
+      if (!categoria) return;
+
+      // Se clicar na mesma categoria, limpa o filtro (toggle)
+      if (categoriaAtiva === categoria) {
+        categoriaAtiva = "";
+        renderProdutos("");
+      } else {
+        categoriaAtiva = categoria;
+        renderProdutos(categoria);
+      }
     });
   });
 }
@@ -239,20 +266,32 @@ function mapearProdutoApi(p) {
     priceOld: p.price_was ? parseFloat(p.price_was) : null,
     stock:    Number(p.stock ?? 999),
     link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
+    categoria: (p.category || "").toLowerCase().trim(),
   };
 }
 
 /* =========================================================
   renderProdutos — busca produtos do backend e injeta no DOM
   ========================================================= */
-async function renderProdutos() {
+async function renderProdutos(categoriaFiltro = "") {
   const grid = document.querySelector(".grid");
   if (!grid) return;
 
   grid.innerHTML = `<p style="padding:2rem;text-align:center;color:#888">Carregando produtos...</p>`;
 
+  // Atualiza label do botão de filtro para indicar categoria ativa
+  const filterLabel = document.getElementById("filter-btn");
+  if (filterLabel) {
+    filterLabel.innerHTML = categoriaFiltro
+      ? `<img src="./img/filtoicon.png" alt="Filtro"> ${categoriaFiltro} <span style="font-size:.75em;opacity:.7">✕</span>`
+      : `<img src="./img/filtoicon.png" alt="Filtro"> filtro`;
+  }
+
   try {
-    const resposta = await window.api.produtos.listar();
+    const params = categoriaFiltro
+      ? `?categoria=${encodeURIComponent(categoriaFiltro)}`
+      : "";
+    const resposta = await window.api.produtos.listar(params);
     const lista = (resposta.data || resposta).map(mapearProdutoApi);
 
     if (lista.length === 0) {
@@ -469,6 +508,7 @@ document.addEventListener("click", (event) => {
   INICIALIZAÇÃO
   ========================================================= */
 async function init() {
+  await renderProdutos();          // ← carrega os produtos ao abrir a página
   await carregarFavoritosUsuario();
   sincronizarFavoritosVisuais();
 }
