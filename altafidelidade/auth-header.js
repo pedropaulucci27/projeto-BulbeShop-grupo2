@@ -32,7 +32,8 @@
         </a>
         <button id="btnLogout"
           style="background:none;border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:8px;
-                 padding:5px 14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap;">
+                 padding:5px 14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap;
+                 line-height:1;vertical-align:middle;display:flex;align-items:center;">
           Sair
         </button>`;
     } else {

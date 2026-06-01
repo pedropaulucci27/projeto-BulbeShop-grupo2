@@ -63,9 +63,15 @@ body {
     flex-shrink: 0;
 }
 
+.icons a {
+    display: flex;
+    align-items: center;
+}
+
 .icons img {
     width: 28px;
     height: 28px;
+    display: block;
     transition: transform 0.2s;
 }
 
