@@ -287,3 +287,18 @@ btnCategorias?.addEventListener("click", (e) => {
 
 fecharMenu?.addEventListener("click", fecharMenuCategorias);
 overlay?.addEventListener("click", fecharMenuCategorias);
+
+async function renderProdutos() {
+  const grid = document.querySelector(".grid");
+  if (!grid) return;
+
+  const banners = await carregarBanners();
+
+  try {
+    const resposta = await window.api.produtos.listar();       // ← chama GET /api/v1/produtos
+    const lista = (resposta.data || resposta).map(mapearProdutoApi);
+    grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
+  } catch {
+    grid.innerHTML = banners.map(buildCard).join("");           // ← fallback se API cair
+  }
+}

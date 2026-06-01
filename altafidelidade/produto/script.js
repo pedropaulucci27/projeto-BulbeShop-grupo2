@@ -213,3 +213,17 @@ document.getElementById("btn-add")?.addEventListener("click", () => {
     location.href = "/altafidelidade/carrinhos/carrinho.html";
   }, 600);
 });
+async function carregarProduto() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");            // pega o ?id= da URL
+  if (!id || !window.api) return;
+
+  const p = await window.api.produtos.buscar(id);
+  // que faz: GET http://localhost:3000/api/v1/produtos/1
+
+  // Preenche os elementos do HTML com os dados da API:
+  document.querySelector(".product-title").textContent = p.title;
+  document.querySelector(".price-current").textContent = `R$ ${formatPriceBR(p.price)}`;
+  document.getElementById("gallery-img").src = resolverImagemProduto(p.image);
+  // etc.
+}
