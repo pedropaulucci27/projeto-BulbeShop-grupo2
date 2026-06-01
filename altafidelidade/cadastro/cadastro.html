@@ -13,7 +13,7 @@
 
   <main class="shell">
     <section class="card">
-      <a class="back-btn" onclick="history.back()" aria-label="Voltar">
+      <a class="back-btn" href="/altafidelidade/login/login.html" aria-label="Voltar">
         <img src="/altafidelidade/meu perfil/img/Icon.svg" alt="Voltar" width="24" height="24"
              onerror="this.replaceWith(document.createTextNode('←'))">
       </a>
@@ -47,6 +47,14 @@
               <img src="/altafidelidade/meu perfil/img/olhoicon.svg" alt="" width="20" height="20"
                    onerror="this.replaceWith(document.createTextNode('👁'))">
             </button>
+          </div>
+          <small id="forcaSenha" class="forca-senha"></small>
+        </div>
+
+        <div class="input-group">
+          <label for="confirmarSenha">Confirmar senha:</label>
+          <div class="input-wrap">
+            <input id="confirmarSenha" type="password" placeholder="Repita a senha" autocomplete="new-password" required>
           </div>
         </div>
 
