@@ -266,6 +266,15 @@ function starsStr(n) {
 }
 
 async function renderizarAvaliacoes(id) {
+
+  if (!id) {
+    console.warn("renderizarAvaliacoes chamada sem id");
+    return;
+  }
+
+  const seed = REVIEWS_SEED[id] || [];   // ← se id for inválido, seed = []
+  const user = getReviewsStorage(id);
+  const all  = [...user, ...seed];
   let avaliacoesAPI  = [];
   let mediaAPI       = null;
   let totalAPI       = null;
