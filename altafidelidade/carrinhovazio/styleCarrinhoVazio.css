@@ -808,3 +808,21 @@ body {
   line-height: 1;
   white-space: nowrap;
 }
+
+/* Botão continuar comprando */
+.btn-continuar-comprando {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 28px;
+  background: #08068D;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-continuar-comprando:hover {
+  background: #0762C7;
+}
