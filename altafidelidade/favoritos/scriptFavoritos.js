@@ -81,26 +81,37 @@ function renderFavoritos() {
 
   // Adicionar ao carrinho
   container.querySelectorAll(".icon-btn.cart[data-add-id]").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const id = btn.dataset.addId;
       const fav = getFavs().find(f => f.id === id);
       if (!fav) return;
 
+      btn.disabled = true;
+
+      if (window.api?.estaLogado()) {
+        try {
+          await window.api.carrinho.adicionar(Number(id), 1);
+          window.location.href = "/altafidelidade/carrinhos/carrinho.html";
+          return;
+        } catch (err) {
+          console.warn("Erro ao adicionar ao carrinho via API:", err);
+          btn.disabled = false;
+          return;
+        }
+      }
+
+      // Fallback localStorage para usuários não logados
       const parsePrecoBR = (txt) => {
         if (!txt) return 0;
         return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
       };
-
       const price = parsePrecoBR(fav.price);
       const cartId = `${(fav.title || '').toLowerCase()}|${price.toFixed(2)}`;
-
       let carrinho = [];
       try { carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || []; } catch {}
-
       const existente = carrinho.find(p => p.id === cartId);
       if (existente) existente.qty++;
       else carrinho.push({ id: cartId, title: fav.title, price, img: fav.img, alt: fav.title, qty: 1 });
-
       localStorage.setItem("bulbe:cart", JSON.stringify(carrinho));
       localStorage.setItem("bulbe:lastAddedId", cartId);
       window.location.href = "/altafidelidade/carrinhos/carrinho.html";
