@@ -38,14 +38,14 @@ const IMG_HEART_FILLED   = IMG_BASE + "Exclude.png";
 })();
 
 /* =========================================================
-   Busca
+   Busca — redireciona para home com ?busca=
    ========================================================= */
 function wireSearch(form) {
   if (!form) return;
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const q = form.querySelector('input[type="search"]')?.value?.trim();
-    if (q) alert(`Busca por: ${q}`);
+    if (q) window.location.href = `/altafidelidade/home/paginicial.html?busca=${encodeURIComponent(q)}`;
   });
 }
 wireSearch(document.querySelector(".search"));
@@ -105,80 +105,37 @@ function showToast(msg) {
 }
 
 /* =========================================================
-   Likes (favoritos)
+   Favoritos — via API
    ========================================================= */
-const LS_KEY_LIKES = "bulbe_likes_v1";
-const LS_KEY_FAVS  = "bulbe:favorites";
-
-function getLikes() {
-  try { return new Set(JSON.parse(localStorage.getItem(LS_KEY_LIKES)) || []); }
-  catch { return new Set(); }
-}
-function setLikes(set) {
-  localStorage.setItem(LS_KEY_LIKES, JSON.stringify(Array.from(set)));
-}
-function getFavs() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY_FAVS)) || []; }
-  catch { return []; }
-}
-function saveFavs(arr) {
-  localStorage.setItem(LS_KEY_FAVS, JSON.stringify(arr));
-}
-
-function getProductDataForBtn(btn) {
-  // Tenta ler dados do tile pai (prateleira)
-  const tile = btn.closest('.tile');
-  if (tile) {
-    return {
-      id:       btn.dataset.likeId || btn.id,
-      title:    tile.querySelector('.title')?.textContent?.trim() || 'Produto',
-      price:    tile.querySelector('.price')?.textContent?.trim() || '',
-      priceOld: tile.querySelector('.price-old')?.textContent?.trim() || '',
-      img:      tile.querySelector('img')?.getAttribute('src') || '',
-    };
-  }
-  // Produto principal da página
-  return {
-    id:       btn.dataset.likeId || btn.id,
-    title:    document.querySelector('.product-title')?.textContent?.trim() || 'Produto',
-    price:    document.querySelector('.price-current')?.textContent?.trim() || '',
-    priceOld: document.querySelector('.price-old')?.textContent?.trim() || '',
-    img:      document.querySelector('#gallery-img')?.getAttribute('src') || '',
-  };
-}
-
-function isLiked(id) { return getLikes().has(id); }
-
 function paintHeart(btn, liked) {
   btn.src = liked ? IMG_HEART_FILLED : IMG_HEART_OUTLINE;
 }
 
-function toggleLike(btn) {
-  const id  = btn.dataset.likeId || btn.id;
-  const set = getLikes();
-  const liked = !set.has(id);
-  if (liked) set.add(id);
-  else set.delete(id);
-  setLikes(set);
-
-  // Atualiza lista de favoritos completos
-  const favs = getFavs();
-  if (liked) {
-    if (!favs.find(f => f.id === id)) favs.push(getProductDataForBtn(btn));
-    saveFavs(favs);
-  } else {
-    saveFavs(favs.filter(f => f.id !== id));
-  }
-
-  paintHeart(btn, liked);
-  showToast(liked ? "Adicionado aos Favoritos ❤️" : "Removido dos Favoritos");
-}
-
 function initLikes() {
-  const all = document.querySelectorAll(".btn-fav");
-  all.forEach((btn) => {
-    paintHeart(btn, isLiked(btn.dataset.likeId || btn.id));
-    btn.addEventListener("click", () => toggleLike(btn));
+  document.querySelectorAll(".btn-fav").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!window.api?.estaLogado()) {
+        window.location.href = "/altafidelidade/login/login.html?next=" +
+          encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+      }
+      const produtoId = Number(_produtoAtual?.id);
+      if (!produtoId) return;
+      const jaLiked = btn.src.includes("Exclude");
+      paintHeart(btn, !jaLiked);
+      try {
+        if (jaLiked) {
+          await window.api.favoritos.remover(produtoId);
+          showToast("Removido dos Favoritos");
+        } else {
+          await window.api.favoritos.adicionar(produtoId);
+          showToast("Adicionado aos Favoritos");
+        }
+      } catch {
+        paintHeart(btn, jaLiked); // reverte se API falhar
+        showToast("Erro ao atualizar favoritos.");
+      }
+    });
   });
 }
 initLikes();
@@ -203,18 +160,24 @@ initLikes();
 })();
 
 /* =========================================================
-   Ícone do carrinho no header
+   Ícone do carrinho no header — via API
    ========================================================= */
 const botaoCarrinho = document.getElementById("btnCarrinho");
 
 if (botaoCarrinho) {
-  botaoCarrinho.addEventListener("click", () => {
-    const carrinho = JSON.parse(localStorage.getItem("bulbe:cart")) || [];
-
-    if (carrinho.length === 0) {
+  botaoCarrinho.addEventListener("click", async () => {
+    if (!window.api?.estaLogado()) {
       window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
-    } else {
-      window.location.href = "/altafidelidade/carrinhos/carrinho.html";
+      return;
+    }
+    try {
+      const resp  = await window.api.carrinho.listar();
+      const itens = Array.isArray(resp) ? resp : (resp?.itens ?? []);
+      window.location.href = itens.length > 0
+        ? "/altafidelidade/carrinhos/carrinho.html"
+        : "/altafidelidade/carrinhovazio/carrinhovazio.html";
+    } catch {
+      window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
     }
   });
 }
@@ -231,11 +194,24 @@ function formatPriceBR(n) {
 async function carregarProduto() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
-  if (!id || !window.api) return;
+
+  if (!id) {
+    document.querySelector(".product-title").textContent = "Produto não encontrado";
+    document.querySelector(".container").innerHTML =
+      `<p style="padding:24px;text-align:center;color:#666">
+         Nenhum produto foi informado. <a href="/altafidelidade/home/paginicial.html">Voltar para a loja</a>
+       </p>`;
+    return;
+  }
+
+  if (!window.api) return;
 
   try {
     const p = await window.api.produtos.buscar(id);
     _produtoAtual = p;
+
+    // Atualiza title da aba com nome real do produto
+    document.title = `${p.title} • Bulbe`;
 
     const titleEl = document.querySelector(".product-title");
     if (titleEl) titleEl.textContent = p.title;
@@ -273,8 +249,14 @@ async function carregarProduto() {
           variationsCard.style.display = "block";
       }
     }
+
+    // Carrega descrição real da API
+    const descEl = document.querySelector(".product-description, .description, [data-description]");
+    if (descEl && p.description) descEl.textContent = p.description;
+
   } catch {
-    // mantém o conteúdo estático do HTML se a API não estiver disponível
+    document.querySelector(".product-title").textContent = "Produto não encontrado";
+    showToast("Não foi possível carregar o produto. Tente novamente.");
   }
 }
 
