@@ -287,6 +287,14 @@ async function renderProdutos(categoriaFiltro = "") {
       : `<img src="./img/filtoicon.png" alt="Filtro"> filtro`;
   }
 
+  // Carrega banners do produtos.json
+  let banners = [];
+  try {
+    const res = await fetch("./produtos.json");
+    const data = await res.json();
+    banners = data.filter(p => p.type === "banner");
+  } catch {}
+
   try {
     const params = categoriaFiltro
       ? `?categoria=${encodeURIComponent(categoriaFiltro)}`
@@ -294,12 +302,12 @@ async function renderProdutos(categoriaFiltro = "") {
     const resposta = await window.api.produtos.listar(params);
     const lista = (resposta.data || resposta).map(mapearProdutoApi);
 
-    if (lista.length === 0) {
+    if (lista.length === 0 && banners.length === 0) {
       grid.innerHTML = `<p style="padding:2rem;text-align:center">Nenhum produto encontrado.</p>`;
       return;
     }
 
-    grid.innerHTML = lista.map(buildCard).join("");
+    grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
     sincronizarFavoritosVisuais();
 
   } catch (err) {
