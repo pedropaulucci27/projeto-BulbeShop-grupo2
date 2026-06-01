@@ -348,7 +348,6 @@ async function renderizarAvaliacoes(id) {
         </div>
       </header>
       <p class="review-text">${r.texto}</p>
-      <div class="review-photos"><div class="ph"></div><div class="ph"></div></div>
     </article>
   `).join("");
 }
