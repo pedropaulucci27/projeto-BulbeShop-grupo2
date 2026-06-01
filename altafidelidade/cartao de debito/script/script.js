@@ -43,11 +43,7 @@ function validate(){
 function markInvalid(el){ el.classList.add('is-invalid'); }
 function clearInvalid(el){ el.classList.remove('is-invalid'); }
 
-// Ação do botão
-btn.addEventListener('click', () => {
-  if(btn.disabled) return;
-  alert('Pagamento por débito confirmado ✅');
-});
+// Ação do botão — redirect tratado pelo IIFE debito.js abaixo
 
 // valida no load
 validate();
@@ -140,19 +136,36 @@ validate();
     });
   }
 
-  // botão concluir compra (ajuste o seletor se necessário)
+  // botão concluir compra
   function wireFinish() {
     const btn = document.getElementById('btnFinish') || document.querySelector('[data-action="finish"]');
     if (!btn) return;
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      // se seu fluxo usa "disabled" quando inválido, respeita
       if (btn.disabled) return;
-      // salva método e formulário
-      try { localStorage.setItem('bulbe:paymentMethod', 'debito'); } catch (e) {}
+
+      try { localStorage.setItem('bulbe:paymentMethod', 'debito'); } catch {}
       saveForm();
-      // redireciona para "processando compra"
-      window.location.href = PROCESSING_URL;
+
+      const pedidoId = localStorage.getItem('bulbe:pedidoId');
+      if (window.api?.estaLogado() && pedidoId) {
+        btn.disabled = true;
+        try {
+          const numero  = document.getElementById('debitNumber')?.value.replace(/\s/g, '') || '';
+          const expiry  = document.getElementById('debitExpiry')?.value || '';
+          const cvv     = document.getElementById('debitCVV')?.value || '';
+          await window.api.pedidos.pagarDebito(pedidoId, { numero, validade: expiry, cvv });
+          // localStorage.removeItem('bulbe:pedidoId'); // comentado para a tela final conseguir ler
+          localStorage.removeItem('bulbe:cart');
+          localStorage.removeItem('bulbe:checkoutItems');
+          window.location.href = PROCESSING_URL;
+        } catch {
+          btn.disabled = false;
+          window.location.href = '/altafidelidade/pagamento e recusado/status-recusada.html';
+        }
+      } else {
+        window.location.href = PROCESSING_URL;
+      }
     });
   }
 
@@ -161,3 +174,52 @@ validate();
   wireAutosave();
   wireFinish();
 })();
+
+async function carregarDadosDebito() {
+  const cliente = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
+  const elEndereco = document.getElementById("enderecoCobranca");
+  
+  if (elEndereco && cliente.rua) {
+    elEndereco.innerHTML = `${cliente.rua}, ${cliente.numero || 'S/N'}${cliente.compl ? ', ' + cliente.compl : ''}<br>${cliente.cep || ''} ${cliente.cidade || ''}, ${cliente.estado || ''}`;
+  } else if (elEndereco) {
+    elEndereco.innerHTML = "Endereço não encontrado.";
+  }
+
+  const pedidoId = localStorage.getItem("bulbe:pedidoId");
+  let total = 0;
+
+  if (pedidoId && window.api?.estaLogado()) {
+    try {
+      const pedido = await window.api.pedidos.buscar(pedidoId);
+      total = pedido.total;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // Fallback: Se falhar por causa do ID, busca o último pedido do histórico da pessoa
+  if ((!total || total <= 0) && window.api?.estaLogado()) {
+      try {
+          const historico = await window.api.pedidos.listar();
+          if (historico && historico.length > 0) {
+              total = historico[0].total; // pega o mais recente
+              localStorage.setItem("bulbe:pedidoId", historico[0].id); // corrige o ID salvo
+          }
+      } catch(e) {}
+  }
+
+  // Último recurso: carrinho offline
+  if (!total || total <= 0) {
+      try {
+          const checkoutItems = JSON.parse(localStorage.getItem('bulbe:checkoutItems') || '[]');
+          total = checkoutItems.reduce((soma, item) => soma + (parseFloat(item.price || 0) * parseInt(item.qty || 1)), 0);
+      } catch(e) {}
+  }
+
+  const boxValor = document.getElementById("valorTotalBox");
+  if (boxValor) {
+    boxValor.innerHTML = `R$ ${total.toFixed(2).replace('.', ',')}`;
+  }
+}
+
+carregarDadosDebito();

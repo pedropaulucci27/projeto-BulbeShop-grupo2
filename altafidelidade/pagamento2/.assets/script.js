@@ -1,8 +1,7 @@
-// /altafidelidade/pagamento2/.assets/script.js
 (function () {
   const btn = document.getElementById('btnSave');
 
-  // ---------- País (select-block) ----------
+  // ── País (select-block) ───────────────────────────────────────────
   const selPais   = document.getElementById('countrySelect');
   const paisHead  = selPais?.querySelector('.select-head');
   const paisList  = selPais?.querySelector('.select-list');
@@ -23,110 +22,126 @@
       if (!li) return;
       if (paisLabel) paisLabel.textContent = li.textContent.trim();
       selPais.setAttribute('aria-expanded', 'false');
-      refreshCTA();
     });
     document.addEventListener('click', (e) => {
       if (!selPais.contains(e.target)) selPais.setAttribute('aria-expanded', 'false');
     });
   }
 
-  // ---------- Estado/Cidade (inline-enhanced) ----------
-  const selEstado = document.getElementById('stateSelect');
-  const selCidade = document.getElementById('citySelect');
+  // ── Campos de estado e cidade (somente leitura, preenchidos pelo CEP) ─
+  const inpEstado = document.getElementById('estado');
+  const inpCidade = document.getElementById('cidade');
 
-  const setInlineValue = (container, value) => {
-    const lbl = container?.querySelector('.inline-label');
-    if (lbl && value) lbl.textContent = value;
-  };
-
-  function wireInline(container) {
-    if (!container) return;
-    container.addEventListener('click', (e) => {
-      const head = e.target.closest('.inline-head');
-      const opt  = e.target.closest('.inline-opt');
-      if (head) {
-        const open = container.getAttribute('aria-expanded') === 'true';
-        container.setAttribute('aria-expanded', String(!open));
-        return;
-      }
-      if (opt) {
-        setInlineValue(container, opt.textContent.trim());
-        container.setAttribute('aria-expanded', 'false');
-      }
-    });
-    document.addEventListener('click', (e) => {
-      if (!container.contains(e.target)) container.setAttribute('aria-expanded', 'false');
-    });
-  }
-
-  // ---------- Campos básicos ----------
-  const sectionCards = Array.from(document.querySelectorAll('.card'));
-  const camposComprador = sectionCards[1]?.querySelectorAll('.field .input') || [];
-  const [inpNome, inpFone, inpCPF] = camposComprador;
-
-  const camposEndereco = sectionCards[2]?.querySelectorAll('.field .input') || [];
-  const [inpCEP, inpRua, inpNumero, inpCompl, inpBairro] = camposEndereco;
+  // ── Campos básicos ───────────────────────────────────────────────
+  const inpNome   = document.getElementById('nomeCompleto');
+  const inpFone   = document.getElementById('telefone');
+  const inpCPF    = document.getElementById('cpf');
+  const inpCEP    = document.getElementById('cep');
+  const inpRua    = document.getElementById('rua');
+  const inpNumero = document.getElementById('numero');
+  const inpCompl  = document.getElementById('complemento');
+  const inpBairro = document.getElementById('bairro');
   const cbSemNumero = document.querySelector('.checkbox-inline input[type="checkbox"]');
 
   cbSemNumero?.addEventListener('change', () => {
     if (cbSemNumero.checked) {
-      if (inpNumero) {
-        inpNumero.value = '';
-        inpNumero.disabled = true;
-      }
+      if (inpNumero) { inpNumero.value = ''; inpNumero.disabled = true; }
     } else {
       if (inpNumero) inpNumero.disabled = false;
     }
+    if (window.validarCampos) window.validarCampos();
   });
 
-  // ---------- Frete (obrigatório e exclusivo) ----------
+  // ── Frete via API ─────────────────────────────────────────────────
   const ulFrete = document.getElementById('freteList');
-  const fretes  = Array.from(ulFrete?.querySelectorAll('input[name="frete"]') || []);
+
   function getFreteValue() {
-    const el = fretes.find(f => f.checked);
-    if (!el) return '';
-    const li = el.closest('.frete-item');
+    const checked = ulFrete?.querySelector('input[name="frete"]:checked');
+    if (!checked) return '';
+    const li        = checked.closest('.frete-item');
     const labelText = li?.querySelector('label span')?.textContent?.trim() || '';
     const priceText = li?.querySelector('strong')?.textContent?.trim() || '';
     return `${labelText} | ${priceText}`;
   }
-  fretes.forEach(chk => {
-    chk.addEventListener('change', () => {
-      if (chk.checked) fretes.forEach(o => { if (o !== chk) o.checked = false; });
-      refreshCTA();
+
+  function renderOpcoesFrete(opcoes) {
+    if (!ulFrete) return;
+    ulFrete.innerHTML = opcoes.map(op => `
+      <li class="frete-item">
+        <label>
+          <input type="radio" name="frete">
+          <span>${op.transportadora} (${op.prazo})</span>
+        </label>
+        <strong>R$ ${Number(op.preco).toFixed(2).replace('.', ',')}</strong>
+      </li>`).join('');
+
+    ulFrete.querySelectorAll('input[name="frete"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (window.validarCampos) window.validarCampos();
+      });
     });
+  }
+
+  async function buscarFrete(cep) {
+    const cepLimpo = cep.replace(/\D/g, '');
+    if (cepLimpo.length !== 8) return;
+    try {
+      console.log('Buscando frete para CEP:', cepLimpo);
+      const resposta = await fetch(`http://localhost:3000/api/v1/frete?cep=${cepLimpo}`);
+      const dados    = await resposta.json();
+      console.log('Resposta da API:', dados);
+      if (dados.opcoes) {
+        renderOpcoesFrete(dados.opcoes);
+        if (dados.estado && inpEstado) inpEstado.value = dados.estado;
+        if (dados.cidade && inpCidade) inpCidade.value = dados.cidade;
+        if (window.validarCampos) window.validarCampos();
+      }
+    } catch (err) {
+      console.error('Erro ao buscar frete:', err);
+    }
+  }
+
+  // Busca frete ao sair do campo CEP
+  inpCEP?.addEventListener('blur', () => {
+    const cep = inpCEP.value.trim();
+    if (cep.replace(/\D/g, '').length === 8) buscarFrete(cep);
   });
 
-  // ---------- Reidratar se houver ----------
+  // ── Reidrata campos com dados salvos ─────────────────────────────
   const saved = JSON.parse(localStorage.getItem('checkoutCustomer') || '{}');
   if (saved.pais && paisLabel) paisLabel.textContent = saved.pais;
 
-  if (inpNome && saved.nome)   inpNome.value = saved.nome;
-  if (inpFone && saved.fone)   inpFone.value = saved.fone;
-  if (inpCPF  && saved.cpf)    inpCPF.value  = saved.cpf;
+  if (inpNome   && saved.nome)   inpNome.value   = saved.nome;
+  if (inpFone   && saved.fone)   inpFone.value   = saved.fone;
+  if (inpCPF    && saved.cpf)    inpCPF.value    = saved.cpf;
+  if (inpCEP    && saved.cep)    inpCEP.value    = saved.cep;
+  if (inpRua    && saved.rua)    inpRua.value    = saved.rua;
+  if (inpCompl  && saved.compl)  inpCompl.value  = saved.compl;
+  if (inpBairro && saved.bairro) inpBairro.value = saved.bairro;
+  if (inpEstado && saved.estado) inpEstado.value = saved.estado;
+  if (inpCidade && saved.cidade) inpCidade.value = saved.cidade;
 
-  if (inpCEP   && saved.cep)    inpCEP.value   = saved.cep;
-  if (inpRua   && saved.rua)    inpRua.value   = saved.rua;
   if (inpNumero && saved.numero && saved.numero !== 'S/N') inpNumero.value = saved.numero;
   if (cbSemNumero && saved.numero === 'S/N') {
     cbSemNumero.checked = true;
     if (inpNumero) inpNumero.disabled = true;
   }
-  if (inpCompl && saved.compl)  inpCompl.value  = saved.compl;
-  if (inpBairro && saved.bairro)inpBairro.value = saved.bairro;
 
-  if (saved.estado) setInlineValue(selEstado, saved.estado);
-  if (saved.cidade) setInlineValue(selCidade, saved.cidade);
+  if (saved.cep) buscarFrete(saved.cep);
 
-  if (saved.frete) {
-    fretes.forEach(chk => {
-      const li = chk.closest('.frete-item');
-      const labelText = li?.querySelector('label span')?.textContent?.trim() || '';
-      if (saved.frete.startsWith(labelText)) chk.checked = true;
-    });
+  // ── Pré-preenche com dados do perfil se campo vazio ──────────────
+  if (window.api && window.api.estaLogado()) {
+    window.api.usuario.perfil()
+      .then(perfil => {
+        if (inpNome && !inpNome.value && perfil.nome)     inpNome.value = perfil.nome;
+        if (inpFone && !inpFone.value && perfil.telefone) inpFone.value = perfil.telefone;
+        if (inpCPF  && !inpCPF.value  && perfil.cpf)     inpCPF.value  = perfil.cpf;
+        if (window.validarCampos) window.validarCampos();
+      })
+      .catch(() => {});
   }
 
-  // ---------- Coletar + Validar ----------
+  // ── Coleta dados do formulário ────────────────────────────────────
   function collect() {
     const data = {
       pais:   getPaisValue(),
@@ -138,43 +153,24 @@
       numero: (inpNumero?.value || '').trim(),
       compl:  (inpCompl?.value  || '').trim(),
       bairro: (inpBairro?.value || '').trim(),
-      // estado/cidade continuam sendo salvos, mas não são obrigatórios nesta etapa
-      estado: selEstado?.querySelector('.inline-label')?.textContent?.trim() || '',
-      cidade: selCidade?.querySelector('.inline-label')?.textContent?.trim() || '',
-      frete:  getFreteValue()
+      estado: (inpEstado?.value || '').trim(),
+      cidade: (inpCidade?.value || '').trim(),
+      frete:  getFreteValue(),
     };
     if (cbSemNumero?.checked) data.numero = 'S/N';
     return data;
   }
 
-  // ⚠️ Nesta etapa, só exigimos País + Frete
-  function isValid(data) {
-    return Boolean(data.pais && data.frete);
-  }
-
-  function refreshCTA() {
-    if (!btn) return;
-    btn.disabled = !isValid(collect());
-  }
-
-  // Inputs de texto
-  Array.from(document.querySelectorAll('input')).forEach(el => {
-    el.addEventListener('input', refreshCTA, {passive:true});
-    el.addEventListener('change', refreshCTA, {passive:true});
-  });
-
   wirePais();
-  wireInline(selEstado);
-  wireInline(selCidade);
-  refreshCTA();
 
-  // ---------- Salvar + redirecionar ----------
+  // ── Expõe funções globalmente ─────────────────────────────────────
+  window.buscarFrete       = buscarFrete;
+  window.renderOpcoesFrete = renderOpcoesFrete;
+
+  // ── Salva e redireciona para o método de pagamento ────────────────
   btn?.addEventListener('click', () => {
+    if (btn.disabled) return;
     const data = collect();
-    if (!isValid(data)) {
-      alert('Selecione o País e um método de Frete para continuar.');
-      return;
-    }
     localStorage.setItem('checkoutCustomer', JSON.stringify(data));
 
     const method = (localStorage.getItem('payMethod') || '').toLowerCase();
@@ -186,85 +182,66 @@
       window.location.href = '/altafidelidade/pagamento3/pagamento3.html';
       return;
     }
-        if (method.includes('pix')) {
+    if (method.includes('pix')) {
       window.location.href = '/altafidelidade/pix/pix.html';
       return;
     }
-        if (method.includes('boleto')) {
+    if (method.includes('boleto')) {
       window.location.href = '/altafidelidade/boleto/boleto.html';
       return;
     }
 
-
-    // fallback
     window.location.href = '/altafidelidade/pagamento1/pagamento.html';
   });
 })();
 
 
-document.addEventListener("DOMContentLoaded", function () {
+// ── Validação dos campos obrigatórios ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  const btnSave = document.getElementById('btnSave');
 
-  const btnSave = document.getElementById("btnSave");
-
-  // Lista dos campos obrigatórios por ID
   const camposObrigatorios = [
-    "nomeCompleto",
-    "telefone",
-    "cpf",
-    "cep",
-    "rua",
-    "numero",
-    "bairro"
+    'nomeCompleto', 'telefone', 'cpf', 'cep', 'rua', 'numero', 'bairro',
   ];
 
   function validarCampos() {
     let valido = true;
 
-    // Validação dos campos de texto
     camposObrigatorios.forEach(id => {
       const campo = document.getElementById(id);
-      if (!campo.value.trim()) {
+      if (id === 'numero' && document.querySelector('.checkbox-inline input[type="checkbox"]')?.checked) {
+        // se marcou 'Sem número', o campo numero não precisa ser validado
+      } else if (!campo.value.trim()) {
         valido = false;
       }
     });
 
-    // Validação do País
     const paisSelecionado =
-      document.querySelector("#countrySelect .select-placeholder").textContent.trim() !== "Selecionar";
+      document.querySelector('#countrySelect .select-placeholder')?.textContent.trim() !== 'Selecionar';
     if (!paisSelecionado) valido = false;
 
-    // Estado
-    const estadoSelecionado =
-      document.querySelector("#stateSelect .inline-label").textContent.trim() !== "Selecione o estado";
-    if (!estadoSelecionado) valido = false;
+    // Cidade e Estado não bloqueiam mais o botão
+    const estadoPreenchido = (document.getElementById('estado')?.value || '').trim() !== '';
+    const cidadePreenchida = (document.getElementById('cidade')?.value || '').trim() !== '';
 
-    // Cidade
-    const cidadeSelecionada =
-      document.querySelector("#citySelect .inline-label").textContent.trim() !== "Selecione a cidade";
-    if (!cidadeSelecionada) valido = false;
-
-    // Frete
     const freteSelecionado = document.querySelector("input[name='frete']:checked");
     if (!freteSelecionado) valido = false;
 
-    // Ativa / Desativa botão
     btnSave.disabled = !valido;
-    btnSave.classList.toggle("enabled", valido);
+    btnSave.classList.toggle('enabled', valido);
   }
 
-  // Eventos de atualização
+  window.validarCampos = validarCampos;
+
   camposObrigatorios.forEach(id => {
-    document.getElementById(id).addEventListener("input", validarCampos);
+    document.getElementById(id).addEventListener('input', validarCampos);
   });
 
   document.querySelectorAll("input[name='frete']").forEach(el => {
-    el.addEventListener("change", validarCampos);
+    el.addEventListener('change', validarCampos);
   });
 
-  document.getElementById("countrySelect").addEventListener("click", validarCampos);
-  document.getElementById("stateSelect").addEventListener("click", validarCampos);
-  document.getElementById("citySelect").addEventListener("click", validarCampos);
+  document.getElementById('countrySelect').addEventListener('click', validarCampos);
 
-  validarCampos(); // Evita botão ativado inicial
+  validarCampos();
 });
-

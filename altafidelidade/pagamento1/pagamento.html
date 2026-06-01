@@ -14,10 +14,10 @@
 
   <!-- HEADER -->
   <header class="appbar">
-    <button class="appbar__back" aria-label="Voltar" onclick="history.back()">
+    <a class="appbar__back" aria-label="Voltar" href="/altafidelidade/carrinhos/carrinho.html">
       <img src="/altafidelidade/pagamento1/.assets/img/corner-up-left.svg" alt="">
-    </button>
-    <img class="appbar__logo" src="/altafidelidade/pagamento1/.assets/img/logo-base.svg" alt="Bulbe">
+    </a>
+    <a href="/altafidelidade/home/paginicial.html"><img class="appbar__logo" src="/altafidelidade/pagamento1/.assets/img/logo-base.svg" alt="Bulbe"></a>
   </header>
 
   <main class="wrap">
@@ -27,7 +27,7 @@
       <div class="steps__bar">
         <ol class="steps__list">
 
-          <!-- 1: Checar (etapa atual) -->
+          <!-- Etapa atual -->
           <li class="step is-current">
             <div class="step__circle">
               <span class="step__number">1</span>
@@ -35,7 +35,7 @@
             <span class="step__text">Checar</span>
           </li>
 
-          <!-- 2: Cadastro (próxima) -->
+          <!-- Próximas etapas -->
           <li class="step">
             <div class="step__circle">
               <span class="step__number">2</span>
@@ -43,7 +43,6 @@
             <span class="step__text">Cadastro</span>
           </li>
 
-          <!-- 3: Pagamento (próxima) -->
           <li class="step">
             <div class="step__circle">
               <span class="step__number">3</span>
@@ -51,7 +50,6 @@
             <span class="step__text">Pagamento</span>
           </li>
 
-          <!-- 4: Confirmação (próxima) -->
           <li class="step">
             <div class="step__circle">
               <span class="step__number">4</span>
@@ -62,6 +60,7 @@
         </ol>
       </div>
     </section>
+
     <!-- ENDEREÇO -->
     <section class="address-card">
       <div class="address-card__icon">
@@ -78,10 +77,9 @@
         <img src="/altafidelidade/pagamento1/.assets/img/chevron-right.svg" alt="">
       </div>
     </section>
-
-    <!-- CARRINHO -->
-    <section class="cart">
-      <!-- Lâmpada -->
+    
+    <!-- Produtos escritos à mão no HTML --> 
+    <!-- <section class="cart">
       <article class="cart-card">
         <img class="cart-card__thumb"
           src="/altafidelidade/pagamento1/.assets/img/c6559d49aec17a510b73b50f7689acc97fe64b4d.png" alt="Lâmpada">
@@ -103,7 +101,6 @@
         </div>
       </article>
 
-      <!-- Parafusadeira + faixa colada -->
       <article class="cart-card cart-card--has-strip">
         <img class="cart-card__thumb"
           src="/altafidelidade/pagamento1/.assets/img/f522bac792bf441d089879622204f18fd4c8d80a.png" alt="Parafusadeira">
@@ -133,7 +130,7 @@
           </span>
         </footer>
       </article>
-    </section>
+    </section> -->
 
     <!-- REVISÃO DO PEDIDO -->
     <section class="review-card">
@@ -177,16 +174,15 @@
       </div>
     </section>
 
-    <!-- CTA: próxima caixa no fluxo, abaixo do método de pagamento -->
     <div class="cta">
       <button class="cta__btn" type="button">
         Prosseguir para pagamento
         <img src="/altafidelidade/pagamento1/.assets/img/Icon.svg" alt="" width="18" height="18">
       </button>
     </div>
-
   </main>
 
+  <script src="/altafidelidade/api.js"></script>
   <script src="/altafidelidade/pagamento1/script-checkout.js"></script>
   <script src="../api.js"></script>
 </body>

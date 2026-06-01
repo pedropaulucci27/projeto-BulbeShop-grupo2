@@ -16,6 +16,7 @@
 /* REGRAS GERAIS */
 * {
   box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 html, body {
   height: 100%;
@@ -401,6 +402,11 @@ body {
 }
 
 /* ======== RESUMO (BOTTOM SHEET) ======== */
+
+/* Oculto por padrão — JS exibe quando há pelo menos 1 produto selecionado */
+#resumoCarrinho {
+  display: none;
+}
 
 .resumo-carrinho{
   position: fixed;

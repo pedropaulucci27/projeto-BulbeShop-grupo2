@@ -20,7 +20,7 @@
             <img src="/altafidelidade/pix/img/corner-up-left.svg" alt="">
         </button>
 
-        <img class="appbar__logo" src="/altafidelidade/pix/img/logo-base.svg" alt="Bulbe">
+        <a href="/altafidelidade/home/paginicial.html"><img class="appbar__logo" src="/altafidelidade/pix/img/logo-base.svg" alt="Bulbe"></a>
     </header>
 
     <main class="wrap">
@@ -72,8 +72,8 @@
                     <img src="img\Vector (1).png" alt="" class="info-ico">
                     <div>
                         <h2>Boleto</h2>
-                        <p>Seu boleto foi gerado! O boleto foi enviado no seu email utilizado na sua conta BulbeShop.
-                        </p>
+                        <p id="mensagemBoleto">Revise os dados antes de gerar seu boleto.</p>
+                        <h3 id="valorPedido"></h3>
                     </div>
                 </header>
             </div>
@@ -83,6 +83,7 @@
                 <p class="info-title">Código escaneável:</p>
                 <div class="barcode-wrapper">
                     <img src="img\codigo-de-barras 1.png" alt="Código de barras do boleto">
+                    <p id="codigoBarrasTxt" class="barcode-text"></p>
                 </div>
             </div>
 
@@ -123,7 +124,7 @@
 
             <div class="modal-body">
                 <p class="email-label">Boleto enviado para:</p>
-                <p class="email-box">********ares@gmail.com</p>
+                <p class="email-box" id="emailUsuario">Carregando...</p>
                 <p class="email-help">Confira seu email ou tente novamente</p>
             </div>
 
@@ -136,6 +137,7 @@
 
 
 
+    <script src="../api.js"></script>
     <script src="Boletoscript.js"></script>
     <script src="../api.js"></script>
 </body>

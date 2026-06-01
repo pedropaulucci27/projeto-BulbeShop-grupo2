@@ -78,6 +78,99 @@ document.querySelectorAll(".variations .choices").forEach((group) => {
 /* =========================================================
   Rating (estrelas — preenche a partir do data-rating)
   ========================================================= */
+   Toast (snackbar)
+   ========================================================= */
+function showToast(msg) {
+  const el = document.getElementById("snackbar");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add("is-show");
+  clearTimeout(showToast.__t);
+  showToast.__t = setTimeout(() => el.classList.remove("is-show"), 2200);
+}
+
+/* =========================================================
+   Likes (favoritos)
+   ========================================================= */
+const LS_KEY_LIKES = "bulbe_likes_v1";
+const LS_KEY_FAVS  = "bulbe:favorites";
+
+function getLikes() {
+  try { return new Set(JSON.parse(localStorage.getItem(LS_KEY_LIKES)) || []); }
+  catch { return new Set(); }
+}
+function setLikes(set) {
+  localStorage.setItem(LS_KEY_LIKES, JSON.stringify(Array.from(set)));
+}
+function getFavs() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_FAVS)) || []; }
+  catch { return []; }
+}
+function saveFavs(arr) {
+  localStorage.setItem(LS_KEY_FAVS, JSON.stringify(arr));
+}
+
+function getProductDataForBtn(btn) {
+  // Tenta ler dados do tile pai (prateleira)
+  const tile = btn.closest('.tile');
+  if (tile) {
+    return {
+      id:       btn.dataset.likeId || btn.id,
+      title:    tile.querySelector('.title')?.textContent?.trim() || 'Produto',
+      price:    tile.querySelector('.price')?.textContent?.trim() || '',
+      priceOld: tile.querySelector('.price-old')?.textContent?.trim() || '',
+      img:      tile.querySelector('img')?.getAttribute('src') || '',
+    };
+  }
+  // Produto principal da página
+  return {
+    id:       btn.dataset.likeId || btn.id,
+    title:    document.querySelector('.product-title')?.textContent?.trim() || 'Produto',
+    price:    document.querySelector('.price-current')?.textContent?.trim() || '',
+    priceOld: document.querySelector('.price-old')?.textContent?.trim() || '',
+    img:      document.querySelector('#gallery-img')?.getAttribute('src') || '',
+  };
+}
+
+function isLiked(id) { return getLikes().has(id); }
+
+function paintHeart(btn, liked) {
+  btn.src = liked ? IMG_HEART_FILLED : IMG_HEART_OUTLINE;
+}
+
+function toggleLike(btn) {
+  const id  = btn.dataset.likeId || btn.id;
+  const set = getLikes();
+  const liked = !set.has(id);
+  if (liked) set.add(id);
+  else set.delete(id);
+  setLikes(set);
+
+  // Atualiza lista de favoritos completos
+  const favs = getFavs();
+  if (liked) {
+    if (!favs.find(f => f.id === id)) favs.push(getProductDataForBtn(btn));
+    saveFavs(favs);
+  } else {
+    saveFavs(favs.filter(f => f.id !== id));
+  }
+
+  paintHeart(btn, liked);
+  showToast(liked ? "Adicionado aos Favoritos ❤️" : "Removido dos Favoritos");
+}
+
+function initLikes() {
+  const all = document.querySelectorAll(".btn-fav");
+  all.forEach((btn) => {
+    paintHeart(btn, isLiked(btn.dataset.likeId || btn.id));
+    btn.addEventListener("click", () => toggleLike(btn));
+  });
+}
+initLikes();
+
+/* =========================================================
+   Rating (estrelas)
+   ========================================================= */
 (() => {
   document.querySelectorAll(".rating-inline").forEach((b) => {
     const rating = Math.max(0, Math.min(5, parseFloat(b.dataset.rating || "0")));
@@ -308,6 +401,92 @@ async function adicionarItem(redirecionarPara) {
   if (btnAdd) btnAdd.disabled = true;
   if (btnBuy) btnBuy.disabled = true;
 
+   CARREGAR PRODUTO DA API
+   ========================================================= */
+let _produtoAtual = null;
+
+function formatPriceBR(n) {
+  return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function carregarProduto() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id || !window.api) return;
+
+  try {
+    const p = await window.api.produtos.buscar(id);
+    _produtoAtual = p;
+
+    const titleEl = document.querySelector(".product-title");
+    if (titleEl) titleEl.textContent = p.title;
+
+    const priceEl = document.querySelector(".price-current");
+    if (priceEl) priceEl.textContent = `R$ ${formatPriceBR(p.price)}`;
+
+    const priceOldEl = document.querySelector(".price-old");
+    if (priceOldEl) priceOldEl.style.display = "none";
+
+    const imgEl = document.getElementById("gallery-img");
+    if (imgEl) {
+      const imgUrl = resolverImagemProduto(p.image);
+      imgEl.src = imgUrl;
+      imgEl.alt = p.title;
+    }
+
+    const breadcrumb = document.querySelector(".breadcrumbs");
+    if (breadcrumb) breadcrumb.innerHTML = `Você está em: <a href="/altafidelidade/home/paginicial.html">produtos</a> › ${p.title}`;
+
+    const stockEl = document.querySelector(".stock");
+    if (stockEl) stockEl.textContent = p.stock > 0 ? "Em estoque" : "Produto indisponível";
+
+    const btnAdd = document.getElementById("btn-add");
+    if (btnAdd && p.stock <= 0) {
+      btnAdd.disabled = true;
+      btnAdd.textContent = "Indisponível";
+    }
+
+    const variationsCard = document.querySelector(".card.variations");
+    if (variationsCard) {
+      if (!p.variations || p.variations === '[]' || p.variations === 'null') {
+          variationsCard.style.display = "none";
+      } else {
+          variationsCard.style.display = "block";
+      }
+    }
+  } catch {
+    // mantém o conteúdo estático do HTML se a API não estiver disponível
+  }
+}
+
+document.addEventListener("DOMContentLoaded", carregarProduto);
+
+/* =========================================================
+   ADICIONAR AO CARRINHO E COMPRAR
+   ========================================================= */
+async function adicionarItem(redirecionarPara) {
+  // Produto deve estar carregado da API antes do clique
+  if (!_produtoAtual) {
+    showToast("Produto não carregado. Recarregue a página.");
+    return;
+  }
+
+  // Usuário deve estar logado
+  if (!window.api?.estaLogado()) {
+    window.location.href =
+      "/altafidelidade/login/login.html?next=" +
+      encodeURIComponent(window.location.pathname);
+    return;
+  }
+
+  const qty   = parseInt(document.getElementById("qty-select")?.value || "1", 10);
+  const numId = Number(_produtoAtual.id);
+
+  if (!numId || isNaN(numId)) {
+    showToast("ID de produto inválido.");
+    return;
+  }
+
   try {
     await window.api.carrinho.adicionar(numId, qty);
     showToast("Adicionando...");
@@ -329,3 +508,10 @@ document.getElementById("btn-buy")?.addEventListener("click", () =>
   INICIALIZAÇÃO
   ========================================================= */
 document.addEventListener("DOMContentLoaded", carregarProduto);
+    console.error("Erro ao adicionar ao carrinho", e);
+    showToast("Não foi possível adicionar ao carrinho. Tente novamente.");
+  }
+}
+
+document.getElementById("btn-add")?.addEventListener("click", () => adicionarItem("/altafidelidade/carrinhos/carrinho.html"));
+document.getElementById("btn-buy")?.addEventListener("click", () => adicionarItem("/altafidelidade/pagamento1/pagamento.html"));

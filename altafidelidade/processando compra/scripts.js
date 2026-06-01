@@ -1,11 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Voltar para a página de pagamento (NÃO limpa o storage)
-  const backBtn = document.querySelector(".appbar__back");
-  backBtn?.addEventListener("click", (ev) => {
-    ev.preventDefault();
-    window.location.href = "/altafidelidade/pagamento3/pagamento3.html";
-  });
-
   // (opcional) Fechar o toast se existir um botão de fechar com data-close
   document.querySelectorAll("[data-close]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -14,19 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ===== NÃO APAGAR DADOS DO USUÁRIO =====
-  // Nada de localStorage.removeItem(...) aqui.
-  // Os dados salvos em pagamento3 permanecem intactos.
+  // ===== REDIRECIONAR APÓS VERIFICAR RESULTADO REAL DA API =====
+  async function verificarResultadoPagamento() {
+    try {
+      if (window.api?.estaLogado()) {
+        const resultado = await window.api.pagamento?.verificarStatus?.();
+        if (resultado?.status === 'recusado') {
+          window.location.href = "../../pagamento e recusado/status-recusada.html";
+          return;
+        }
+      }
+    } catch {}
+    window.location.href = "../../pagamento e recusado/status-aprovada.html";
+  }
 
-  // ===== REDIRECIONAR APÓS 7 SEGUNDOS =====
-  // Use um caminho RELATIVO para evitar problemas com espaços no nome de pasta.
-  // Estamos em: /altafidelidade/processando compra/html/index.html
-  // Destino:     /altafidelidade/pagamento e recusado/status-aprovada.html
-  const destino = "../../pagamento e recusado/status-aprovada.html";
-
-  // Se quiser exibir um countdown visual, você pode atualizar algum elemento aqui.
-  const timeoutMs = 7000;
-  setTimeout(() => {
-    window.location.href = destino;
-  }, timeoutMs);
+  verificarResultadoPagamento();
 });

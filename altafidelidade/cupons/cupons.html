@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cupons | Bulbe</title>
+    <title>Cupons • Bulbe</title>
     <link rel="stylesheet" href="styleCupom.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
     <!-- HEADER -->
     <header class="header">
         <button class="back-btn" aria-label="Voltar"><span class="arrow">←</span></button>
-        <img src="./logobulbe.jpeg" alt="Bulbe" class="logo">
+        <a href="/altafidelidade/home/paginicial.html"><img src="./logobulbe.jpeg" alt="Bulbe" class="logo"></a>
     </header>
 
     <div class="app">
@@ -28,155 +28,16 @@
             <input id="search" type="search" placeholder="Digite o cupom" autocomplete="off" />
         </div>
 
-        <!-- LISTA -->
+        <!-- LISTA — preenchida pelo scriptCupom.js via API -->
         <main class="list" id="couponList">
-
-            <!-- ARAUJO -->
-            <article class="card" data-coupon="ARAUJO6">
-                <span class="badge merchant--araujo">ARAUJO6</span>
-                <h3 class="h">6% OFF em compras acima de 50 reais na Araujo</h3>
-                <div class="muted">Expira em 15/05/2025</div>
-
-                <div class="links-row">
-                    <button class="terms-link" data-terms>Termos de uso</button>
-                </div>
-
-                <!-- ⬇️ BOTÃO VISÍVEL NO CARTÃO (fora do painel) -->
-                <div class="cta">
-                    <button class="btn redeem-btn" data-code="ARA6" data-merchant="Drogaria Araujo"
-                        data-discount="6% OFF" data-valid="true">Resgatar cupom</button>
-                </div>
-
-                <!-- Painel de termos -->
-                <div class="terms-panel" data-terms-panel>
-                    <button class="panel-close" title="Fechar" aria-label="Fechar">↩</button>
-
-                    <div class="panel-row">
-                        <span class="badge merchant--araujo">ARAUJO6</span>
-                    </div>
-                    <h4 class="panel-title">6% OFF em compras acima de 50 reais na Araujo</h4>
-                    <div class="panel-expire">Expira em 15/05/2025</div>
-
-                    <div class="panel-info">
-                        <span class="i">i</span>
-                        <span>Cupom não valido para compra de medicamentos</span>
-                    </div>
-
-                    <!-- ⬇️ BOTÃO DENTRO DO PAINEL -->
-                    <button class="btn redeem-btn" data-code="ARA6" data-merchant="Drogaria Araujo"
-                        data-discount="6% OFF" data-valid="true">Resgatar cupom</button>
-                </div>
-            </article>
-
-            <!-- PHILCO 10 -->
-            <article class="card" data-coupon="PHILCO10">
-                <span class="badge merchant--phil">PHILCO</span>
-                <h3 class="h">10% OFF em compras de dois produtos ou mais</h3>
-                <div class="muted">Expira em 20/12/2025</div>
-
-                <div class="links-row">
-                    <button class="terms-link" data-terms>Termos de uso</button>
-                </div>
-
-                <div class="cta">
-                    <button class="btn redeem-btn" data-code="PHILCO10" data-merchant="Philco" data-discount="10% OFF"
-                        data-valid="true">Resgatar cupom</button>
-                </div>
-
-                <div class="terms-panel" data-terms-panel>
-                    <button class="panel-close" title="Fechar" aria-label="Fechar">↩</button>
-
-                    <div class="panel-row">
-                        <span class="badge merchant--phil">PHILCO</span>
-                    </div>
-                    <h4 class="panel-title">10% OFF em compras de dois produtos ou mais</h4>
-                    <div class="panel-expire">Expira em 20/12/2025</div>
-
-                    <div class="panel-info">
-                        <span class="i">i</span>
-                        <span>Válido na compra mínima de 2 itens participantes.</span>
-                    </div>
-
-                    <button class="btn redeem-btn" data-code="PHILCO10" data-merchant="Philco" data-discount="10% OFF"
-                        data-valid="true">Resgatar cupom</button>
-                </div>
-            </article>
-
-            <!-- PONTO10 -->
-            <article class="card" data-coupon="PONTO10">
-                <span class="badge merchant--ponto">PONTO10</span>
-                <h3 class="h">10% OFF em compras de utensílios de cozinha</h3>
-                <div class="muted">Expira em 18/05/2025</div>
-
-                <div class="links-row">
-                    <button class="terms-link" data-terms>Termos de uso</button>
-                </div>
-
-                <div class="cta">
-                    <button class="btn redeem-btn" data-code="PONTO10" data-merchant="Ponto" data-discount="10% OFF"
-                        data-valid="false">Resgatar cupom</button>
-                </div>
-
-                <div class="terms-panel" data-terms-panel>
-                    <button class="panel-close" title="Fechar" aria-label="Fechar">↩</button>
-
-                    <div class="panel-row">
-                        <span class="badge merchant--ponto">PONTO10</span>
-                    </div>
-                    <h4 class="panel-title">10% OFF em compras de utensílios de cozinha</h4>
-                    <div class="panel-expire">Expira em 18/05/2025</div>
-
-                    <div class="panel-info">
-                        <span class="i">i</span>
-                        <span>Promoção limitada ao estoque. Um uso por CPF.</span>
-                    </div>
-
-                    <button class="btn redeem-btn" data-code="PONTO10" data-merchant="Ponto" data-discount="10% OFF"
-                        data-valid="false">Resgatar cupom</button>
-                </div>
-            </article>
-
-            <!-- PHILCO 5 -->
-            <article class="card" data-coupon="PHILCO5">
-                <span class="badge merchant--phil">PHILCO</span>
-                <h3 class="h">5% OFF em compras de itens lançamento</h3>
-                <div class="muted">Expira em 09/06/2025</div>
-
-                <div class="links-row">
-                    <button class="terms-link" data-terms>Termos de uso</button>
-                </div>
-
-                <div class="cta">
-                    <button class="btn redeem-btn" data-code="PHILCO5" data-merchant="Philco" data-discount="5% OFF"
-                        data-valid="false">Resgatar cupom</button>
-                </div>
-
-                <div class="terms-panel" data-terms-panel>
-                    <button class="panel-close" title="Fechar" aria-label="Fechar">↩</button>
-
-                    <div class="panel-row">
-                        <span class="badge merchant--phil">PHILCO</span>
-                    </div>
-                    <h4 class="panel-title">5% OFF em compras de itens lançamento</h4>
-                    <div class="panel-expire">Expira em 09/06/2025</div>
-
-                    <div class="panel-info">
-                        <span class="i">i</span>
-                        <span>Não cumulativo com outras promoções.</span>
-                    </div>
-
-                    <button class="btn redeem-btn" data-code="PHILCO5" data-merchant="Philco" data-discount="5% OFF"
-                        data-valid="false">Resgatar cupom</button>
-                </div>
-            </article>
-
+            <p class="cupons-loading" id="cuponsLoading">Carregando cupons...</p>
         </main>
     </div>
 
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
-            <img src="./logobulbe.jpeg" alt="Bulbe" class="footer-logo">
+            <a href="/altafidelidade/home/paginicial.html"><img src="./logobulbe.jpeg" alt="Bulbe" class="footer-logo"></a>
             <p class="footer-text">sua próxima energia</p>
         </div>
     </footer>
@@ -196,6 +57,8 @@
         </div>
     </div>
 
+    <script src="../api.js"></script>
+    <script src="../auth-header.js"></script>
     <script src="scriptCupom.js" defer></script>
     <script src="../api.js"></script>
 </body>

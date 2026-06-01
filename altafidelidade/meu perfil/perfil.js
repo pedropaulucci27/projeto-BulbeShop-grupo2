@@ -1,4 +1,67 @@
-// Mostrar/ocultar senha
+/* =========================================================
+   CARREGAR PERFIL DA API
+   ========================================================= */
+async function carregarPerfil() {
+  if (!window.api?.estaLogado()) return;
+
+  try {
+    const usuario = await window.api.usuario.perfil();
+    const nomeEl = document.getElementById('nomeUsuario');
+    if (nomeEl && usuario.nome) nomeEl.value = usuario.nome;
+
+    const emailEl = document.getElementById('email');
+    if (emailEl && usuario.email) emailEl.value = usuario.email;
+  } catch {}
+
+  try {
+    const pontos = await window.api.usuario.pontos();
+    const btn = document.getElementById('abrirPontosBulbe');
+    if (btn && pontos?.pontos !== undefined) btn.innerHTML = `${pontos.pontos} pts &gt;`;
+  } catch {}
+}
+
+async function salvarPerfil(e) {
+  e.preventDefault();
+  if (!window.api?.estaLogado()) return;
+
+  const nome     = document.getElementById('nomeUsuario')?.value.trim();
+  const email    = document.getElementById('email')?.value.trim();
+  const senha    = document.getElementById('senha')?.value;
+  const telefone = document.getElementById('telefone')?.value.trim();
+  const cpf      = document.getElementById('cpf')?.value.trim();
+  const endereco = document.getElementById('endereco')?.value.trim();
+  const btn      = e.target.querySelector('[type="submit"]');
+
+  const dados = {};
+  if (nome)     dados.nome     = nome;
+  if (email)    dados.email    = email;
+  if (senha && senha !== '************') dados.senha = senha;
+  if (telefone) dados.telefone = telefone;
+  if (cpf)      dados.cpf      = cpf;
+  if (endereco) dados.endereco = endereco;
+
+  if (!Object.keys(dados).length) return;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+
+  try {
+    await window.api.usuario.atualizarPerfil(dados);
+    if (btn) { btn.textContent = 'Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }, 2000); }
+  } catch {
+    if (btn) { btn.disabled = false; btn.textContent = 'Alterar Perfil'; }
+    const errEl = document.getElementById('erro-perfil');
+    if (errEl) { errEl.textContent = 'Erro ao salvar perfil. Tente novamente.'; errEl.hidden = false; }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  carregarPerfil();
+  document.querySelector('form.form')?.addEventListener('submit', salvarPerfil);
+});
+
+/* =========================================================
+   MOSTRAR/OCULTAR SENHA
+   ========================================================= */
 const toggle = document.getElementById('toggleSenha');
 const senha = document.getElementById('senha');
 

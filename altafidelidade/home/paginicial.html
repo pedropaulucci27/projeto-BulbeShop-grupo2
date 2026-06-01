@@ -22,7 +22,7 @@
         </a>
 
         <div class="logo">
-            <img src="./img/logoHeader.png" alt="Bulbe Logo">
+            <a href="/altafidelidade/home/paginicial.html"><img src="./img/logoHeader.png" alt="Bulbe Logo"></a>
         </div>
 
         <div class="icons">
@@ -30,7 +30,6 @@
             <a id="btnCarrinho">
                 <img src="./img/carrinho.png" alt="Carrinho">
             </a>
-            <a href="#"><img src="./img/bellicon.png" alt="Notificações"></a>
         </div>
     </header>
 
@@ -182,9 +181,11 @@
             </footer>
         </div>
     </div>
-    <!--CARDS-->
+    <!--CARDS — renderizados dinamicamente via produtos.json + scriptHome.js-->
     <main class="wrap">
         <h2 class="section-title">Em alta</h2>
+        <section class="grid"></section>
+    </main>
 
         <section class="grid">
             <!-- CARD 1 -->
@@ -386,6 +387,9 @@
     <script src="../api.js"></script>
     <script src="../auth-header.js"></script>
     <script src="./scriptHome.js"></script>
+    <script src="../api.js"></script>
+    <script src="../auth-header.js"></script>
+    <script src="scriptHome.js"></script>
 </body>
 
 </html>

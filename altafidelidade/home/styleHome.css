@@ -29,9 +29,9 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: var(--header);
-    /* Azul escuro */
-    padding: 10px 20px;
+    padding: 12px 20px;
     position: relative;
+    gap: 12px;
 }
 
 .header img {
@@ -46,19 +46,33 @@ body {
 }
 
 /* LOGO */
+.logo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
 .logo img {
     height: 40px;
+}
+
+.home-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 /* ICONS */
 .icons {
     display: flex;
-    gap: 15px;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
 }
 
 .icons img {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     transition: transform 0.2s;
 }
 

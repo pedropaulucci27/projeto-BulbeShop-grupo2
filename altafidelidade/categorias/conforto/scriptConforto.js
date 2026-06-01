@@ -223,3 +223,4 @@ btnCategorias?.addEventListener("click", (e) => {
 
 fecharMenu?.addEventListener("click", fecharMenuCategorias);
 overlay?.addEventListener("click", fecharMenuCategorias);
+document.addEventListener('DOMContentLoaded', () => renderProdutosCategoria('conforto'));

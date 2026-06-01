@@ -15,7 +15,7 @@
     <button class="appbar__back" aria-label="Voltar" id="btnBack">
       <img src="../pagamento e recusado/.assets/img/corner-up-left.svg" alt="">
     </button>
-    <img class="appbar__logo" id="btnLogo" src="../pagamento e recusado/.assets/img/logo-base (1).svg" alt="Bulbe">
+    <a href="/altafidelidade/home/paginicial.html"><img class="appbar__logo" id="btnLogo" src="../pagamento e recusado/.assets/img/logo-base (1).svg" alt="Bulbe"></a>
   </header>
 
   <main class="wrap">
@@ -26,9 +26,9 @@
     </figure>
 
     <!-- Banner de status -->
-    <button class="status-banner status-banner--ok" type="button" disabled>
+    <div class="status-banner status-banner--ok" role="status">
       Compra aprovada!
-    </button>
+    </div>
 
     <!-- Caixa Dados do pedido -->
     <section class="info-card info-card--ok">
@@ -37,14 +37,15 @@
         <span class="info-card__title">Dados do pedido</span>
       </header>
       <p class="info-card__text" id="orderInfo">
-        Número do pedido: —<br>
-        Código de rastreio: (será atualizado em breve)
+        Número do pedido: —
+      </p>
+      <p class="info-card__text" id="trackingInfo" hidden>
+        Código de rastreio: <span id="trackingCode"></span>
       </p>
     </section>
 
     <!-- Ações -->
-    <div class="actions actions--two">
-      <button class="btn btn--ghost" id="btnResumo">Resumo da compra</button>
+    <div class="actions actions--one">
       <button class="btn btn--ok" id="btnInicio">Voltar para início</button>
     </div>
 

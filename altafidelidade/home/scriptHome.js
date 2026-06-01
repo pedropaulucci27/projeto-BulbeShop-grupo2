@@ -111,6 +111,150 @@ btnCategorias?.addEventListener("click", (e) => {
 });
 fecharMenu?.addEventListener("click", fecharMenuCategorias);
 overlay?.addEventListener("click", fecharMenuCategorias);
+   CATÁLOGO — renderiza cards a partir de produtos.json
+   ========================================================= */
+const SVG_HEART = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
+const SVG_CART  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
+
+function formatPriceBR(n) {
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function buildCard(p) {
+  if (p.type === "banner") {
+    return `<article class="card card-banner"><img src="${p.img}" alt="${p.alt}"></article>`;
+  }
+
+  const badge = p.badge
+    ? `<span class="badge badge-${p.badge === "flash" ? "flash" : "cash"}">${p.badge === "flash" ? "oferta relâmpago" : "com cashback"}</span>`
+    : "";
+
+  const priceWas = p.priceOld
+    ? `<div class="price-was">R$${formatPriceBR(p.priceOld)}</div>`
+    : "";
+
+  let promoHTML = "";
+  if (p.promo) {
+    if (p.promo.type === "pill-green") {
+      promoHTML = `<span class="pill pill-green">${p.promo.text}</span>`;
+    } else if (p.promo.type === "ship") {
+      promoHTML = `<span class="ship-pill"><span>${p.promo.text}</span></span>`;
+    }
+    if (p.footnote) promoHTML += `<small class="footnote">${p.footnote}</small>`;
+    promoHTML = `<div class="promo-row">${promoHTML}</div>`;
+  }
+
+  return `
+    <article class="card">
+      <div class="card-body">
+        ${badge}
+        <div class="media">
+          <a href="${p.link}"><img src="${p.img}" alt="${p.alt}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a>
+        </div>
+        <div class="info">
+          <a href="${p.link}"><h3 class="title">${p.title}</h3></a>
+          <div class="pricebox">
+            <div class="price-now" data-preco="${p.price}">R$${formatPriceBR(p.price)}</div>
+            ${priceWas}
+          </div>
+          ${promoHTML}
+        </div>
+        <div class="actions">
+          <button class="icon-btn heart" aria-label="Favoritar">${SVG_HEART}</button>
+          <button class="icon-btn cart" aria-label="Adicionar ao carrinho">${SVG_CART}</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function mapearProdutoApi(p) {
+  return {
+    id:       String(p.id),
+    type:     "product",
+    badge:    p.destaque ? "flash" : null,
+    img:      resolverImagemProduto(p.image),
+    alt:      p.title,
+    title:    p.title,
+    price:    parseFloat(p.price),
+    priceOld: null,
+    promo:    null,
+    footnote: null,
+    link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
+  };
+}
+
+async function carregarBanners() {
+  try {
+    const res = await fetch("./produtos.json");
+    const data = await res.json();
+    return data.filter(p => p.type === "banner");
+  } catch { return []; }
+}
+
+async function renderProdutos() {
+  const grid = document.querySelector(".grid");
+  if (!grid) return;
+
+  const banners = await carregarBanners();
+
+  try {
+    const resposta = await window.api.produtos.listar();
+    const lista = (resposta.data || resposta).map(mapearProdutoApi);
+    grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
+  } catch {
+    // Se o backend cair, mostra apenas os banners e nenhum produto estático
+    grid.innerHTML = banners.map(buildCard).join("");
+    console.error("Servidor backend offline. Produtos não puderam ser carregados.");
+  }
+}
+
+renderProdutos();
+
+/* =========================================================
+   ÍCONES (favoritos + adicionar ao carrinho)
+   — usa event delegation para funcionar com cards dinâmicos
+   ========================================================= */
+
+document.addEventListener("click", (event) => {
+  const btn = event.target.closest(".icon-btn");
+  if (!btn) return;
+
+    // === FAVORITAR ===
+    if (btn.classList.contains("heart")) {
+      btn.classList.toggle("active");
+      const card = btn.closest(".card, [data-produto], .produto") || null;
+      if (!card) return;
+
+      const imgEl   = card.querySelector("img");
+      const titleEl = card.querySelector(".title, h3, h2");
+      const priceEl = card.querySelector(".price-now, .price, [data-preco]");
+
+      const parsePrecoBR = (txt) => {
+        if (!txt) return 0;
+        return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
+      };
+
+      const title = titleEl?.textContent.trim() || "Produto";
+      const price = priceEl?.dataset?.preco
+        ? `R$ ${parseFloat(priceEl.dataset.preco).toFixed(2).replace('.', ',')}`
+        : (priceEl?.textContent.trim() || '');
+      const img = imgEl?.src || "";
+      const id  = `home-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
+
+      let favs = [];
+      try { favs = JSON.parse(localStorage.getItem("bulbe:favorites")) || []; } catch {}
+
+      const jaFavoritado = favs.find(f => f.id === id);
+      if (jaFavoritado) {
+        favs = favs.filter(f => f.id !== id);
+        btn.classList.remove("active");
+      } else {
+        favs.push({ id, title, price, priceOld: '', img });
+        btn.classList.add("active");
+      }
+      try { localStorage.setItem("bulbe:favorites", JSON.stringify(favs)); } catch {}
+      return;
+    }
 
 /* =========================================================
   CARROSSEL DE BANNERS
@@ -245,6 +389,13 @@ async function renderProdutos() {
     }
 
     grid.innerHTML = lista.map(buildCard).join("");
+      // Feedback visual breve — sem redirecionar
+      btn.classList.add("active");
+      setTimeout(() => btn.classList.remove("active"), 1000);
+    }
+
+  event.stopPropagation();
+});
 
     // Após renderizar, marca os que já estão favoritados
     sincronizarFavoritosVisuais();

@@ -1,37 +1,36 @@
 // ——— navegação do header
 document.getElementById('btnBack')?.addEventListener('click', () => {
-  // volta para a tela de pagamento 3 mantendo os dados
-  window.location.href = '/altafidelidade/pagamento3/pagamento3.html';
+  window.history.back();
 });
 
 document.getElementById('btnLogo')?.addEventListener('click', () => {
   // leve o usuário para sua “home”
-  window.location.href = '/altafidelidade/home/index.html';
+  window.location.href = '/altafidelidade/home/paginicial.html';
 });
 
-// ——— carrega dados do pedido / cartão (salvos na etapa de pagamento)
+// ——— carrega dados do pedido vindos da API (salvos após confirmação do pagamento)
 (function hydrateFromStorage(){
-  try{
-    const data = JSON.parse(localStorage.getItem('bulbeCheckout') || '{}');
-
-    // gera e mostra (se não existir) um nº de pedido simples
-    if(!data.orderId){
-      const rnd = Math.random().toString(36).slice(2,8).toUpperCase();
-      data.orderId = `AP${Date.now().toString().slice(-6)}${rnd}`;
-      localStorage.setItem('bulbeCheckout', JSON.stringify(data));
-    }
-
+  try {
+    const pedidoIdReal = localStorage.getItem('bulbe:pedidoId') || '';
     const el = document.getElementById('orderInfo');
     if(el){
-      el.innerHTML = `Número do pedido: ${data.orderId}<br>Código de rastreio: (será atualizado em breve)`;
+      el.innerHTML = pedidoIdReal ? `Número do pedido: ${pedidoIdReal}` : 'Número do pedido: aguardando confirmação';
     }
-  }catch(e){}
+    const trackingCode = localStorage.getItem('bulbe:trackingCode');
+    if(trackingCode){
+      const trackingEl = document.getElementById('trackingInfo');
+      const codeEl = document.getElementById('trackingCode');
+      if(trackingEl && codeEl){
+        codeEl.textContent = trackingCode;
+        trackingEl.hidden = false;
+      }
+    }
+  } catch(e) {}
 })();
 
 // ——— botões da página
 document.getElementById('btnResumo')?.addEventListener('click', () => {
-  // ajuste a rota do seu resumo se já existir
-  alert('Abrir resumo de compra (defina a rota do seu resumo aqui).');
+  window.location.href = '/altafidelidade/pagamento1/pagamento.html';
 });
 
 document.getElementById('btnInicio')?.addEventListener('click', () => {
