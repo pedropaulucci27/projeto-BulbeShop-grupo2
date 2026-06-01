@@ -336,3 +336,20 @@ body {
     font-weight: 500;
     margin: 0
 }
+/* Cupons expirados */
+.card--expirado {
+    opacity: 0.6;
+    filter: grayscale(0.4);
+}
+
+.btn--expirado {
+    background: var(--muted) !important;
+    cursor: not-allowed;
+}
+
+.cupons-loading,
+.cupons-vazio {
+    text-align: center;
+    color: var(--muted);
+    padding: 2rem 1rem;
+}
