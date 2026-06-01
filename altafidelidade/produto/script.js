@@ -187,6 +187,14 @@ if (botaoCarrinho) {
    ========================================================= */
 let _produtoAtual = null;
 
+const PRODUTO_FALLBACK = {
+  "1": { title: "Lâmpada LED 9W",              img: "/altafidelidade/home/img/luz.png",                  price: "149,90" },
+  "2": { title: "Liquidificador Mondial 1000W", img: "/altafidelidade/home/img/blender.jpg",              price: "183,00" },
+  "3": { title: "Garrafa de Água Tupperware",   img: "/altafidelidade/home/img/tupperware.jpg",           price: "53,00"  },
+  "4": { title: "Ventilador de Mesa Britânia",  img: "/altafidelidade/home/img/ventiladorbritania.webp",  price: "279,00" },
+  "5": { title: "Energia: Fique por Dentro",    img: "/altafidelidade/home/img/livro.jpg",                price: "49,00"  },
+};
+
 function formatPriceBR(n) {
   return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -256,11 +264,24 @@ async function carregarProduto() {
 
   } catch (err) {
     console.error("Erro ao carregar produto:", err);
-    const titleEl = document.querySelector(".product-title");
-    if (titleEl && titleEl.textContent.trim() === "") {
-      titleEl.textContent = "Produto não encontrado";
+
+    const fallback = PRODUTO_FALLBACK[id];
+    if (fallback) {
+      document.title = `${fallback.title} • Bulbe`;
+      const titleEl = document.querySelector(".product-title");
+      if (titleEl) titleEl.textContent = fallback.title;
+      const imgEl = document.getElementById("gallery-img");
+      if (imgEl) { imgEl.src = fallback.img; imgEl.alt = fallback.title; }
+      const priceEl = document.querySelector(".price-current");
+      if (priceEl) priceEl.textContent = `R$ ${fallback.price}`;
+      const breadcrumb = document.querySelector(".breadcrumbs");
+      if (breadcrumb) breadcrumb.innerHTML = `Você está em: <a href="/altafidelidade/home/paginicial.html">produtos</a> › ${fallback.title}`;
+    } else {
+      const titleEl = document.querySelector(".product-title");
+      if (titleEl) titleEl.textContent = "Produto não encontrado";
     }
-    showToast("Não foi possível carregar o produto. Tente novamente.");
+
+    showToast("Servidor offline. Exibindo informações básicas do produto.");
   }
 }
 

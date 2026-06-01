@@ -12,7 +12,7 @@ async function renderCheckoutItems() {
     const items = resposta.itens || resposta.data || resposta || [];
 
     if(!items.length) {
-      window.location.href = '/altafidelidade/carrinho/carrinho.html';
+      window.location.href = '/altafidelidade/carrinhos/carrinho.html';
       return;
     }
 

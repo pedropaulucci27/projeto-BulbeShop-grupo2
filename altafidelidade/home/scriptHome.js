@@ -111,150 +111,6 @@ btnCategorias?.addEventListener("click", (e) => {
 });
 fecharMenu?.addEventListener("click", fecharMenuCategorias);
 overlay?.addEventListener("click", fecharMenuCategorias);
-   CATÁLOGO — renderiza cards a partir de produtos.json
-   ========================================================= */
-const SVG_HEART = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.8 7.4 6.75 5.6 8.56c-1.82 1.82-1.78 4.72.1 6.6l5.83 5.83c.26.26.68.26.94 0l5.83-5.83c1.88-1.88 1.92-4.78.1-6.6-1.8-1.81-4.54-1.76-6.3.08z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
-const SVG_CART  = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 3h2l2.2 10.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>`;
-
-function formatPriceBR(n) {
-  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function buildCard(p) {
-  if (p.type === "banner") {
-    return `<article class="card card-banner"><img src="${p.img}" alt="${p.alt}"></article>`;
-  }
-
-  const badge = p.badge
-    ? `<span class="badge badge-${p.badge === "flash" ? "flash" : "cash"}">${p.badge === "flash" ? "oferta relâmpago" : "com cashback"}</span>`
-    : "";
-
-  const priceWas = p.priceOld
-    ? `<div class="price-was">R$${formatPriceBR(p.priceOld)}</div>`
-    : "";
-
-  let promoHTML = "";
-  if (p.promo) {
-    if (p.promo.type === "pill-green") {
-      promoHTML = `<span class="pill pill-green">${p.promo.text}</span>`;
-    } else if (p.promo.type === "ship") {
-      promoHTML = `<span class="ship-pill"><span>${p.promo.text}</span></span>`;
-    }
-    if (p.footnote) promoHTML += `<small class="footnote">${p.footnote}</small>`;
-    promoHTML = `<div class="promo-row">${promoHTML}</div>`;
-  }
-
-  return `
-    <article class="card">
-      <div class="card-body">
-        ${badge}
-        <div class="media">
-          <a href="${p.link}"><img src="${p.img}" alt="${p.alt}" onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'"></a>
-        </div>
-        <div class="info">
-          <a href="${p.link}"><h3 class="title">${p.title}</h3></a>
-          <div class="pricebox">
-            <div class="price-now" data-preco="${p.price}">R$${formatPriceBR(p.price)}</div>
-            ${priceWas}
-          </div>
-          ${promoHTML}
-        </div>
-        <div class="actions">
-          <button class="icon-btn heart" aria-label="Favoritar">${SVG_HEART}</button>
-          <button class="icon-btn cart" aria-label="Adicionar ao carrinho">${SVG_CART}</button>
-        </div>
-      </div>
-    </article>`;
-}
-
-function mapearProdutoApi(p) {
-  return {
-    id:       String(p.id),
-    type:     "product",
-    badge:    p.destaque ? "flash" : null,
-    img:      resolverImagemProduto(p.image),
-    alt:      p.title,
-    title:    p.title,
-    price:    parseFloat(p.price),
-    priceOld: null,
-    promo:    null,
-    footnote: null,
-    link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
-  };
-}
-
-async function carregarBanners() {
-  try {
-    const res = await fetch("./produtos.json");
-    const data = await res.json();
-    return data.filter(p => p.type === "banner");
-  } catch { return []; }
-}
-
-async function renderProdutos() {
-  const grid = document.querySelector(".grid");
-  if (!grid) return;
-
-  const banners = await carregarBanners();
-
-  try {
-    const resposta = await window.api.produtos.listar();
-    const lista = (resposta.data || resposta).map(mapearProdutoApi);
-    grid.innerHTML = [...lista, ...banners].map(buildCard).join("");
-  } catch {
-    // Se o backend cair, mostra apenas os banners e nenhum produto estático
-    grid.innerHTML = banners.map(buildCard).join("");
-    console.error("Servidor backend offline. Produtos não puderam ser carregados.");
-  }
-}
-
-renderProdutos();
-
-/* =========================================================
-   ÍCONES (favoritos + adicionar ao carrinho)
-   — usa event delegation para funcionar com cards dinâmicos
-   ========================================================= */
-
-document.addEventListener("click", (event) => {
-  const btn = event.target.closest(".icon-btn");
-  if (!btn) return;
-
-    // === FAVORITAR ===
-    if (btn.classList.contains("heart")) {
-      btn.classList.toggle("active");
-      const card = btn.closest(".card, [data-produto], .produto") || null;
-      if (!card) return;
-
-      const imgEl   = card.querySelector("img");
-      const titleEl = card.querySelector(".title, h3, h2");
-      const priceEl = card.querySelector(".price-now, .price, [data-preco]");
-
-      const parsePrecoBR = (txt) => {
-        if (!txt) return 0;
-        return parseFloat(txt.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
-      };
-
-      const title = titleEl?.textContent.trim() || "Produto";
-      const price = priceEl?.dataset?.preco
-        ? `R$ ${parseFloat(priceEl.dataset.preco).toFixed(2).replace('.', ',')}`
-        : (priceEl?.textContent.trim() || '');
-      const img = imgEl?.src || "";
-      const id  = `home-${title.toLowerCase().slice(0, 40).replace(/\s+/g, '-')}`;
-
-      let favs = [];
-      try { favs = JSON.parse(localStorage.getItem("bulbe:favorites")) || []; } catch {}
-
-      const jaFavoritado = favs.find(f => f.id === id);
-      if (jaFavoritado) {
-        favs = favs.filter(f => f.id !== id);
-        btn.classList.remove("active");
-      } else {
-        favs.push({ id, title, price, priceOld: '', img });
-        btn.classList.add("active");
-      }
-      try { localStorage.setItem("bulbe:favorites", JSON.stringify(favs)); } catch {}
-      return;
-    }
 
 /* =========================================================
   CARROSSEL DE BANNERS
@@ -307,23 +163,24 @@ function formatPriceBR(n) {
 }
 
 /* =========================================================
-  buildCard — gera o HTML de cada card de produto.
-  Recebe o objeto já normalizado de mapearProdutoApi().
-  Armazena data-produto-id no article para os eventos.
+  buildCard — gera o HTML de cada card de produto
   ========================================================= */
 function buildCard(p) {
-  const stockAttr   = p.stock <= 0 ? 'data-sem-estoque="true"' : '';
-  const stockBadge  = p.stock <= 0
+  if (p.type === "banner") {
+    return `<article class="card card-banner"><img src="${p.img}" alt="${p.alt}"></article>`;
+  }
+
+  const stockAttr  = p.stock <= 0 ? 'data-sem-estoque="true"' : '';
+  const stockBadge = p.stock <= 0
     ? `<span class="badge badge-indisponivel">Indisponível</span>`
     : (p.badge
         ? `<span class="badge badge-${p.badge === "flash" ? "flash" : "cash"}">${p.badge === "flash" ? "oferta relâmpago" : "com cashback"}</span>`
         : "");
 
-  const priceWas = p.priceOld
+  const priceWas    = p.priceOld
     ? `<div class="price-was">R$${formatPriceBR(p.priceOld)}</div>`
     : "";
 
-  // Botão de carrinho: desabilitado visualmente se sem estoque
   const cartDisabled = p.stock <= 0 ? 'disabled title="Produto indisponível"' : '';
 
   return `
@@ -352,8 +209,7 @@ function buildCard(p) {
 }
 
 /* =========================================================
-  mapearProdutoApi — normaliza o objeto que a API retorna
-  para o formato que buildCard() espera.
+  mapearProdutoApi — normaliza objeto da API para buildCard()
   ========================================================= */
 function mapearProdutoApi(p) {
   return {
@@ -364,7 +220,7 @@ function mapearProdutoApi(p) {
     title:    p.title,
     price:    parseFloat(p.price),
     priceOld: p.price_was ? parseFloat(p.price_was) : null,
-    stock:    Number(p.stock ?? 999),   // ← vem do banco; 0 = indisponível
+    stock:    Number(p.stock ?? 999),
     link:     `/altafidelidade/produto/produto.html?id=${p.id}`,
   };
 }
@@ -376,7 +232,6 @@ async function renderProdutos() {
   const grid = document.querySelector(".grid");
   if (!grid) return;
 
-  // Mostra loading enquanto carrega
   grid.innerHTML = `<p style="padding:2rem;text-align:center;color:#888">Carregando produtos...</p>`;
 
   try {
@@ -389,15 +244,6 @@ async function renderProdutos() {
     }
 
     grid.innerHTML = lista.map(buildCard).join("");
-      // Feedback visual breve — sem redirecionar
-      btn.classList.add("active");
-      setTimeout(() => btn.classList.remove("active"), 1000);
-    }
-
-  event.stopPropagation();
-});
-
-    // Após renderizar, marca os que já estão favoritados
     sincronizarFavoritosVisuais();
 
   } catch (err) {
@@ -410,16 +256,15 @@ async function renderProdutos() {
 
 /* =========================================================
   BUSCA — filtra os cards já renderizados no DOM
-  (sem nova chamada à API)
   ========================================================= */
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl   = document.querySelector(".search-btn");
 
 function filtrarProdutos() {
   const termo = (searchInputEl?.value || "").trim().toLowerCase();
-  document.querySelectorAll(".grid .card").forEach((card) => {
+  document.querySelectorAll(".card[data-produto-id]").forEach((card) => {
     const titulo = card.querySelector(".title")?.textContent.toLowerCase() || "";
-    card.style.display = termo === "" || titulo.includes(termo) ? "block" : "none";
+    card.style.display = termo === "" || titulo.includes(termo) ? "" : "none";
   });
 }
 
@@ -431,17 +276,12 @@ searchInputEl?.addEventListener("keypress", (e) => {
 /* =========================================================
   FAVORITOS — sincronia visual e ação via API
   ========================================================= */
-
-// Retorna Set de IDs numéricos que o usuário já favoritou
-// Armazenado em memoria durante a sessão para não ficar fazendo
-// chamadas à API a cada clique
 let _favoritosIds = new Set();
 
 async function carregarFavoritosUsuario() {
   if (!window.api?.estaLogado()) return;
   try {
     const lista = await window.api.favoritos.listar();
-    // A API retorna array de { id, produtoId, title, price, image }
     _favoritosIds = new Set(lista.map(f => String(f.produtoId)));
   } catch {
     _favoritosIds = new Set();
@@ -458,17 +298,18 @@ function sincronizarFavoritosVisuais() {
 }
 
 async function toggleFavorito(btn) {
-  // Se não está logado, manda para o login
   if (!window.api?.estaLogado()) {
     window.location.href = "/altafidelidade/login/login.html?next=" +
       encodeURIComponent(window.location.pathname);
     return;
   }
 
-  const produtoId = btn.dataset.produtoId;
+  const produtoId = btn.dataset.produtoId ||
+    btn.closest("[data-produto-id]")?.dataset?.produtoId;
+  if (!produtoId) return;
+
   const jaFavoritado = _favoritosIds.has(produtoId);
 
-  // Atualização optimista: muda o visual imediatamente
   btn.disabled = true;
   if (jaFavoritado) {
     _favoritosIds.delete(produtoId);
@@ -487,7 +328,6 @@ async function toggleFavorito(btn) {
       await window.api.favoritos.adicionar(Number(produtoId));
     }
   } catch (err) {
-    // Reverte o visual se a API falhou
     if (jaFavoritado) {
       _favoritosIds.add(produtoId);
       btn.classList.add("active");
@@ -507,16 +347,16 @@ async function toggleFavorito(btn) {
   CARRINHO — adicionar via API
   ========================================================= */
 async function adicionarAoCarrinho(btn) {
-  // Se não está logado, manda para o login
   if (!window.api?.estaLogado()) {
     window.location.href = "/altafidelidade/login/login.html?next=" +
       encodeURIComponent(window.location.pathname);
     return;
   }
 
-  const produtoId = btn.dataset.produtoId;
+  const produtoId = btn.dataset.produtoId ||
+    btn.closest("[data-produto-id]")?.dataset?.produtoId;
+  if (!produtoId) return;
 
-  // Verifica estoque consultando o backend antes de adicionar
   try {
     const produto = await window.api.produtos.buscar(produtoId);
     if (produto.stock <= 0) {
@@ -531,7 +371,6 @@ async function adicionarAoCarrinho(btn) {
   btn.disabled = true;
   try {
     await window.api.carrinho.adicionar(Number(produtoId), 1);
-    // Feedback visual: ícone fica "cheio" por 1,5s
     btn.classList.add("active");
     mostrarToast("Produto adicionado ao carrinho!");
     setTimeout(() => {
@@ -569,10 +408,10 @@ function mostrarToast(msg) {
 
 /* =========================================================
   BOTÃO DO CARRINHO NO HEADER
-  — verifica o carrinho na API (se logado) ou redireciona
   ========================================================= */
 const btnCarrinhoHeader = document.getElementById("btnCarrinho");
 if (btnCarrinhoHeader) {
+  btnCarrinhoHeader.style.cursor = "pointer";
   btnCarrinhoHeader.addEventListener("click", async () => {
     if (!window.api?.estaLogado()) {
       window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
@@ -581,11 +420,9 @@ if (btnCarrinhoHeader) {
     try {
       const itens = await window.api.carrinho.listar();
       const lista = Array.isArray(itens) ? itens : (itens.itens || itens.items || []);
-      if (lista.length === 0) {
-        window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
-      } else {
-        window.location.href = "/altafidelidade/carrinhos/carrinho.html";
-      }
+      window.location.href = lista.length > 0
+        ? "/altafidelidade/carrinhos/carrinho.html"
+        : "/altafidelidade/carrinhovazio/carrinhovazio.html";
     } catch {
       window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
     }
@@ -593,16 +430,20 @@ if (btnCarrinhoHeader) {
 }
 
 /* =========================================================
-  EVENT DELEGATION — coração e carrinho em cards dinâmicos
+  EVENT DELEGATION — coração e carrinho (dinâmicos + estáticos)
   ========================================================= */
-document.querySelector(".grid")?.addEventListener("click", (event) => {
+document.addEventListener("click", (event) => {
   const btn = event.target.closest(".icon-btn");
   if (!btn) return;
-  event.stopPropagation();
+
+  const card = btn.closest(".card, [data-produto-id]");
+  if (!card) return;
 
   if (btn.classList.contains("heart")) {
+    event.stopPropagation();
     toggleFavorito(btn);
   } else if (btn.classList.contains("cart") && !btn.disabled) {
+    event.stopPropagation();
     adicionarAoCarrinho(btn);
   }
 });
@@ -612,7 +453,6 @@ document.querySelector(".grid")?.addEventListener("click", (event) => {
   ========================================================= */
 async function init() {
   await renderProdutos();
-  // Carrega favoritos do servidor (só se logado) para pintar os corações certos
   await carregarFavoritosUsuario();
   sincronizarFavoritosVisuais();
 }

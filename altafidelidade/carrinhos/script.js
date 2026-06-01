@@ -92,9 +92,11 @@ function buildCard(item) {
         <input type="checkbox" class="selecao-individual">
         <span class="texto-checkbox btn-selecao">Selecionar</span>
       </label>
+      <button class="btn-remover-item" aria-label="Remover item" title="Remover do carrinho"
+        style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:#999;line-height:1;">✕</button>
       <div class="imagem-produto">
         <img src="${img}" alt="${item.produto.title}"
-             onerror="this.src='./assets/img/lamp.svg'">
+             onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'">
       </div>
       <div class="informacoes-produto">
         <h3 class="titulo-produto">${item.produto.title}</h3>
@@ -156,6 +158,10 @@ function renderItens() {
     card
       .querySelector('[data-acao="diminuir"]')
       ?.addEventListener("click", () => alterarQuantidade(itemId, -1, card));
+
+    card
+      .querySelector(".btn-remover-item")
+      ?.addEventListener("click", () => removerItem(itemId, card));
 
   });
 
