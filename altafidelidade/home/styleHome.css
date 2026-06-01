@@ -29,7 +29,7 @@ body {
     align-items: center;
     justify-content: space-between;
     background-color: var(--header);
-    padding: 16px 24px;
+    padding: 14px 24px;
     position: relative;
     min-height: 68px;
 }
@@ -45,12 +45,11 @@ body {
     height: 20px;
 }
 
-/* LOGO — centralizada de forma absoluta, independente dos ícones laterais */
+/* LOGO */
 .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    flex: 1;
     display: flex;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -58,23 +57,23 @@ body {
     height: 38px;
 }
 
-.home-btn {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-
 /* ICONS — agrupados à direita */
 .icons {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 20px;
     flex-shrink: 0;
 }
 
+.icons a {
+    display: flex;
+    align-items: center;
+}
+
 .icons img {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
+    display: block;
     transition: transform 0.2s;
 }
 
