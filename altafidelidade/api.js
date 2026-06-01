@@ -68,7 +68,7 @@ async function requisicao(metodo, caminho, corpo) {
     throw new Error(erro.erro || erro.mensagem || erro.message || `Erro ${resp.status}`);
   }
 
-  return resp.json();
+  return resp.json().catch(() => null);
 }
 
 const api = {
