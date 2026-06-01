@@ -1,12 +1,21 @@
-/* Importa as regras base compartilhadas e aplica apenas os modificadores de cor para a variação recusada */
-@import url(“status.css”);
+/* Modificadores de cor para a variação "recusada".
+   status.css já é carregado antes no HTML — este arquivo só sobrescreve o necessário. */
 
 .status-banner--err {
     background: var(--red);
 }
 
+.info-card--ok {
+    background: rgba(240, 68, 56, .10);
+    border: 3px solid rgba(240, 68, 56, .60);
+}
+
 .info-card__title {
     color: var(--red);
+}
+
+.btn--ok {
+    background: var(--blue-cta);
 }
 
 .btn--ghost {
