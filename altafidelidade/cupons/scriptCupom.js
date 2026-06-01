@@ -98,10 +98,10 @@ function renderCupons(cupons) {
 
 // ===== FALLBACK: cupons fixos caso a API não retorne nada =====
 const CUPONS_FALLBACK = [
-    { codigo: "ARA6",    descricao: "6% OFF em compras acima de R$50 na Araujo",          desconto: 6,  loja: "Drogaria Araujo", validade: "2025-05-15", ativo: true,  termos: "Cupom não válido para compra de medicamentos." },
-    { codigo: "PHILCO10",descricao: "10% OFF em compras de dois produtos ou mais",         desconto: 10, loja: "Philco",          validade: "2025-12-20", ativo: true,  termos: "Válido na compra mínima de 2 itens participantes." },
-    { codigo: "PONTO10", descricao: "10% OFF em compras de utensílios de cozinha",         desconto: 10, loja: "Ponto",           validade: "2025-05-18", ativo: false, termos: "Promoção limitada ao estoque. Um uso por CPF." },
-    { codigo: "PHILCO5", descricao: "5% OFF em compras de itens lançamento",               desconto: 5,  loja: "Philco",          validade: "2025-06-09", ativo: false, termos: "Não cumulativo com outras promoções." },
+    { codigo: "ARA6",    descricao: "6% OFF em compras acima de R$50 na Araujo",          desconto: 6,  loja: "Drogaria Araujo", validade: "2026-12-31", ativo: true,  termos: "Cupom não válido para compra de medicamentos." },
+    { codigo: "PHILCO10",descricao: "10% OFF em compras de dois produtos ou mais",         desconto: 10, loja: "Philco",          validade: "2026-12-31", ativo: true,  termos: "Válido na compra mínima de 2 itens participantes." },
+    { codigo: "PONTO10", descricao: "10% OFF em compras de utensílios de cozinha",         desconto: 10, loja: "Ponto",           validade: "2026-06-30", ativo: true,  termos: "Promoção limitada ao estoque. Um uso por CPF." },
+    { codigo: "PHILCO5", descricao: "5% OFF em compras de itens lançamento",               desconto: 5,  loja: "Philco",          validade: "2026-09-30", ativo: true,  termos: "Não cumulativo com outras promoções." },
 ];
 
 // ===== CARREGA CUPONS DA API =====
