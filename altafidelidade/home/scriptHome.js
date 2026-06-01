@@ -15,6 +15,23 @@ if (filterBtn && filterMenu) {
       filterMenu.style.display = "none";
     }
   });
+
+  const LINKS_FILTRO = {
+    "Eletrônicos":               "/altafidelidade/categorias/eletronicos/eletronico.html",
+    "Economia de Energia":       "/altafidelidade/categorias/economia de energia/economiaEnergia.html",
+    "Casa, Conforto e Bem-Estar":"/altafidelidade/categorias/conforto/conforto.html",
+    "Eletrodomésticos":          "/altafidelidade/categorias/conforto/conforto.html",
+    "Família e Educação":        "/altafidelidade/categorias/educacao/educacao.html",
+  };
+
+  filterMenu.querySelectorAll("li").forEach((li) => {
+    li.style.cursor = "pointer";
+    li.addEventListener("click", () => {
+      const destino = LINKS_FILTRO[li.textContent.trim()];
+      if (destino) window.location.href = destino;
+      filterMenu.style.display = "none";
+    });
+  });
 }
 
 /* =========================================================
