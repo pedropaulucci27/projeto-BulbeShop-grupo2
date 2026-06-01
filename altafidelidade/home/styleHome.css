@@ -27,7 +27,7 @@ body {
 .header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     background-color: var(--header);
     padding: 14px 24px;
     position: relative;
@@ -44,28 +44,17 @@ body {
     height: 20px;
 }
 
-/* LOGO — sempre no centro exato */
+/* LOGO — centro exato via absolute */
 .logo {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    pointer-events: none;
-}
-
-.logo a {
-    pointer-events: auto;
 }
 
 .logo img {
     height: 40px;
-}
-
-.home-btn {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
 }
 
 /* ICONS — agrupados à direita */
