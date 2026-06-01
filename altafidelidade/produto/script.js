@@ -254,8 +254,12 @@ async function carregarProduto() {
     const descEl = document.querySelector(".product-description, .description, [data-description]");
     if (descEl && p.description) descEl.textContent = p.description;
 
-  } catch {
-    document.querySelector(".product-title").textContent = "Produto não encontrado";
+  } catch (err) {
+    console.error("Erro ao carregar produto:", err);
+    const titleEl = document.querySelector(".product-title");
+    if (titleEl && titleEl.textContent.trim() === "") {
+      titleEl.textContent = "Produto não encontrado";
+    }
     showToast("Não foi possível carregar o produto. Tente novamente.");
   }
 }
