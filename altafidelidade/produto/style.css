@@ -1056,3 +1056,25 @@ body {
 #btn-submit-review:active {
   transform: translateY(1px);
 }
+
+.star-select {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.star-opt {
+  font-size: 28px;
+  color: var(--gray-200);
+  cursor: pointer;
+  transition: color .2s ease, transform .15s ease;
+}
+
+.star-opt:hover {
+  color: #F79009;
+  transform: scale(1.1);
+}
+
+.star-opt.active {
+  color: #F79009;
+}
