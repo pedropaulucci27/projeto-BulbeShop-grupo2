@@ -116,13 +116,19 @@ async function carregarFavoritosDoServidor() {
   try {
     const resposta = await window.api.favoritos.listar();
     const lista = Array.isArray(resposta) ? resposta : (resposta.favoritos || []);
-    const favs = lista.map(p => ({
-      id:       String(p.produtoId || p.id),
-      title:    p.title,
-      price:    `R$ ${parseFloat(p.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-      priceOld: "",
-      img:      p.image || "",
-    }));
+    const favs = lista.map(p => {
+      const produto = p.produto || p;
+      const preco = parseFloat(produto.preco || produto.price || 0);
+      return {
+        id:       String(p.produtoId || produto.id || p.id),
+        title:    produto.nome || produto.name || produto.title || 'Produto',
+        price:    `R$ ${preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+        priceOld: "",
+        img:      window.resolverImagemProduto
+          ? window.resolverImagemProduto(produto.imagem || produto.image || "")
+          : (produto.imagem || produto.image || ""),
+      };
+    });
     saveFavs(favs);
   } catch {}
   renderFavoritos();
