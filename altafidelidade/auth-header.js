@@ -15,7 +15,7 @@
 
     const wrap = document.createElement("div");
     wrap.id = "auth-indicator";
-    wrap.style.cssText = "display:flex;align-items:center;gap:6px;font-size:.75rem;font-family:Poppins,sans-serif;";
+    wrap.style.cssText = "display:flex;align-items:center;gap:10px;font-size:.75rem;font-family:Poppins,sans-serif;";
 
     if (logado && usuario) {
       const iniciais = (usuario.nome || usuario.email || "U")
