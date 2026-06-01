@@ -41,26 +41,31 @@ function typeEffect() {
 typeEffect();
 
 /* =========================================================
-   BUSCA FUNCIONAL
+   BUSCA FUNCIONAL — via API
    ========================================================= */
 const searchInputEl = document.getElementById("search-input");
 const searchBtnEl = document.querySelector(".search-btn");
-const cards = document.querySelectorAll(".card");
 
-function filtrarProdutos() {
-  const termo = (searchInputEl?.value || "").trim().toLowerCase();
+async function buscarProdutos() {
+  const termo = (searchInputEl?.value || "").trim();
+  if (!termo) return;
+  const grid = document.querySelector(".grid");
+  if (!grid) return;
 
-  cards.forEach((card) => {
-    const titulo = card.querySelector(".title")?.textContent.toLowerCase() || "";
-    const preco = card.querySelector(".price-now")?.textContent.toLowerCase() || "";
-    const texto = `${titulo} ${preco}`;
-    card.style.display = termo === "" || texto.includes(termo) ? "block" : "none";
-  });
+  try {
+    const resposta = await window.api.produtos.listar(`?busca=${encodeURIComponent(termo)}`);
+    const lista = (resposta.data || resposta).map(mapearProdutoApi);
+    grid.innerHTML = lista.length
+      ? lista.map(buildCard).join("")
+      : `<p style="padding:16px;color:#666">Nenhum produto encontrado para "<strong>${termo}</strong>".</p>`;
+  } catch {
+    grid.innerHTML = `<p style="padding:16px;color:#666">Erro ao buscar. Tente novamente.</p>`;
+  }
 }
 
-searchBtnEl?.addEventListener("click", filtrarProdutos);
+searchBtnEl?.addEventListener("click", buscarProdutos);
 searchInputEl?.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") filtrarProdutos();
+  if (e.key === "Enter") buscarProdutos();
 });
 
 /* =========================================================
