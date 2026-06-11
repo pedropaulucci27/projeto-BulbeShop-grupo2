@@ -468,6 +468,10 @@ async function carregarProduto() {
     return;
   }
 
+  const IDS_COM_VOLTAGEM = new Set(["2", "4"]);
+  const voltageGroup = document.querySelector('.choices[data-variation="voltage"]')?.closest(".var-group");
+  if (voltageGroup) voltageGroup.style.display = IDS_COM_VOLTAGEM.has(id) ? "" : "none";
+
   // Descrição, avaliações e prateleira por produto (independente da API)
   const descEl = document.getElementById("product-desc");
   if (descEl && DESCRICOES_PRODUTOS[id]) descEl.textContent = DESCRICOES_PRODUTOS[id];
