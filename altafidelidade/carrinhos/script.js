@@ -35,10 +35,38 @@ const moedaBR = (n) =>
 let itensCarrinho = []; // array normalizado [{id, produtoId, quantidade, produto:{title,price,image}}]
 const selecionados = new Set(); // Set de itemId (string)
 
+const IMAGENS_POR_ID = {
+  "1": "/altafidelidade/home/img/luz.png",
+  "2": "/altafidelidade/home/img/blender.jpg",
+  "3": "/altafidelidade/home/img/tupperware.jpg",
+  "4": "/altafidelidade/home/img/ventiladorbritania.webp",
+  "5": "/altafidelidade/home/img/livro.jpg",
+};
+
+const IMAGENS_POR_TITULO = [
+  { re: /liquidificador/i,              src: "/altafidelidade/home/img/blender.jpg" },
+  { re: /tupperware|garrafa de [áa]gua/i, src: "/altafidelidade/home/img/tupperware.jpg" },
+  { re: /l[aâ]mpada|led.*9w/i,         src: "/altafidelidade/home/img/luz.png" },
+  { re: /ventilador/i,                  src: "/altafidelidade/home/img/ventiladorbritania.webp" },
+  { re: /livro|energia.*fique/i,        src: "/altafidelidade/home/img/livro.jpg" },
+];
+
 /* Resolve imagem usando função global do api.js */
 function resolverImg(filename) {
   if (typeof resolverImagemProduto === "function") return resolverImagemProduto(filename);
-  return filename || "./assets/img/lamp.svg";
+  return filename || "/altafidelidade/home/img/ventiladorbritania.webp";
+}
+
+/* Resolve imagem para os mini cards: tenta ID, depois título, depois resolverImg */
+function resolverImgMini(p) {
+  if (IMAGENS_POR_ID[String(p.id)]) return IMAGENS_POR_ID[String(p.id)];
+  const titulo = String(p.title || "");
+  for (const { re, src } of IMAGENS_POR_TITULO) {
+    if (re.test(titulo)) return src;
+  }
+  const url = resolverImg(p.image);
+  if (url && !url.includes("ventiladorbritania")) return url;
+  return "/altafidelidade/home/img/ventiladorbritania.webp";
 }
 
 /* Redireciona para login se não autenticado */
@@ -276,8 +304,8 @@ async function carregarMaisItens() {
         (p) => `
         <article class="cartao-mini" data-produto-id="${p.id}">
           <div class="miniatura-produto">
-            <img src="${resolverImg(p.image)}" alt="${p.title}"
-                 onerror="this.src='./assets/img/lamp.svg'">
+            <img src="${resolverImgMini(p)}" alt="${p.title}"
+                 onerror="this.onerror=null;this.src='/altafidelidade/home/img/ventiladorbritania.webp'">
           </div>
           <h4 class="titulo-mini">${p.title}</h4>
           <div class="preco-mini"><strong>${moedaBR(p.price)}</strong></div>
