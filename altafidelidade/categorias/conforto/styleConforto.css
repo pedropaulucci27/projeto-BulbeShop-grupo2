@@ -26,12 +26,12 @@ body {
 /* HEADER */
 .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     background-color: var(--header);
-    /* Azul escuro */
-    padding: 10px 20px;
+    padding: 14px 24px;
     position: relative;
+    min-height: 68px;
 }
 
 .header img {
@@ -46,19 +46,34 @@ body {
 }
 
 /* LOGO */
+.logo {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 .logo img {
-    height: 40px;
+    height: 38px;
 }
 
 /* ICONS */
 .icons {
     display: flex;
-    gap: 15px;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.icons a {
+    display: flex;
+    align-items: center;
 }
 
 .icons img {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
+    display: block;
     transition: transform 0.2s;
 }
 

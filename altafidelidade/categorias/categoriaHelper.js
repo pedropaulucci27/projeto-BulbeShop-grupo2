@@ -110,3 +110,25 @@ async function renderProdutosCategoria(categoriaSlug) {
 }
 
 window.renderProdutosCategoria = renderProdutosCategoria;
+
+/* BOTÃO DO CARRINHO NO HEADER */
+document.addEventListener("DOMContentLoaded", () => {
+  const btnCarrinho = document.getElementById("btnCarrinho");
+  if (!btnCarrinho) return;
+  btnCarrinho.style.cursor = "pointer";
+  btnCarrinho.addEventListener("click", async () => {
+    if (!window.api?.estaLogado()) {
+      window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
+      return;
+    }
+    try {
+      const itens = await window.api.carrinho.listar();
+      const lista = Array.isArray(itens) ? itens : (itens.itens || itens.items || []);
+      window.location.href = lista.length > 0
+        ? "/altafidelidade/carrinhos/carrinho.html"
+        : "/altafidelidade/carrinhovazio/carrinhovazio.html";
+    } catch {
+      window.location.href = "/altafidelidade/carrinhovazio/carrinhovazio.html";
+    }
+  });
+});
