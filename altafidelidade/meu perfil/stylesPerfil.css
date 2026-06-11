@@ -88,6 +88,9 @@ body {
     width: 32px;
     height: 32px;
     background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
 .back-btn img {
