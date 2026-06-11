@@ -244,7 +244,52 @@ async function carregarMaisItens() {
   }
 }
 
+function compartilharFavoritos() {
+  const favs = getFavs();
+  if (favs.length === 0) {
+    alert("Sua lista de favoritos está vazia.");
+    return;
+  }
+
+  const linhas = favs.map(f => {
+    const link = `https://bulbeshop.com.br/produto/${f.id}`;
+    return `• ${f.title} — ${f.price}\n  ${link}`;
+  });
+  const texto = `Minha lista de favoritos na Bulbe:\n\n${linhas.join("\n\n")}`;
+
+  if (navigator.share) {
+    navigator.share({ title: "Meus Favoritos • Bulbe", text: texto })
+      .catch(() => {});
+    navigator.clipboard.writeText(texto)
+      .then(() => mostrarToast("Lista também copiada para a área de transferência!"))
+      .catch(() => {});
+    return;
+  }
+
+  // Fallback: copiar para área de transferência
+  navigator.clipboard.writeText(texto).then(() => {
+    mostrarToast("Lista copiada para a área de transferência!");
+  }).catch(() => {
+    alert(texto);
+  });
+}
+
+function mostrarToast(msg) {
+  const toast = document.createElement("div");
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 8px;
+    font-size: 14px; z-index: 9999; opacity: 1; transition: opacity 0.4s;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = "0"; }, 2000);
+  setTimeout(() => toast.remove(), 2400);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   carregarFavoritosDoServidor();
   carregarMaisItens();
+
+  document.querySelector(".share-btn")?.addEventListener("click", compartilharFavoritos);
 });
