@@ -8,6 +8,22 @@ const IMAGENS_PRODUTOS = {
   "livro-energia-fique-por-dentro.jpg":   "/altafidelidade/home/img/livro.jpg",
 };
 
+const IMAGENS_POR_ID = {
+  "1": "/altafidelidade/home/img/luz.png",
+  "2": "/altafidelidade/home/img/blender.jpg",
+  "3": "/altafidelidade/home/img/tupperware.jpg",
+  "4": "/altafidelidade/home/img/ventiladorbritania.webp",
+  "5": "/altafidelidade/home/img/livro.jpg",
+};
+
+const IMAGENS_POR_TITULO = [
+  { re: /liquidificador/i,                src: "/altafidelidade/home/img/blender.jpg" },
+  { re: /tupperware|garrafa de [áa]gua/i, src: "/altafidelidade/home/img/tupperware.jpg" },
+  { re: /l[aâ]mpada|led.*9w/i,            src: "/altafidelidade/home/img/luz.png" },
+  { re: /ventilador/i,                    src: "/altafidelidade/home/img/ventiladorbritania.webp" },
+  { re: /livro|energia.*fique/i,          src: "/altafidelidade/home/img/livro.jpg" },
+];
+
 function resolverImagemProduto(filename) {
   if (!filename) return "/altafidelidade/home/img/ventiladorbritania.webp";
   if (filename.startsWith("http") || filename.startsWith("/altafidelidade")) return filename;
@@ -15,6 +31,21 @@ function resolverImagemProduto(filename) {
   if (local) return local;
   if (filename.startsWith("/")) return `http://localhost:3000${filename}`;
   return "/altafidelidade/home/img/ventiladorbritania.webp";
+}
+
+// Igual a resolverImagemProduto, mas com fallback por id/título quando o
+// nome de arquivo vindo da API não bate com IMAGENS_PRODUTOS (evita cair
+// na imagem padrão do ventilador para outros produtos).
+function resolverImagemProdutoCompleta(p) {
+  const porId = IMAGENS_POR_ID[String(p.id)];
+  if (porId) return porId;
+
+  const titulo = String(p.title || p.alt || "");
+  for (const { re, src } of IMAGENS_POR_TITULO) {
+    if (re.test(titulo)) return src;
+  }
+
+  return resolverImagemProduto(p.image);
 }
 
 function getToken() {

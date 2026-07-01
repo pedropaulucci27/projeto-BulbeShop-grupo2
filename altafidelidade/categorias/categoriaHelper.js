@@ -15,7 +15,7 @@ function buildCardCategoria(p) {
     : "";
 
   const link  = `/altafidelidade/produto/produto.html?id=${p.id}`;
-  const img   = resolverImagemProduto(p.image);
+  const img   = resolverImagemProdutoCompleta(p);
   const preco = parseFloat(p.price);
 
   return `

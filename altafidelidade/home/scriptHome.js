@@ -259,7 +259,7 @@ function mapearProdutoApi(p) {
   return {
     id:       String(p.id),
     badge:    p.destaque ? "flash" : null,
-    img:      resolverImagemProduto(p.image),
+    img:      resolverImagemProdutoCompleta(p),
     alt:      p.title,
     title:    p.title,
     price:    parseFloat(p.price),
