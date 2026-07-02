@@ -88,7 +88,7 @@ function normalizarItens(resp) {
 
 /* Gera o HTML de um card de produto, usando as mesmas classes do layout original */
 function buildCard(item) {
-  const img = resolverImg(item.produto.image);
+  const img = resolverImgMini({ id: item.produtoId, title: item.produto.title, image: item.produto.image });
   const preco = item.produto.price;
   const qty = item.quantidade;
 
@@ -258,7 +258,7 @@ function atualizarResumo() {
   if (totalEl) totalEl.textContent = moedaBR(total);
   if (tituloEl) tituloEl.textContent = primeiro.produto.title;
   if (imgEl) {
-    imgEl.src = resolverImg(primeiro.produto.image);
+    imgEl.src = resolverImgMini({ id: primeiro.produtoId, title: primeiro.produto.title, image: primeiro.produto.image });
     imgEl.alt = primeiro.produto.title;
   }
   if (qtdEl) qtdEl.textContent = primeiro.quantidade;
