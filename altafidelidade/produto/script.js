@@ -201,14 +201,6 @@ const DESCRICOES_PRODUTOS = {
   "5": "O livro 'Energia: Fique por Dentro' é o guia completo sobre eficiência energética e sustentabilidade. Aborda desde conceitos básicos até estratégias avançadas para reduzir o consumo em casa e no trabalho. Linguagem acessível, com dicas práticas e informações sobre fontes renováveis. Leitura essencial para quem quer economizar.",
 };
 
-const RATINGS_BASE = {
-  "1": { score: 4.8, count: 127 },
-  "2": { score: 4.9, count: 203 },
-  "3": { score: 4.7, count: 89  },
-  "4": { score: 4.7, count: 347 },
-  "5": { score: 4.6, count: 54  },
-};
-
 const REVIEWS_SEED = {
   "1": [
     { nome: "Carlos M.",   estrelas: 5, variacao: "9W | Luz Branca",  texto: "Lâmpada excelente! Ilumina muito bem e o consumo é mínimo. Já comprei 5 para casa toda e vou comprar mais." },
@@ -267,8 +259,6 @@ function starsStr(n) {
 
 async function renderizarAvaliacoes(id) {
   let avaliacoesAPI  = [];
-  let mediaAPI       = null;
-  let totalAPI       = null;
 
   // Tenta buscar da API
   if (window.api) {
@@ -281,8 +271,6 @@ async function renderizarAvaliacoes(id) {
         variacao: "",
         texto:    a.comentario || "",
       }));
-      mediaAPI = resp.produto?.media;
-      totalAPI = resp.total;
     } catch (e) {
       console.warn("API de avaliações indisponível, usando dados locais.", e);
     }
@@ -297,20 +285,13 @@ async function renderizarAvaliacoes(id) {
     ? [...user, ...avaliacoesAPI]   // comentários locais pendentes + API
     : [...user, ...seed];
 
-  // Calcula scores. Usa a mesma condição de "all" (avaliacoesAPI.length) para
-  // decidir a fonte, em vez de mediaAPI !== null: a API pode devolver uma
-  // média "produto.media" mesmo com 0 avaliações reais, e misturá-la com o
-  // total de avaliações locais gerava uma soma sem peso (ex.: 4.7 + 5 = 9.7).
-  const temAPI     = avaliacoesAPI.length > 0;
-  const base       = RATINGS_BASE[id] || { score: 5.0, count: 0 };
-  const userSum    = user.reduce((s, r) => s + r.estrelas, 0);
-  const baseCount  = temAPI ? (totalAPI ?? avaliacoesAPI.length) : base.count;
-  const baseScore  = temAPI ? mediaAPI : base.score;
-  const totalCount = baseCount + user.length;
-  const scoreBruto = user.length
-    ? (baseScore * baseCount + userSum) / totalCount
-    : baseScore;
-  const scoreNum   = Math.max(0, Math.min(5, scoreBruto));
+  // Nota e contagem vêm exclusivamente das avaliações realmente exibidas em
+  // "all" (sem baseline fixo), para que "X avaliações" sempre bata com a
+  // quantidade de comentários mostrados na página.
+  const totalCount = all.length;
+  const scoreNum   = totalCount
+    ? Math.max(0, Math.min(5, all.reduce((s, r) => s + r.estrelas, 0) / totalCount))
+    : 0;
 
   // Atualiza cabeçalho de avaliações
   const scoreEl = document.getElementById("score-big-val");
