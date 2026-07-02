@@ -297,15 +297,20 @@ async function renderizarAvaliacoes(id) {
     ? [...user, ...avaliacoesAPI]   // comentários locais pendentes + API
     : [...user, ...seed];
 
-  // Calcula scores
+  // Calcula scores. Usa a mesma condição de "all" (avaliacoesAPI.length) para
+  // decidir a fonte, em vez de mediaAPI !== null: a API pode devolver uma
+  // média "produto.media" mesmo com 0 avaliações reais, e misturá-la com o
+  // total de avaliações locais gerava uma soma sem peso (ex.: 4.7 + 5 = 9.7).
+  const temAPI     = avaliacoesAPI.length > 0;
   const base       = RATINGS_BASE[id] || { score: 5.0, count: 0 };
   const userSum    = user.reduce((s, r) => s + r.estrelas, 0);
-  const totalCount = totalAPI !== null
-    ? totalAPI + user.length
-    : base.count + user.length;
-  const scoreNum   = mediaAPI !== null
-    ? (user.length ? (mediaAPI * (totalAPI || 1) + userSum) / (totalCount) : mediaAPI)
-    : (user.length ? (base.score * base.count + userSum) / (base.count + user.length) : base.score);
+  const baseCount  = temAPI ? (totalAPI ?? avaliacoesAPI.length) : base.count;
+  const baseScore  = temAPI ? mediaAPI : base.score;
+  const totalCount = baseCount + user.length;
+  const scoreBruto = user.length
+    ? (baseScore * baseCount + userSum) / totalCount
+    : baseScore;
+  const scoreNum   = Math.max(0, Math.min(5, scoreBruto));
 
   // Atualiza cabeçalho de avaliações
   const scoreEl = document.getElementById("score-big-val");
