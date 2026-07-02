@@ -74,6 +74,7 @@ function renderCupons(cupons) {
             <div class="cta">
                 <button class="btn redeem-btn${expirado ? " btn--expirado" : ""}"
                     data-code="${codigo}" data-merchant="${loja || codigo}" data-discount="${descontoStr}"
+                    data-tipo="${tipo}" data-valor="${valorDesc}" data-descricao="${descricao}"
                     ${expirado ? "disabled aria-disabled='true'" : ""}>
                     ${expirado ? "Cupom expirado" : "Resgatar cupom"}
                 </button>
@@ -86,6 +87,7 @@ function renderCupons(cupons) {
                 <div class="panel-info"><span class="i">i</span><span>${cupom.termos || "Consulte as condições de uso."}</span></div>
                 <button class="btn redeem-btn${expirado ? " btn--expirado" : ""}"
                     data-code="${codigo}" data-merchant="${loja || codigo}" data-discount="${descontoStr}"
+                    data-tipo="${tipo}" data-valor="${valorDesc}" data-descricao="${descricao}"
                     ${expirado ? "disabled aria-disabled='true'" : ""}>
                     ${expirado ? "Cupom expirado" : "Resgatar cupom"}
                 </button>
@@ -103,6 +105,17 @@ const CUPONS_FALLBACK = [
     { codigo: "PONTO10", descricao: "10% OFF em compras de utensílios de cozinha",         desconto: 10, loja: "Ponto",           validade: "2026-06-30", ativo: true,  termos: "Promoção limitada ao estoque. Um uso por CPF." },
     { codigo: "PHILCO5", descricao: "5% OFF em compras de itens lançamento",               desconto: 5,  loja: "Philco",          validade: "2026-09-30", ativo: true,  termos: "Não cumulativo com outras promoções." },
 ];
+
+// ===== CUPONS RESGATADOS (disponíveis para uso no checkout) =====
+const CHAVE_CUPONS_RESGATADOS = "bulbe:cupons:resgatados";
+
+function salvarCupomResgatado(cupom) {
+    let lista = [];
+    try { lista = JSON.parse(localStorage.getItem(CHAVE_CUPONS_RESGATADOS) || "[]"); } catch {}
+    lista = lista.filter(c => c.codigo !== cupom.codigo);
+    lista.push(cupom);
+    localStorage.setItem(CHAVE_CUPONS_RESGATADOS, JSON.stringify(lista));
+}
 
 // ===== CARREGA CUPONS DA API =====
 async function carregarCupons() {
@@ -158,11 +171,15 @@ function bindEventos() {
             const code     = btn.dataset.code;
             const merchant = btn.dataset.merchant;
             const discount = btn.dataset.discount;
+            const tipo     = btn.dataset.tipo || "%";
+            const valor    = Number(btn.dataset.valor || 0);
+            const descricao = btn.dataset.descricao || "";
 
             btn.disabled = true;
             try {
                 if (window.api) await window.api.cupons.buscar(code);
                 localStorage.setItem("bulbe:cupom", code);
+                salvarCupomResgatado({ codigo: code, tipo, desconto: valor, loja: merchant, descricao });
                 showToast(
                     "success",
                     "Cupom resgatado com sucesso",

@@ -144,6 +144,25 @@
       <div class="review-total"><span>Total do pedido:</span><strong id="review-total-final">R$ 0,00</strong></div>
     </section>
 
+    <!-- CUPOM DE DESCONTO -->
+    <section class="payment-card">
+      <div class="payment-card__title">
+        <img src="/altafidelidade/pagamento1/.assets/img/wallet-02.svg" alt="">
+        <span>Cupom de desconto</span>
+      </div>
+      <div class="payment-card__hint">Escolha entre os cupons resgatados no seu perfil:</div>
+
+      <div class="selectbox" id="cupomSelect" aria-expanded="false">
+        <button type="button" class="selectbox__head" aria-haspopup="listbox" aria-expanded="false">
+          <span class="selectbox__dot"></span>
+          <span class="selectbox__label">Nenhum cupom disponível</span>
+          <img class="selectbox__chev" src="/altafidelidade/pagamento1/.assets/img/chevron-right.svg" alt="">
+        </button>
+
+        <ul class="selectbox__list" role="listbox" id="cupomList"></ul>
+      </div>
+    </section>
+
     <!-- MÉTODO DE PAGAMENTO -->
     <section class="payment-card">
       <div class="payment-card__title">
